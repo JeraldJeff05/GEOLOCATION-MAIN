@@ -195,6 +195,81 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  // New function to test a specific location against the polygon
+  void _showTestLocationDialog() {
+    final TextEditingController latitudeController = TextEditingController();
+    final TextEditingController longitudeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Test Location'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: latitudeController,
+                decoration: InputDecoration(
+                  labelText: 'Latitude',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: longitudeController,
+                decoration: InputDecoration(
+                  labelText: 'Longitude',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                double? latitude = double.tryParse(latitudeController.text);
+                double? longitude = double.tryParse(longitudeController.text);
+
+                if (latitude != null && longitude != null) {
+                  if (_isPointInPolygon(LatLng(latitude, longitude), polygon)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Input location is within the allowed range.')),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(
+                              'Input location is NOT within the allowed range.')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content:
+                            Text('Please enter valid latitude and longitude.')),
+                  );
+                }
+                Navigator.of(context).pop();
+              },
+              child: Text('Test'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -245,6 +320,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text('Show Location'),
                 onPressed: _showCurrentLocationDialog,
               ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                child: Text('Test Input Location'),
+                onPressed: _showTestLocationDialog,
+              ),
             ],
           ),
         ),
@@ -259,6 +339,14 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Screen'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Text('Welcome to the home screen'),
