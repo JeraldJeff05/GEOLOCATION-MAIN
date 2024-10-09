@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,14 +31,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
 
-  // Define the coordinates of the polygon
-  final List<LatLng> polygon = [
-    LatLng(14.06774778322239, 121.32702398552827),
-    LatLng(14.06781200198926, 121.32696747614202),
-    LatLng(14.068096626677226, 121.32723899181457),
-    LatLng(14.06816583416237, 121.32714354050331),
-    LatLng(14.06774778322239, 121.32702398552827),
-  ];
+  final double minLatitude = 14.06727248844374;
+  final double maxLatitude = 14.068567511556262;
+  final double minLongitude = 121.32635146800003;
+  final double maxLongitude = 121.32768653199999;
 
   Future<void> _getCurrentLocationAndLogin() async {
     bool serviceEnabled;
@@ -72,8 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
         desiredAccuracy: LocationAccuracy.high);
 
     // Check if the user's location is within the allowed area
-    if (!_isPointInPolygon(
-        LatLng(position.latitude, position.longitude), polygon)) {
+    if (!_isLocationInRange(position.latitude, position.longitude)) {
       _showLocationErrorDialog(
           "You are not within the allowed location range and cannot access this site.");
     } else {
@@ -82,33 +76,12 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // Function to determine if a point is inside a polygon
-  bool _isPointInPolygon(LatLng point, List<LatLng> polygon) {
-    int intersectCount = 0;
-    for (int j = 0; j < polygon.length - 1; j++) {
-      if (_rayCastIntersect(point, polygon[j], polygon[j + 1])) {
-        intersectCount++;
-      }
-    }
-    return (intersectCount % 2) == 1; // odd count means inside
-  }
-
-  // Helper function for the ray-casting algorithm
-  bool _rayCastIntersect(LatLng point, LatLng vertA, LatLng vertB) {
-    double ax = vertA.longitude;
-    double ay = vertA.latitude;
-    double bx = vertB.longitude;
-    double by = vertB.latitude;
-    double px = point.longitude;
-    double py = point.latitude;
-
-    if ((ay > py && by > py) || (ay < py && by < py) || (ax < px && bx < px)) {
-      return false;
-    }
-
-    double m = (by - ay) / (bx - ax);
-    double intersectX = (py - ay) / m + ax;
-    return intersectX > px;
+  // Function to check if the location is within the defined ranges
+  bool _isLocationInRange(double latitude, double longitude) {
+    return latitude >= minLatitude &&
+        latitude <= maxLatitude &&
+        longitude >= minLongitude &&
+        longitude <= maxLongitude;
   }
 
   Future<void> _showCurrentLocationDialog() async {
@@ -195,7 +168,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  // New function to test a specific location against the polygon
+  // Function to show input dialog for testing location
   void _showTestLocationDialog() {
     final TextEditingController latitudeController = TextEditingController();
     final TextEditingController longitudeController = TextEditingController();
@@ -234,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 double? longitude = double.tryParse(longitudeController.text);
 
                 if (latitude != null && longitude != null) {
-                  if (_isPointInPolygon(LatLng(latitude, longitude), polygon)) {
+                  if (_isLocationInRange(latitude, longitude)) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                           content: Text(
