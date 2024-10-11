@@ -22,7 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _showLocationErrorDialog(
           "You are not within the allowed location range and cannot access this site.");
     } else {
-      _login();
+      _login(); // Make sure this function does what you intend
     }
   }
 
@@ -91,28 +91,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _showWelcomeDialog() {
-    _showDialog('Welcome', 'Welcome to FDS!');
-    Navigator.pushReplacementNamed(context, '/home');
-  }
-
-  void _login() {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState?.save();
-      if (_username == 'admin' && _password == 'admin') {
-        _showWelcomeDialog();
-      } else {
-        _showSnackbar('Invalid username or password');
-      }
-    }
-  }
-
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   void _showTestLocationDialog() {
     final TextEditingController latitudeController = TextEditingController();
     final TextEditingController longitudeController = TextEditingController();
@@ -154,7 +132,23 @@ class _MyHomePageState extends State<MyHomePage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(),
+        labelStyle: TextStyle(color: Colors.white), // Set label color
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(color: Colors.white), // Set border color
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide:
+              BorderSide(color: Colors.white), // Set enabled border color
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(
+              color: Colors.orangeAccent), // Set focused border color
+        ),
+        filled: true,
+        fillColor: Color(0xFF800000), // Background color
       ),
       keyboardType: TextInputType.number,
     );
@@ -172,23 +166,44 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _login() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _formKey.currentState?.save();
+      if (_username == 'admin' && _password == 'admin') {
+        _showWelcomeDialog();
+      } else {
+        _showSnackbar('Invalid username or password');
+      }
+    }
+  }
+
+  void _showWelcomeDialog() {
+    _showDialog('Welcome', 'Welcome to FDS!');
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
                     'assets/background.png'), // Background image path
-                fit: BoxFit.cover, // Cover the entire background
+                fit: BoxFit.cover,
               ),
             ),
           ),
           Align(
-            alignment: Alignment.centerRight, // Aligns the form to the right
+            alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.all(20.0),
               child: _buildLoginForm(),
@@ -196,15 +211,53 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showSettingsMenu,
+        child: Icon(Icons.settings),
+        backgroundColor: Colors.white38,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  void _showSettingsMenu() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.location_on),
+                title: Text('Show Location'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showCurrentLocationDialog();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.settings), // Changed to an available icon
+                title: Text('Test Input Location'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showTestLocationDialog();
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildLoginForm() {
     return Container(
-      width: 500, // Adjust the width of the login form
-      padding: EdgeInsets.all(20.0),
+      width: 400,
+      padding: EdgeInsets.all(50.00),
       decoration: BoxDecoration(
-        color: Colors.white38.withOpacity(1.0),
+        color: Color(0xFF800000).withOpacity(1.0),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Form(
@@ -216,9 +269,9 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               "Employee’s Log",
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Colors.brown,
+                color: Colors.white,
               ),
             ),
             SizedBox(height: 20),
@@ -243,22 +296,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 30),
             _buildGradientButton('Login', _getCurrentLocationAndLogin),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showCurrentLocationDialog,
-              child: Text('Show Location'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(200, 50),
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _showTestLocationDialog,
-              child: Text('Test Input Location'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size(200, 50),
-              ),
-            ),
           ],
         ),
       ),
@@ -271,7 +308,7 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 50,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.orange, Colors.red],
+          colors: [Colors.deepOrange, Colors.red],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -281,7 +318,11 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: onPressed,
         child: Text(
           text,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white, // Change color to black here
+          ),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
@@ -300,9 +341,23 @@ class _MyHomePageState extends State<MyHomePage> {
     return TextFormField(
       decoration: InputDecoration(
         labelText: labelText,
+        labelStyle: TextStyle(color: Colors.white), // Set label color
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(color: Colors.white), // Set border color
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide:
+              BorderSide(color: Colors.white), // Set enabled border color
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          borderSide: BorderSide(
+              color: Colors.deepOrangeAccent), // Set focused border color
+        ),
+        filled: true,
+        fillColor: Color(0xFF800000), // Background color
       ),
       obscureText: obscureText,
       validator: validator,
