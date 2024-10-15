@@ -15,6 +15,9 @@ class _MyHomePageState extends State<MyHomePage> {
   final double minLongitude = 121.32635146800003;
   final double maxLongitude = 121.32768653199999;
 
+  final double _loginBoxTop = 250.0; // Position from the top
+  final double _loginBoxLeft = 495.5; // Position from the left
+
   Future<void> _getCurrentLocationAndLogin() async {
     if (!await _checkLocationService()) return;
     Position position = await _getCurrentPosition();
@@ -22,34 +25,38 @@ class _MyHomePageState extends State<MyHomePage> {
       _showLocationErrorDialog(
           "You are not within the allowed location range and cannot access this site.");
     } else {
-      _login(); // Make sure this function does what you intend
+      _login();
     }
   }
 
   Future<bool> _checkLocationService() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      _showLocationErrorDialog("Location services are disabled.");
+      _showLocationErrorDialog(
+          "Location services are disabled. Please enable them in your device settings.");
       return false;
     }
+
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        _showLocationErrorDialog("Location permissions are denied.");
+        _showLocationErrorDialog(
+            "Location permissions are denied. Please grant permissions to proceed.");
         return false;
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
-      _showLocationErrorDialog("Location permissions are permanently denied.");
+      _showLocationErrorDialog(
+          "Location permissions are permanently denied. Please enable them in settings.");
       return false;
     }
     return true;
   }
 
   Future<Position> _getCurrentPosition() {
-    return Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    return Geolocator.getCurrentPosition();
   }
 
   bool _isLocationInRange(double latitude, double longitude) {
@@ -83,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -99,12 +106,12 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Test Location'),
+          title: const Text('Test Location'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildTextField(latitudeController, 'Latitude'),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               _buildTextField(longitudeController, 'Longitude'),
             ],
           ),
@@ -115,11 +122,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     latitudeController.text, longitudeController.text);
                 Navigator.of(context).pop();
               },
-              child: Text('Test'),
+              child: const Text('Test'),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -132,23 +139,21 @@ class _MyHomePageState extends State<MyHomePage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white), // Set label color
+        labelStyle: const TextStyle(color: Colors.white),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: Colors.white), // Set border color
+          borderSide: const BorderSide(color: Colors.white),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide:
-              BorderSide(color: Colors.white), // Set enabled border color
+          borderSide: const BorderSide(color: Colors.white),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(
-              color: Colors.orangeAccent), // Set focused border color
+          borderSide: const BorderSide(color: Colors.orangeAccent),
         ),
         filled: true,
-        fillColor: Color(0xFF800000), // Background color
+        fillColor: const Color(0xFF800000),
       ),
       keyboardType: TextInputType.number,
     );
@@ -190,31 +195,37 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final loginBoxWidth = screenSize.width; // 80% of screen width
+
     return Scaffold(
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'assets/background.png'), // Background image path
+                image: AssetImage('assets/bgminimalist.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: _buildLoginForm(),
-            ),
+          Positioned(
+            left: _loginBoxLeft, // Use your defined position
+            top: _loginBoxTop, // Use your defined position
+            child: _buildLoginForm(loginBoxWidth),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showSettingsMenu,
-        child: Icon(Icons.settings),
-        backgroundColor: Colors.white38,
+        backgroundColor: Colors.transparent, // No background color
+        foregroundColor:
+            Colors.transparent, // Change to your desired icon color
+        elevation: 0, // Remove shadow
+        child: const Icon(
+          Icons.settings,
+          size: 50, // Change this value to adjust the icon size
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -225,21 +236,21 @@ class _MyHomePageState extends State<MyHomePage> {
       context: context,
       builder: (BuildContext context) {
         return Container(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.location_on),
-                title: Text('Show Location'),
+                leading: const Icon(Icons.location_on),
+                title: const Text('Show Location'),
                 onTap: () {
                   Navigator.pop(context);
                   _showCurrentLocationDialog();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.settings), // Changed to an available icon
-                title: Text('Test Input Location'),
+                leading: const Icon(Icons.settings),
+                title: const Text('Test Input Location'),
                 onTap: () {
                   Navigator.pop(context);
                   _showTestLocationDialog();
@@ -252,13 +263,22 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(double width) {
     return Container(
-      width: 400,
-      padding: EdgeInsets.all(50.00),
+      width: 450,
+      padding: const EdgeInsets.all(50.0),
+      height: 450, // Optional: You can also set a height if needed
       decoration: BoxDecoration(
-        color: Color(0xFF800000).withOpacity(1.0),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFFFFFFFF).withOpacity(1.0),
+        borderRadius: BorderRadius.circular(0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.5),
+            spreadRadius: 5,
+            blurRadius: 10,
+            offset: const Offset(0, 5), // changes the position of the shadow
+          ),
+        ],
       ),
       child: Form(
         key: _formKey,
@@ -266,35 +286,39 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              "Employee’s Log",
+            const Text(
+              "Associate's Log",
               style: TextStyle(
-                fontSize: 32,
+                height: 1,
+                fontSize: 42,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Color(0xFF000000),
               ),
             ),
-            SizedBox(height: 20),
-            SizedBox(
-              width: 300,
-              child: _buildTextFieldWithValidation('Username', (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your username';
-                }
-                return null;
-              }, (value) => _username = value),
+            const Text(
+              "",
+              style: TextStyle(
+                height: 1,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF000000),
+              ),
             ),
-            SizedBox(height: 20),
-            SizedBox(
-              width: 300,
-              child: _buildTextFieldWithValidation('Password', (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
-              }, (value) => _password = value, obscureText: true),
-            ),
-            SizedBox(height: 30),
+            const SizedBox(height: 20),
+            _buildTextFieldWithValidation('Username', (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your username';
+              }
+              return null;
+            }, (value) => _username = value),
+            const SizedBox(height: 20),
+            _buildTextFieldWithValidation('Password', (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter your password';
+              }
+              return null;
+            }, (value) => _password = value, obscureText: true),
+            const SizedBox(height: 30),
             _buildGradientButton('Login', _getCurrentLocationAndLogin),
           ],
         ),
@@ -303,32 +327,36 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildGradientButton(String text, VoidCallback onPressed) {
-    return Container(
-      width: 200,
-      height: 50,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.deepOrange, Colors.red],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(25),
-      ),
+    return SizedBox(
+      width: 100,
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(
-          text,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white, // Change color to black here
+        style: ElevatedButton.styleFrom(
+          backgroundColor:
+              Colors.transparent, // Set background color to transparent
+          elevation: 0, // Remove shadow
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF800000), Color(0xFF800000)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            constraints:
+                const BoxConstraints(maxWidth: double.infinity, minHeight: 50),
+            alignment: Alignment.center,
+            child: Text(
+              text,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+            ),
           ),
         ),
       ),
@@ -336,30 +364,29 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildTextFieldWithValidation(String labelText,
-      String? Function(String?) validator, void Function(String?) onSaved,
+      String? Function(String?)? validator, void Function(String?)? onSaved,
       {bool obscureText = false}) {
     return TextFormField(
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: TextStyle(color: Colors.white), // Set label color
+        labelStyle: const TextStyle(color: Colors.black),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: Colors.white), // Set border color
+          borderSide: const BorderSide(color: Colors.black),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide:
-              BorderSide(color: Colors.white), // Set enabled border color
+          borderSide: const BorderSide(color: Colors.black),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(
-              color: Colors.deepOrangeAccent), // Set focused border color
+          borderSide: const BorderSide(color: Colors.orangeAccent),
         ),
         filled: true,
-        fillColor: Color(0xFF800000), // Background color
+        fillColor: const Color(0xFFF8F8F8),
       ),
-      obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
       validator: validator,
       onSaved: onSaved,
     );
