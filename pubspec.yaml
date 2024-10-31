@@ -30,7 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-    
+  shared_preferences: ^2.0.0  # Ensure you have this for storing user data
+  email_validator: ^2.0.1
+  
   marquee: ^2.1.0
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -39,6 +41,9 @@ dependencies:
   latlong2: ^0.9.1
   google_maps_flutter: ^2.9.0
   geolocator_web: ^4.1.1
+  table_calendar: ^3.1.2
+  
+    
 
 dev_dependencies:
   flutter_test:
@@ -64,8 +69,15 @@ flutter:
    
     - assets/design.png
     - assets/design2.png
-    - assets/bg3.png
+    - assets/muchmorebetterbg.png
     - assets/bgminimalist.png
+    - assets/peeps.png
+    - assets/bigsize.png
+  
+  fonts:
+    - family: CustomFont
+      fonts:
+        - asset: assets/fonts/Moderniz.otf
     
   
   
