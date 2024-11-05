@@ -152,15 +152,15 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/muchmorebetterbg.png'),
+                image: AssetImage('assets/Autumn.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Positioned(
             top: screenHeight *
-                0.335, // Adjust this percentage to move form up/down
-            left: 0,
+                0.185, // Adjust this percentage to move form up/down
+            left: 55,
             right: 0,
             child: Center(
               child: _buildLoginForm(),
@@ -173,18 +173,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildLoginForm() {
     return Container(
-      width: 420,
-      height: 400,
-      padding: const EdgeInsets.all(20.0),
+      width: 560,
+      height: 550,
+      padding: const EdgeInsets.all(30.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        color: Color(0xFFF9D689).withOpacity(0.8),
+        borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 5,
             blurRadius: 10,
-            offset: const Offset(0, 5),
+            offset: const Offset(50, 5),
           ),
         ],
       ),
@@ -219,33 +219,84 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Associate's Log",
-                  style: TextStyle(
-                    fontFamily: 'CustomFont',
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
+                Image.asset(
+                  'assets/FINALFDS.png', // Replace with the path to your image
+                  width: 600,
+                  height: 140,
+                  fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 20),
-                _buildTextFieldWithValidation('Username', (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your username';
-                  }
-                  return null;
-                }, (value) => _username = value),
-                const SizedBox(height: 20),
-                _buildTextFieldWithValidation('Password', (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                }, (value) => _password = value, obscureText: true),
-                const SizedBox(height: 30),
-                _buildGradientButton('Login', _getCurrentLocationAndLogin),
                 const SizedBox(height: 10),
-                _buildGradientButton('Sign In', _signIn),
+                _buildTextFieldWithValidation(
+                  icon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your username';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _username = value,
+                ),
+                const SizedBox(height: 10),
+                _buildTextFieldWithValidation(
+                  icon: Icons.lock,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _password = value,
+                  obscureText: true,
+                ),
+                const SizedBox(height: 15),
+                _buildGradientButton('Login', _getCurrentLocationAndLogin),
+                const SizedBox(height: 25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Divider(
+                          thickness: 2, color: Colors.black), // Straight line
+                    ),
+                    const SizedBox(width: 20), // Space between line and text
+                    const Text(
+                        style: TextStyle(
+                          fontFamily: 'CustomFont',
+                          fontSize: 15,
+                        ),
+                        "Sign up "),
+                    GestureDetector(
+                      onTap: _signIn,
+                      child: Text(
+                        "Here",
+                        style: TextStyle(
+                          color: Color(0xFF630606),
+                          fontFamily: 'CustomFont',
+                          fontSize: 15,
+                          // Change color for the clickable part
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 20), // Space between text and line
+                    Expanded(
+                      child: Divider(
+                          thickness: 2, color: Colors.black), // Straight line
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30), // Space before the new text
+                const Text(
+                  "We Listen We Anticipate We Deliver",
+                  style: TextStyle(
+                    color: Color(0xFF630606),
+                    fontSize: 30, // Adjust the font size as needed
+                    fontFamily: 'CustomFont',
+                    fontWeight:
+                        FontWeight.normal, // Adjust the weight as needed
+                  ),
+                  textAlign: TextAlign.center, // Center the text
+                ),
               ],
             ),
           ),
@@ -345,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildGradientButton(String text, VoidCallback onPressed) {
     return SizedBox(
       height: 60,
-      width: 400,
+      width: 120,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -353,25 +404,26 @@ class _MyHomePageState extends State<MyHomePage> {
           elevation: 0,
           padding: const EdgeInsets.symmetric(vertical: 15),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(0),
           ),
         ),
         child: Ink(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Colors.red, Color(0xFF002220)],
+              colors: [Color(0xFFF9D689), Color(0xFFF9D689)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
             ),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(5),
           ),
           child: Container(
             alignment: Alignment.center,
             child: Text(
               text,
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
+                color: Colors.black,
+                fontFamily: 'CustomFont',
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -381,19 +433,24 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextFieldWithValidation(
-    String labelText,
-    FormFieldValidator<String> validator,
-    FormFieldSetter<String> onSaved, {
+  Widget _buildTextFieldWithValidation({
+    required IconData icon,
+    required FormFieldValidator<String> validator,
+    required FormFieldSetter<String> onSaved,
     bool obscureText = false,
   }) {
     return TextFormField(
       obscureText: obscureText,
       decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+        prefixIcon: Icon(icon),
+        // Add the icon here
+        border: InputBorder.none,
+        filled: true,
+        // Fill the background color
+        fillColor: Color(0xFFF9D689),
+        // Background color for the text field
+        contentPadding: const EdgeInsets.symmetric(
+            vertical: 15.0, horizontal: 10.0), // Padding inside the text field
       ),
       validator: validator,
       onSaved: onSaved,

@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.0.0  # Ensure you have this for storing user data
   email_validator: ^2.0.1
+  flutter_colorpicker: ^1.0.3
   
   marquee: ^2.1.0
   # The following adds the Cupertino Icons font to your application.
@@ -67,17 +68,18 @@ flutter:
   uses-material-design: true
   assets:
    
-    - assets/design.png
-    - assets/design2.png
+  
     - assets/muchmorebetterbg.png
     - assets/bgminimalist.png
     - assets/peeps.png
     - assets/bigsize.png
+    - assets/Autumn.png
+    - assets/FINALFDS.png
   
   fonts:
     - family: CustomFont
       fonts:
-        - asset: assets/fonts/Moderniz.otf
+        - asset: assets/fonts/Playfair_Display/static/PlayfairDisplay-ExtraBold.ttf
     
   
   

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'kanban_board.dart'; // Import Kanban Board
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -10,12 +11,12 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFCBDCEB),
         elevation: 0,
         title: const Text(
-          'Dashboard',
+          'Profile',
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
       ),
       drawer: Drawer(
-        child: Column(
+        child: ListView(
           children: [
             DrawerHeader(
               decoration: BoxDecoration(color: const Color(0xFF133E87)),
@@ -31,6 +32,40 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             ListTile(
+              leading:
+                  Icon(Icons.calendar_today, color: const Color(0xFF8B1E3F)),
+              title: Text('Calendar'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CalendarSection()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.list, color: const Color(0xFF8B1E3F)),
+              title: Text('To-Do List'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ToDoListSection()),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.view_kanban, color: const Color(0xFF8B1E3F)),
+              title: Text('Kanban Board'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => KanbanBoard()),
+                );
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.logout, color: const Color(0xFF8B1E3F)),
               title: Text('Logout'),
               onTap: () => Navigator.pushReplacementNamed(context, '/'),
@@ -43,21 +78,10 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDashboardHeader(),
+            _buildProfileHeader(),
             const SizedBox(height: 20),
             Expanded(
-              child: GridView(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                children: [
-                  AttendanceSection(),
-                  CalendarSection(),
-                  ToDoListSection(),
-                ],
-              ),
+              child: _buildProfileInfo(),
             ),
           ],
         ),
@@ -65,12 +89,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDashboardHeader() {
+  Widget _buildProfileHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: const [
         Text(
-          'Your Dashboard',
+          'Your Profile',
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -80,39 +104,62 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
-}
 
-// Attendance Section
-class AttendanceSection extends StatefulWidget {
-  @override
-  _AttendanceSectionState createState() => _AttendanceSectionState();
-}
+  Widget _buildProfileInfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(
+                  'assets/profile_picture.png'), // Replace with actual profile image path
+            ),
+            const SizedBox(width: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Username',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'user@example.com',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        const Divider(color: Colors.grey),
+        const SizedBox(height: 10),
+        Text(
+          'Additional Information',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF333A3A)),
+        ),
+        const SizedBox(height: 10),
+        _buildProfileDetailRow(Icons.date_range, 'Member since: January 2022'),
+        _buildProfileDetailRow(Icons.badge, 'Position: Associate'),
+        _buildProfileDetailRow(Icons.location_on, 'Location: City, Country'),
+      ],
+    );
+  }
 
-class _AttendanceSectionState extends State<AttendanceSection> {
-  bool isPresent = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildCard(
-      color: const Color(0xFF94E0D0),
-      title: 'Attendance',
-      icon: Icons.check_circle,
-      iconColor: const Color(0xFF8B1E3F),
+  Widget _buildProfileDetailRow(IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Mark Attendance',
-            style: TextStyle(fontSize: 18, color: Color(0xFF383A3A)),
-          ),
-          Checkbox(
-            value: isPresent,
-            onChanged: (bool? value) {
-              setState(() {
-                isPresent = value ?? false;
-              });
-            },
-            activeColor: const Color(0xFF8B1E3F),
+          Icon(icon, color: const Color(0xFF8B1E3F)),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: TextStyle(fontSize: 16),
           ),
         ],
       ),
@@ -134,12 +181,11 @@ class _CalendarSectionState extends State<CalendarSection> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildCard(
-      color: const Color(0xFFF5D0C5),
-      title: 'Calendar',
-      icon: Icons.calendar_today,
-      iconColor: const Color(0xFF8B1E3F),
-      child: TableCalendar(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Calendar'),
+      ),
+      body: TableCalendar(
         firstDay: DateTime.utc(2020, 1, 1),
         lastDay: DateTime.utc(2030, 12, 31),
         focusedDay: _focusedDay,
@@ -149,34 +195,11 @@ class _CalendarSectionState extends State<CalendarSection> {
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
-
-            // Toggle important date
             if (_importantDates.contains(selectedDay)) {
               _importantDates.remove(selectedDay);
             } else {
               _importantDates.add(selectedDay);
             }
-          });
-        },
-        calendarStyle: CalendarStyle(
-          todayDecoration: BoxDecoration(
-            color: Colors.redAccent,
-            shape: BoxShape.circle,
-          ),
-          selectedDecoration: BoxDecoration(
-            color: Colors.green,
-            shape: BoxShape.circle,
-          ),
-          markerDecoration: BoxDecoration(
-            color: Colors.blue,
-            shape: BoxShape.circle,
-          ),
-        ),
-        eventLoader: (day) =>
-            _importantDates.contains(day) ? ['Important'] : [],
-        onFormatChanged: (format) {
-          setState(() {
-            _calendarFormat = format;
           });
         },
       ),
@@ -188,55 +211,14 @@ class _CalendarSectionState extends State<CalendarSection> {
 class ToDoListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return _buildCard(
-      color: const Color(0xFFFAD4D8),
-      title: 'To-Do List',
-      icon: Icons.list,
-      iconColor: const Color(0xFF8B1E3F),
-      child: const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16.0),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('To-Do List'),
+      ),
+      body: Center(
         child:
             Text('To-Do list widget goes here', style: TextStyle(fontSize: 16)),
       ),
     );
   }
-}
-
-// A utility function to create styled cards with a title and icon.
-Widget _buildCard({
-  required Color color,
-  required String title,
-  required IconData icon,
-  required Color iconColor,
-  required Widget child,
-}) {
-  return Card(
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-    color: color,
-    elevation: 5,
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor, size: 28),
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: iconColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Expanded(child: child),
-        ],
-      ),
-    ),
-  );
 }
