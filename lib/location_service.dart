@@ -1,5 +1,4 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter/material.dart';
 
 class LocationService {
   static const double minLatitude = 14.06727248844374;
@@ -12,7 +11,7 @@ class LocationService {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       showLocationErrorDialog(
-          "Location services are disabled. Please 7 enable them in your device settings.");
+          "Location services are disabled. Please enable them in your device settings.");
       return false;
     }
 

@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'kanban_board.dart'; // Import Kanban Board
+import 'calendar_section.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFCBDCEB),
+      backgroundColor: const Color(0xFFF2F5FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFCBDCEB),
-        elevation: 0,
+        backgroundColor: Colors.white,
+        elevation: 1,
         title: const Text(
           'Profile',
-          style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       drawer: Drawer(
         child: ListView(
@@ -24,7 +30,7 @@ class HomeScreen extends StatelessWidget {
                 child: Text(
                   'Welcome',
                   style: TextStyle(
-                    color: Color(0xFF001F3F),
+                    color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -92,8 +98,8 @@ class HomeScreen extends StatelessWidget {
   Widget _buildProfileHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Text(
+      children: [
+        const Text(
           'Your Profile',
           style: TextStyle(
             fontSize: 32,
@@ -101,52 +107,71 @@ class HomeScreen extends StatelessWidget {
             color: Color(0xFF333A3A),
           ),
         ),
+        IconButton(
+          icon: const Icon(Icons.edit, color: Color(0xFF8B1E3F)),
+          onPressed: () {
+            // Add edit functionality here
+          },
+        ),
       ],
     );
   }
 
   Widget _buildProfileInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                  'assets/profile_picture.png'), // Replace with actual profile image path
-            ),
-            const SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Username',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage(
+                      'assets/profile_picture.png'), // Replace with actual profile image path
                 ),
-                Text(
-                  'user@example.com',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'John Doe',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'john.doe@example.com',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            const Divider(color: Colors.grey),
+            const SizedBox(height: 10),
+            const Text(
+              'Additional Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF333A3A),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _buildProfileDetailRow(
+                Icons.date_range, 'Member since: January 2022'),
+            _buildProfileDetailRow(Icons.badge, 'Position: Associate'),
+            _buildProfileDetailRow(
+                Icons.location_on, 'Location: City, Country'),
           ],
         ),
-        const SizedBox(height: 20),
-        const Divider(color: Colors.grey),
-        const SizedBox(height: 10),
-        Text(
-          'Additional Information',
-          style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF333A3A)),
-        ),
-        const SizedBox(height: 10),
-        _buildProfileDetailRow(Icons.date_range, 'Member since: January 2022'),
-        _buildProfileDetailRow(Icons.badge, 'Position: Associate'),
-        _buildProfileDetailRow(Icons.location_on, 'Location: City, Country'),
-      ],
+      ),
     );
   }
 
@@ -159,49 +184,9 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(width: 10),
           Text(
             text,
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, color: Colors.black87),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// Calendar Section
-class CalendarSection extends StatefulWidget {
-  @override
-  _CalendarSectionState createState() => _CalendarSectionState();
-}
-
-class _CalendarSectionState extends State<CalendarSection> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-  final Set<DateTime> _importantDates = {};
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Calendar'),
-      ),
-      body: TableCalendar(
-        firstDay: DateTime.utc(2020, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
-        focusedDay: _focusedDay,
-        calendarFormat: _calendarFormat,
-        selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-        onDaySelected: (selectedDay, focusedDay) {
-          setState(() {
-            _selectedDay = selectedDay;
-            _focusedDay = focusedDay;
-            if (_importantDates.contains(selectedDay)) {
-              _importantDates.remove(selectedDay);
-            } else {
-              _importantDates.add(selectedDay);
-            }
-          });
-        },
       ),
     );
   }
@@ -213,11 +198,13 @@ class ToDoListSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('To-Do List'),
+        title: const Text('To-Do List'),
       ),
       body: Center(
-        child:
-            Text('To-Do list widget goes here', style: TextStyle(fontSize: 16)),
+        child: const Text(
+          'To-Do list widget goes here',
+          style: TextStyle(fontSize: 16),
+        ),
       ),
     );
   }

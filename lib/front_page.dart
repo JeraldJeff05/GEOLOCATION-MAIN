@@ -25,16 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  Future<void> _showCurrentLocationDialog() async {
-    try {
-      Position position = await LocationService.getCurrentPosition();
-      _showDialog('Current Location',
-          'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
-    } catch (e) {
-      _showLocationErrorDialog("Unable to get location: $e");
-    }
-  }
-
   void _showLocationErrorDialog(String message) {
     _showDialog('Access Denied', message);
   }
@@ -81,71 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showTestLocationDialog() async {
-    final TextEditingController latitudeController = TextEditingController();
-    final TextEditingController longitudeController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Test Location'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildTextField(latitudeController, 'Latitude'),
-              const SizedBox(height: 10),
-              _buildTextField(longitudeController, 'Longitude'),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                _validateTestLocation(
-                    latitudeController.text, longitudeController.text);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Test'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-      ),
-      keyboardType: TextInputType.number,
-    );
-  }
-
-  void _validateTestLocation(String latitude, String longitude) {
-    double? lat = double.tryParse(latitude);
-    double? lon = double.tryParse(longitude);
-    if (lat != null && lon != null) {
-      _showSnackbar(LocationService.isLocationInRange(lat, lon)
-          ? 'Input location is within the allowed range.'
-          : 'Input location is NOT within the allowed range.');
-    } else {
-      _showSnackbar('Please enter valid latitude and longitude.');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -158,13 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
-            top: screenHeight *
-                0.185, // Adjust this percentage to move form up/down
-            left: 55,
-            right: 0,
-            child: Center(
-              child: _buildLoginForm(),
-            ),
+            top: 0.0, // Adjust this value as needed to position vertically
+            left: 0.0, // Ensures it’s pinned to the right side of the screen
+            child: _buildLoginForm(),
           ),
         ],
       ),
@@ -173,8 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildLoginForm() {
     return Container(
-      width: 560,
-      height: 550,
+      width: 500,
+      height: 1000,
       padding: const EdgeInsets.all(30.0),
       decoration: BoxDecoration(
         color: Color(0xFFF9D689).withOpacity(0.8),
@@ -190,42 +113,32 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       child: Stack(
         children: [
-          Positioned(
-            right: 0,
-            top: 0,
-            child: PopupMenuButton(
-              icon: Icon(Icons.settings, color: Colors.transparent),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  child: Text("Show Current Location"),
-                  value: "show_location",
-                ),
-                PopupMenuItem(
-                  child: Text("Test Location"),
-                  value: "test_location",
-                ),
-              ],
-              onSelected: (value) {
-                if (value == "show_location") {
-                  _showCurrentLocationDialog();
-                } else if (value == "test_location") {
-                  _showTestLocationDialog();
-                }
-              },
-            ),
-          ),
           Form(
             key: _formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset(
-                  'assets/FINALFDS.png', // Replace with the path to your image
-                  width: 600,
-                  height: 140,
+                  'assets/FINALFDS.png',
+                  width: 1050,
+                  height: 180,
                   fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 0),
+                Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Employee's Log",
+                    style: TextStyle(
+                      color: Color(0xFF6D4C41),
+                      fontSize: 40,
+                      fontFamily: 'CustomFont',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 50),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
                   validator: (value) {
@@ -236,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   onSaved: (value) => _username = value,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 _buildTextFieldWithValidation(
                   icon: Icons.lock,
                   validator: (value) {
@@ -248,23 +161,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   onSaved: (value) => _password = value,
                   obscureText: true,
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 30),
                 _buildGradientButton('Login', _getCurrentLocationAndLogin),
-                const SizedBox(height: 25),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Divider(
-                          thickness: 2, color: Colors.black), // Straight line
+                      child: Divider(thickness: 2, color: Color(0xFF6D4C41)),
                     ),
-                    const SizedBox(width: 20), // Space between line and text
+                    const SizedBox(width: 20),
                     const Text(
-                        style: TextStyle(
-                          fontFamily: 'CustomFont',
-                          fontSize: 15,
-                        ),
-                        "Sign up "),
+                      style: TextStyle(
+                        fontFamily: 'CustomFont',
+                        fontSize: 15,
+                      ),
+                      "Sign up ",
+                    ),
                     GestureDetector(
                       onTap: _signIn,
                       child: Text(
@@ -273,29 +186,55 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Color(0xFF630606),
                           fontFamily: 'CustomFont',
                           fontSize: 15,
-                          // Change color for the clickable part
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 20), // Space between text and line
+                    const SizedBox(width: 20),
                     Expanded(
-                      child: Divider(
-                          thickness: 2, color: Colors.black), // Straight line
+                      child: Divider(thickness: 2, color: Color(0xFF6D4C41)),
                     ),
                   ],
                 ),
-                const SizedBox(height: 30), // Space before the new text
+                const SizedBox(height: 40),
                 const Text(
                   "We Listen We Anticipate We Deliver",
                   style: TextStyle(
-                    color: Color(0xFF630606),
-                    fontSize: 30, // Adjust the font size as needed
+                    color: Color(0xFF6D4C41),
+                    fontSize: 26,
                     fontFamily: 'CustomFont',
-                    fontWeight:
-                        FontWeight.normal, // Adjust the weight as needed
+                    fontWeight: FontWeight.normal,
                   ),
-                  textAlign: TextAlign.center, // Center the text
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 48),
+                Divider(thickness: 2, color: Color(0xFF6D4C41)),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.language, color: Color(0xFF000000), size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      'https://fdsap-ph.fortress-asya.com',
+                      style: TextStyle(
+                        color: Color(0xFF6D4C41),
+                        fontSize: 14,
+                        fontFamily: 'CustomFont',
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Icon(Icons.phone, color: Color(0xFF000000), size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      '+63 947 362 3226',
+                      style: TextStyle(
+                        color: Color(0xFF6D4C41),
+                        fontSize: 14,
+                        fontFamily: 'CustomFont',
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -313,31 +252,60 @@ class _MyHomePageState extends State<MyHomePage> {
             TextEditingController();
         final TextEditingController passwordController =
             TextEditingController();
-        bool isRobotChecked = false; // Initial state for the robot checkbox
-        bool isPasswordVisible = false; // Initial state for password visibility
+        final TextEditingController confirmPasswordController =
+            TextEditingController();
+        bool isRobotChecked = false;
+        bool isPasswordVisible = false;
 
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Sign Up'),
+              backgroundColor:
+                  const Color(0xFFF9D689), // Light warm background color
+              title: const Text(
+                'Sign Up',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF6D4C41), // Autumn brown color for title text
+                ),
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
                     controller: usernameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Enter Username'),
+                    decoration: const InputDecoration(
+                      labelText: 'Enter Username',
+                      labelStyle: TextStyle(color: Color(0xFF8D6E63)),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color(0xFF8D6E63)), // Accent color for focus
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   TextField(
                     controller: passwordController,
                     decoration: InputDecoration(
                       labelText: 'Enter Password',
+                      labelStyle: const TextStyle(color: Color(0xFF8D6E63)),
+                      border: const OutlineInputBorder(),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF8D6E63)),
+                      ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           isPasswordVisible
                               ? Icons.visibility
                               : Icons.visibility_off,
+                          color: Color(0xFF8D6E63), // Color for icon
                         ),
                         onPressed: () {
                           setState(() {
@@ -349,17 +317,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     obscureText: !isPasswordVisible,
                   ),
                   const SizedBox(height: 10),
+                  TextField(
+                    controller: confirmPasswordController,
+                    decoration: const InputDecoration(
+                      labelText: 'Confirm Password',
+                      labelStyle: TextStyle(color: Color(0xFF8D6E63)),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF8D6E63)),
+                      ),
+                    ),
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       Checkbox(
                         value: isRobotChecked,
+                        activeColor: const Color(0xFF6D4C41),
                         onChanged: (bool? value) {
                           setState(() {
                             isRobotChecked = value ?? false;
                           });
                         },
                       ),
-                      const Text("Are you a Human?"),
+                      const Text("Are you a Human?",
+                          style: TextStyle(color: Color(0xFF8D6E63))),
                     ],
                   ),
                 ],
@@ -367,22 +350,32 @@ class _MyHomePageState extends State<MyHomePage> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    if (isRobotChecked) {
-                      setState(() {
-                        _savedUsername = usernameController.text;
-                        _savedPassword = passwordController.text;
-                      });
-                      Navigator.of(context).pop();
-                      _showSnackbar(
-                          "Sign-up successful! Use the new credentials to log in.");
+                    if (passwordController.text ==
+                        confirmPasswordController.text) {
+                      if (isRobotChecked) {
+                        setState(() {
+                          _savedUsername = usernameController.text;
+                          _savedPassword = passwordController.text;
+                        });
+                        Navigator.of(context).pop();
+                        _showSnackbar(
+                            "Sign-up successful! Use the new credentials to log in.");
+                      } else {
+                        _showSnackbar("Please confirm you are not a robot.");
+                      }
                     } else {
-                      _showSnackbar("Please confirm you are not a robot.");
+                      _showSnackbar(
+                          "Passwords do not match. Please try again.");
                     }
                   },
+                  style: TextButton.styleFrom(
+                      foregroundColor: Color(0xFF6D4C41)), // Button color
                   child: const Text('Save'),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
+                  style:
+                      TextButton.styleFrom(foregroundColor: Color(0xFF6D4C41)),
                   child: const Text('Cancel'),
                 ),
               ],
@@ -394,37 +387,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildGradientButton(String text, VoidCallback onPressed) {
-    return SizedBox(
-      height: 60,
-      width: 120,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-          ),
-        ),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFF9D689), Color(0xFFF9D689)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
+    return Center(
+      child: SizedBox(
+        height: 30,
+        width: 130, // Slightly wider for better appearance
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            elevation: 3,
+            padding: EdgeInsets.zero,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
             ),
-            borderRadius: BorderRadius.circular(5),
           ),
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              text,
-              style: const TextStyle(
-                color: Colors.black,
-                fontFamily: 'CustomFont',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          child: Ink(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFF9D689), Color(0xFFF9D689)], // New gradient
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.3),
+                  blurRadius: 0,
+                  offset: Offset(0, 0),
+                ),
+              ],
+            ),
+            child: Container(
+              alignment: Alignment.center,
+              child: Text(
+                text,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontFamily: 'CustomFont',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

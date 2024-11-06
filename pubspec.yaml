@@ -75,6 +75,7 @@ flutter:
     - assets/bigsize.png
     - assets/Autumn.png
     - assets/FINALFDS.png
+    - assets/profile_picture.png
   
   fonts:
     - family: CustomFont
