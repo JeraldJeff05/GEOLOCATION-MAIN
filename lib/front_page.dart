@@ -1,6 +1,8 @@
+import 'dart:async'; // Import for delayed execution
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'location_service.dart';
+import 'sign_in.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -10,11 +12,28 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
-  String? _savedUsername, _savedPassword; //delete this if not working 1
+  String? _savedUsername, _savedPassword;
+
+  // Initial and target positions for the login form
+  double _leftPosition = -620; // Start off-screen to the left
+  final double _targetLeftPosition =
+      0; // Will calculate final position dynamically
+
+  @override
+  void initState() {
+    super.initState();
+    // Delay the animation to allow the widget to build
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        _leftPosition = _targetLeftPosition;
+      });
+    });
+  }
 
   Future<void> _getCurrentLocationAndLogin() async {
-    if (!await LocationService.checkLocationService(_showLocationErrorDialog))
+    if (!await LocationService.checkLocationService(_showLocationErrorDialog)) {
       return;
+    }
     Position position = await LocationService.getCurrentPosition();
     if (!LocationService.isLocationInRange(
         position.latitude, position.longitude)) {
@@ -51,8 +70,9 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
-      // Validate against saved username and password
       if (_username == _savedUsername && _password == _savedPassword) {
+        _showWelcomeDialog();
+      } else if (_username == 'admin' && _password == 'admin') {
         _showWelcomeDialog();
       } else {
         _showSnackbar('Invalid username or password');
@@ -73,6 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final double centerLeftPosition =
+        MediaQuery.of(context).size.width / 2 - 720;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -84,9 +107,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          Positioned(
-            top: 0.0, // Adjust this value as needed to position vertically
-            left: 0.0, // Ensures it’s pinned to the right side of the screen
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+            top: 0, // Fixed position vertically
+            left: _leftPosition == _targetLeftPosition
+                ? centerLeftPosition
+                : _leftPosition,
             child: _buildLoginForm(),
           ),
         ],
@@ -96,15 +123,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildLoginForm() {
     return Container(
-      width: 500,
-      height: 1000,
-      padding: const EdgeInsets.all(30.0),
+      width: 620,
+      height: 1200,
+      padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
-        color: Color(0xFFF9D689).withOpacity(0.8),
+        color: Color(0xFFF9D689).withOpacity(0.7),
         borderRadius: BorderRadius.circular(5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.6),
             spreadRadius: 5,
             blurRadius: 10,
             offset: const Offset(50, 5),
@@ -119,26 +146,14 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 27.5),
                 Image.asset(
                   'assets/FINALFDS.png',
-                  width: 1050,
+                  width: 1000,
                   height: 180,
                   fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 0),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Employee's Log",
-                    style: TextStyle(
-                      color: Color(0xFF6D4C41),
-                      fontSize: 40,
-                      fontFamily: 'CustomFont',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 75),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
                   validator: (value) {
@@ -161,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   onSaved: (value) => _password = value,
                   obscureText: true,
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20.5),
                 _buildGradientButton('Login', _getCurrentLocationAndLogin),
                 const SizedBox(height: 20),
                 Row(
@@ -196,20 +211,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 55),
                 const Text(
-                  "We Listen We Anticipate We Deliver",
+                  "Today is your opportunity to build the tomorrow you want",
                   style: TextStyle(
                     color: Color(0xFF6D4C41),
-                    fontSize: 26,
+                    fontSize: 33,
                     fontFamily: 'CustomFont',
                     fontWeight: FontWeight.normal,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 50),
                 Divider(thickness: 2, color: Color(0xFF6D4C41)),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -245,142 +260,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _signIn() {
-    showDialog(
+    showSignInDialog(
       context: context,
-      builder: (BuildContext context) {
-        final TextEditingController usernameController =
-            TextEditingController();
-        final TextEditingController passwordController =
-            TextEditingController();
-        final TextEditingController confirmPasswordController =
-            TextEditingController();
-        bool isRobotChecked = false;
-        bool isPasswordVisible = false;
-
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor:
-                  const Color(0xFFF9D689), // Light warm background color
-              title: const Text(
-                'Sign Up',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF6D4C41), // Autumn brown color for title text
-                ),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter Username',
-                      labelStyle: TextStyle(color: Color(0xFF8D6E63)),
-                      border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color(0xFF8D6E63)), // Accent color for focus
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Password',
-                      labelStyle: const TextStyle(color: Color(0xFF8D6E63)),
-                      border: const OutlineInputBorder(),
-                      focusedBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF8D6E63)),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Color(0xFF8D6E63), // Color for icon
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            isPasswordVisible = !isPasswordVisible;
-                          });
-                        },
-                      ),
-                    ),
-                    obscureText: !isPasswordVisible,
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: confirmPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm Password',
-                      labelStyle: TextStyle(color: Color(0xFF8D6E63)),
-                      border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF8D6E63)),
-                      ),
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: isRobotChecked,
-                        activeColor: const Color(0xFF6D4C41),
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isRobotChecked = value ?? false;
-                          });
-                        },
-                      ),
-                      const Text("Are you a Human?",
-                          style: TextStyle(color: Color(0xFF8D6E63))),
-                    ],
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (passwordController.text ==
-                        confirmPasswordController.text) {
-                      if (isRobotChecked) {
-                        setState(() {
-                          _savedUsername = usernameController.text;
-                          _savedPassword = passwordController.text;
-                        });
-                        Navigator.of(context).pop();
-                        _showSnackbar(
-                            "Sign-up successful! Use the new credentials to log in.");
-                      } else {
-                        _showSnackbar("Please confirm you are not a robot.");
-                      }
-                    } else {
-                      _showSnackbar(
-                          "Passwords do not match. Please try again.");
-                    }
-                  },
-                  style: TextButton.styleFrom(
-                      foregroundColor: Color(0xFF6D4C41)), // Button color
-                  child: const Text('Save'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style:
-                      TextButton.styleFrom(foregroundColor: Color(0xFF6D4C41)),
-                  child: const Text('Cancel'),
-                ),
-              ],
-            );
-          },
+      onSignIn: (username, password) {
+        setState(() {
+          _savedUsername = username;
+          _savedPassword = password;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  "Sign-up successful! Use the new credentials to log in.")),
         );
       },
     );
@@ -404,14 +294,17 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Ink(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFFF9D689), Color(0xFFF9D689)], // New gradient
+                colors: [
+                  Colors.transparent,
+                  Colors.transparent
+                ], // New gradient
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
               borderRadius: BorderRadius.circular(8),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withOpacity(0.5),
                   blurRadius: 0,
                   offset: Offset(0, 0),
                 ),
@@ -422,9 +315,9 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text(
                 text,
                 style: const TextStyle(
-                  color: Colors.black87,
+                  color: Colors.white70,
                   fontFamily: 'CustomFont',
-                  fontSize: 15,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -449,10 +342,11 @@ class _MyHomePageState extends State<MyHomePage> {
         border: InputBorder.none,
         filled: true,
         // Fill the background color
-        fillColor: Color(0xFFF9D689),
+        fillColor: Color(0xFF111111).withOpacity(0.4),
         // Background color for the text field
+
         contentPadding: const EdgeInsets.symmetric(
-            vertical: 15.0, horizontal: 10.0), // Padding inside the text field
+            vertical: 20.0, horizontal: 10.0), // Padding inside the text field
       ),
       validator: validator,
       onSaved: onSaved,

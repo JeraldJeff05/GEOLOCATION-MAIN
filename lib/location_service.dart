@@ -1,10 +1,9 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
-  static const double minLatitude = 14.06727248844374;
-  static const double maxLatitude = 14.068567511556262;
-  static const double minLongitude = 121.32635146800003;
-  static const double maxLongitude = 121.32768653199999;
+  static const double centerLatitude = 14.067882127247886;
+  static const double centerLongitude = 121.32713395416246;
+  static const double radiusInMeters = 15.0; // Radius in meters
 
   static Future<bool> checkLocationService(
       Function(String) showLocationErrorDialog) async {
@@ -38,9 +37,15 @@ class LocationService {
   }
 
   static bool isLocationInRange(double latitude, double longitude) {
-    return latitude >= minLatitude &&
-        latitude <= maxLatitude &&
-        longitude >= minLongitude &&
-        longitude <= maxLongitude;
+    // Calculate the distance between the current location and the center point
+    double distanceInMeters = Geolocator.distanceBetween(
+      latitude,
+      longitude,
+      centerLatitude,
+      centerLongitude,
+    );
+
+    // Check if the distance is within the defined radius
+    return distanceInMeters <= radiusInMeters;
   }
 }

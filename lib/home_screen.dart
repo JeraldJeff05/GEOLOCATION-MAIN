@@ -1,97 +1,125 @@
 import 'package:flutter/material.dart';
 import 'kanban_board.dart'; // Import Kanban Board
 import 'calendar_section.dart';
+import 'todolist_section.dart';
+import 'settings_section.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F5FA),
+      backgroundColor: const Color(0xFF121212), // Dark background
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF1F1F1F), // Dark silvery app bar
         elevation: 1,
         title: const Text(
-          'Profile',
+          'FDSASYA PHILIPPINES INC',
           style: TextStyle(
-            fontSize: 26,
+            fontFamily: 'CustomFont',
+            fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            color: Color(0xFFD0D0D0), // Silvery text color
           ),
         ),
         centerTitle: true,
-        iconTheme: IconThemeData(color: Colors.black),
+        iconTheme:
+            const IconThemeData(color: Color(0xFFD0D0D0)), // Silvery icon
       ),
       drawer: Drawer(
+        backgroundColor: const Color(0xFF1C1C1E), // Dark drawer background
         child: ListView(
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: const Color(0xFF133E87)),
-              child: Center(
+              decoration: const BoxDecoration(color: Color(0xFF2C2C2E)),
+              child: const Center(
                 child: Text(
                   'Welcome',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFFD0D0D0), // Silvery text color
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            ListTile(
-              leading:
-                  Icon(Icons.calendar_today, color: const Color(0xFF8B1E3F)),
-              title: Text('Calendar'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CalendarSection()),
-                );
-              },
+            _buildDrawerItem(
+              icon: Icons.calendar_today,
+              label: 'Calendar',
+              context: context,
+              destination: CalendarSection(),
             ),
-            ListTile(
-              leading: Icon(Icons.list, color: const Color(0xFF8B1E3F)),
-              title: Text('To-Do List'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ToDoListSection()),
-                );
-              },
+            _buildDrawerItem(
+              icon: Icons.list,
+              label: 'To-Do List',
+              context: context,
+              destination: ToDoListSection(),
             ),
-            ListTile(
-              leading: Icon(Icons.view_kanban, color: const Color(0xFF8B1E3F)),
-              title: Text('Kanban Board'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => KanbanBoard()),
-                );
-              },
+            _buildDrawerItem(
+              icon: Icons.view_kanban,
+              label: 'Kanban Board',
+              context: context,
+              destination: KanbanBoard(),
             ),
-            ListTile(
-              leading: Icon(Icons.logout, color: const Color(0xFF8B1E3F)),
-              title: Text('Logout'),
+            _buildDrawerItem(
+              icon: Icons.settings,
+              label: 'Settings',
+              context: context,
+              destination: SettingsSection(),
+            ),
+            _buildDrawerItem(
+              icon: Icons.logout,
+              label: 'Logout',
+              context: context,
               onTap: () => Navigator.pushReplacementNamed(context, '/'),
             ),
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 20),
-            Expanded(
-              child: _buildProfileInfo(),
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildProfileHeader(),
+              const SizedBox(height: 20),
+              _buildProfileInfo(),
+              const SizedBox(height: 20),
+              _buildPerformanceOverview(),
+              const SizedBox(height: 20),
+              _buildActivityFeed(),
+              const SizedBox(height: 20),
+              _buildTeamMembers(),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String label,
+    required BuildContext context,
+    Widget? destination,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFFB0B0B0)), // Silvery icon
+      title: Text(
+        label,
+        style: const TextStyle(color: Color(0xFFD0D0D0)), // Silvery text
+      ),
+      onTap: onTap ??
+          () {
+            Navigator.pop(context);
+            if (destination != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => destination),
+              );
+            }
+          },
     );
   }
 
@@ -100,15 +128,15 @@ class HomeScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const Text(
-          'Your Profile',
+          'My Dashboard',
           style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF333A3A),
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFFD0D0D0), // Silvery text color
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit, color: Color(0xFF8B1E3F)),
+          icon: const Icon(Icons.edit, color: Color(0xFF5A5A5A)), // Subtle icon
           onPressed: () {
             // Add edit functionality here
           },
@@ -119,12 +147,13 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildProfileInfo() {
     return Card(
-      elevation: 3,
+      color: const Color(0xFF1C1C1E), // Dark silvery background
+      elevation: 5,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,7 +161,8 @@ class HomeScreen extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage(
+                  backgroundColor: const Color(0xFF3A3A3C), // Subtle border
+                  backgroundImage: const AssetImage(
                       'assets/profile_picture.png'), // Replace with actual profile image path
                 ),
                 const SizedBox(width: 20),
@@ -141,26 +171,35 @@ class HomeScreen extends StatelessWidget {
                   children: const [
                     Text(
                       'John Doe',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFD0D0D0), // Silvery text color
+                      ),
                     ),
                     Text(
                       'john.doe@example.com',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF9A9A9A), // Subtle silvery-grey text
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            const Divider(color: Colors.grey),
+            const Divider(
+              color: Color(0xFF3A3A3C), // Dark divider
+              thickness: 1,
+            ),
             const SizedBox(height: 10),
             const Text(
               'Additional Information',
               style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF333A3A),
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFFD0D0D0), // Silvery text color
               ),
             ),
             const SizedBox(height: 10),
@@ -180,30 +219,69 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF8B1E3F)),
+          Icon(icon, color: const Color(0xFFB0B0B0)), // Silvery icon
           const SizedBox(width: 10),
           Text(
             text,
-            style: const TextStyle(fontSize: 16, color: Colors.black87),
+            style: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFFD0D0D0), // Silvery text color
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-// To-Do List Section
-class ToDoListSection extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('To-Do List'),
-      ),
-      body: Center(
+  Widget _buildPerformanceOverview() {
+    return Card(
+      color: const Color(0xFF1C1C1E), // Dark card
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: const Text(
-          'To-Do list widget goes here',
-          style: TextStyle(fontSize: 16),
+          'Performance Overview (e.g., graphs or stats)',
+          style: TextStyle(
+            fontSize: 18,
+            color: Color(0xFFD0D0D0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActivityFeed() {
+    return Card(
+      color: const Color(0xFF1C1C1E), // Dark card
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: const Text(
+          'Activity Feed (e.g., notifications or updates)',
+          style: TextStyle(
+            fontSize: 18,
+            color: Color(0xFFD0D0D0),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTeamMembers() {
+    return Card(
+      color: const Color(0xFF1C1C1E), // Dark card
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: const Text(
+          'Team Members (e.g., profile pictures and names)',
+          style: TextStyle(
+            fontSize: 18,
+            color: Color(0xFFD0D0D0),
+          ),
         ),
       ),
     );
