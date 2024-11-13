@@ -39,11 +39,15 @@ class _StartScreenState extends State<StartScreen> {
   double _opacity = 0.0;
   bool _isLoading = false;
   String _displayedText = "";
-  final String _fullText = "We Listen We Anticipate We Deliver";
+  final String _fullText = "We Listen We Anticipate We Deliver....";
   int _charIndex = 0;
 
+  // Variables for font customization
+  final String _fontFamily = 'Arial'; // Change to your preferred font
+  final double _fontSize = 30.0; // Adjust the font size as needed
+
   void _startTypingAnimation() {
-    Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    Timer.periodic(const Duration(milliseconds: 80), (timer) {
       if (_charIndex < _fullText.length) {
         setState(() {
           _displayedText += _fullText[_charIndex];
@@ -75,47 +79,85 @@ class _StartScreenState extends State<StartScreen> {
         children: [
           // Background image
           Image.asset(
-            'assets/Autumn.png',
+            'assets/startupbg2.png',
             fit: BoxFit.cover,
           ),
           // Fade-out overlay
           AnimatedOpacity(
             opacity: _opacity,
-            duration: const Duration(milliseconds: 800),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             child: Container(
               color: Colors.black
-                  .withOpacity(0.5), // Semi-transparent black overlay
+                  .withOpacity(0.85), // Semi-transparent black overlay
             ),
           ),
-          // Centered button or typing animation
+          // Center the animated text
           Center(
             child: _isLoading
                 ? Text(
                     _displayedText,
-                    style: const TextStyle(
-                      fontSize: 28,
+                    style: TextStyle(
+                      fontSize: _fontSize,
+                      fontFamily: _fontFamily,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   )
+                : const SizedBox.shrink(), // Empty widget when not loading
+          ),
+          // Positioned "Get Started" button
+          Align(
+            alignment: const Alignment(0.6, 0), // Adjust vertical alignment
+            child: _isLoading
+                ? null
                 : ElevatedButton(
                     onPressed: _fadeOutAndStartTyping,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 16),
-                      backgroundColor: Colors.deepOrangeAccent,
+                      backgroundColor: Colors.white, // White inside
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(20), // Curved sides
+                        side: const BorderSide(
+                          color: Color(0xFF630606), // Maroon border
+                          width: 2,
+                        ),
                       ),
+                      elevation: 2, // Slight elevation for modern look
                     ),
-                    child: const Text(
-                      'Get Started',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Get Started   ',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color(0xFF630606), // Maroon text
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                            width: 10), // Space between text and circle
+                        Container(
+                          width: 20,
+                          height: 25,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF630606), // Maroon circle color
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              '>',
+                              style: TextStyle(
+                                color: Colors.white, // White arrow color
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
           ),

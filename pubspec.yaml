@@ -68,16 +68,15 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/4kVid.mp4
-    - assets/AutumnVid.mp4
+   
     - assets/Fjustthename.png
-    - assets/bgminimalist.png
-    - assets/bigsize.png
     - assets/Autumn.png
     - assets/FINALFDS.png
     - assets/profile_picture.png
     - assets/FDSLOGOJEFF.png
     - assets/JEFFDSLOGOSC.png
+    - assets/CorporateBG1.png
+    - assets/startupbg2.png
   
   fonts:
     - family: CustomFont
