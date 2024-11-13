@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final double centerLeftPosition =
-        MediaQuery.of(context).size.width / 2 - 710;
+        MediaQuery.of(context).size.width / 2 - 250;
 
     return Scaffold(
       body: Stack(
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
-            top: 5, // Fixed position vertically
+            top: 100, // Fixed position vertically
             left: _leftPosition == _targetLeftPosition
                 ? centerLeftPosition
                 : _leftPosition,
@@ -123,8 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildLoginForm() {
     return Container(
-      width: 620,
-      height: 800,
+      width: 500,
+      height: 620,
       padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
         color: Color(0xFFE6F3FA).withOpacity(0.8),
@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.black.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(50, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -149,11 +149,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 27.5),
                 Image.asset(
                   'assets/FINALFDS.png',
-                  width: 1000,
-                  height: 154,
+                  width: 500,
+                  height: 140,
                   fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 10),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
                   validator: (value) {
@@ -189,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     const Text(
                       style: TextStyle(
                         fontFamily: 'CustomFont',
-                        fontSize: 15,
+                        fontSize: 12,
                       ),
                       "Sign up ",
                     ),
@@ -200,7 +200,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         style: TextStyle(
                           color: Color(0xFF630606),
                           fontFamily: 'CustomFont',
-                          fontSize: 15,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -211,20 +211,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 55),
+                const SizedBox(height: 20),
                 const Text(
                   "Today is your opportunity to build the tomorrow you want",
                   style: TextStyle(
                     color: Color(0xFF630606),
-                    fontSize: 33,
+                    fontSize: 20,
                     fontFamily: 'CustomFont',
                     fontWeight: FontWeight.normal,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
                 Divider(thickness: 2, color: Color(0xFF6D4C41)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -346,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
         // Background color for the text field
 
         contentPadding: const EdgeInsets.symmetric(
-            vertical: 20.0, horizontal: 10.0), // Padding inside the text field
+            vertical: 15.0, horizontal: 7.0), // Padding inside the text field
       ),
       validator: validator,
       onSaved: onSaved,
