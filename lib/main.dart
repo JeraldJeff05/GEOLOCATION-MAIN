@@ -39,7 +39,7 @@ class _StartScreenState extends State<StartScreen> {
   double _opacity = 0.0;
   bool _isLoading = false;
   String _displayedText = "";
-  final String _fullText = "We Listen We Anticipate We Deliver....";
+  final String _fullText = "WE LISTEN WE ANTICIPATE WE DELIVER";
   int _charIndex = 0;
 
   // Variables for font customization
@@ -47,7 +47,7 @@ class _StartScreenState extends State<StartScreen> {
   final double _fontSize = 30.0; // Adjust the font size as needed
 
   void _startTypingAnimation() {
-    Timer.periodic(const Duration(milliseconds: 80), (timer) {
+    Timer.periodic(const Duration(milliseconds: 95), (timer) {
       if (_charIndex < _fullText.length) {
         setState(() {
           _displayedText += _fullText[_charIndex];
@@ -108,14 +108,15 @@ class _StartScreenState extends State<StartScreen> {
           ),
           // Positioned "Get Started" button
           Align(
-            alignment: const Alignment(0.6, 0), // Adjust vertical alignment
+            alignment:
+                const Alignment(0.59, -0.12), // Adjust vertical alignment
             child: _isLoading
                 ? null
                 : ElevatedButton(
                     onPressed: _fadeOutAndStartTyping,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 16),
+                          horizontal: 20, vertical: 10),
                       backgroundColor: Colors.white, // White inside
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20), // Curved sides
@@ -130,7 +131,7 @@ class _StartScreenState extends State<StartScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
-                          'Get Started   ',
+                          'Get Started',
                           style: TextStyle(
                             fontSize: 20,
                             color: Color(0xFF630606), // Maroon text
@@ -141,7 +142,7 @@ class _StartScreenState extends State<StartScreen> {
                             width: 10), // Space between text and circle
                         Container(
                           width: 20,
-                          height: 25,
+                          height: 28,
                           decoration: const BoxDecoration(
                             color: Color(0xFF630606), // Maroon circle color
                             shape: BoxShape.circle,

@@ -110,7 +110,8 @@ class _MyHomePageState extends State<MyHomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 800),
             curve: Curves.easeInOut,
-            top: 100, // Fixed position vertically
+            top: 100,
+            // Fixed position vertically
             left: _leftPosition == _targetLeftPosition
                 ? centerLeftPosition
                 : _leftPosition,
@@ -127,14 +128,14 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 620,
       padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
-        color: Color(0xFFE6F3FA).withOpacity(0.8),
-        borderRadius: BorderRadius.circular(5),
+        color: Color(0xFFE6F3FA).withOpacity(0.9),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 5),
+            offset: const Offset(0, 0),
           ),
         ],
       ),
@@ -146,14 +147,14 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 27.5),
+                const SizedBox(height: 10.5),
                 Image.asset(
-                  'assets/FINALFDS.png',
-                  width: 500,
-                  height: 140,
+                  'assets/finallogo(1).png',
+                  width: 400,
+                  height: 100,
                   fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 45),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
                   validator: (value) {
@@ -211,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 const Text(
                   "Today is your opportunity to build the tomorrow you want",
                   style: TextStyle(
@@ -222,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 35),
                 Divider(thickness: 2, color: Color(0xFF6D4C41)),
                 const SizedBox(height: 20),
                 Row(
@@ -339,14 +340,29 @@ class _MyHomePageState extends State<MyHomePage> {
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
         // Add the icon here
-        border: InputBorder.none,
         filled: true,
-        // Fill the background color
         fillColor: Color(0xFF111111).withOpacity(0.4),
-        // Background color for the text field
+        // Background color
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 7.0),
+        // Padding inside the text field
 
-        contentPadding: const EdgeInsets.symmetric(
-            vertical: 15.0, horizontal: 7.0), // Padding inside the text field
+        // Add rounded corners
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none, // No border line
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide.none, // No border line
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: BorderSide(
+            color: Colors.blue, // Optional border color on focus
+            width: 2.0,
+          ),
+        ),
       ),
       validator: validator,
       onSaved: onSaved,

@@ -77,6 +77,7 @@ flutter:
     - assets/JEFFDSLOGOSC.png
     - assets/CorporateBG1.png
     - assets/startupbg2.png
+    - assets/finallogo(1).png
   
   fonts:
     - family: CustomFont
