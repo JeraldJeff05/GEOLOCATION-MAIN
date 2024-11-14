@@ -1,16 +1,44 @@
 import 'package:flutter/material.dart';
-import 'kanban_board.dart'; // Import Kanban Board
+import 'kanban_board.dart';
 import 'calendar_section.dart';
 import 'todolist_section.dart';
 import 'settings_section.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool _isCheckedIn = false;
+  bool _isCheckedOut = false;
+  bool _hasPressedAttendance = false;
+  bool _hasPressedCheckout = false;
+  DateTime? _checkInTime;
+  DateTime? _checkOutTime;
+
+  void _saveAttendanceStatus(bool value) {
+    setState(() {
+      _isCheckedIn = value;
+      _hasPressedAttendance = true;
+      _checkInTime = DateTime.now();
+    });
+  }
+
+  void _saveCheckoutStatus(bool value) {
+    setState(() {
+      _isCheckedOut = value;
+      _hasPressedCheckout = true;
+      _checkOutTime = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121212), // Dark background
+      backgroundColor: const Color(0xFF0D98BA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1F1F1F), // Dark silvery app bar
+        backgroundColor: const Color(0xFF1F1F1F),
         elevation: 1,
         title: const Text(
           'FDSASYA PHILIPPINES INC',
@@ -18,15 +46,14 @@ class HomeScreen extends StatelessWidget {
             fontFamily: 'CustomFont',
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: Color(0xFFD0D0D0), // Silvery text color
+            color: Color(0xFFD0D0D0),
           ),
         ),
         centerTitle: true,
-        iconTheme:
-            const IconThemeData(color: Color(0xFFD0D0D0)), // Silvery icon
+        iconTheme: const IconThemeData(color: Color(0xFFD0D0D0)),
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF1C1C1E), // Dark drawer background
+        backgroundColor: const Color(0xFF1C1C1E),
         child: ListView(
           children: [
             DrawerHeader(
@@ -35,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                 child: Text(
                   'Welcome',
                   style: TextStyle(
-                    color: Color(0xFFD0D0D0), // Silvery text color
+                    color: Color(0xFFD0D0D0),
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -75,24 +102,158 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildProfileHeader(),
-              const SizedBox(height: 20),
-              _buildProfileInfo(),
-              const SizedBox(height: 20),
-              _buildPerformanceOverview(),
-              const SizedBox(height: 20),
-              _buildActivityFeed(),
-              const SizedBox(height: 20),
-              _buildTeamMembers(),
-            ],
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            'assets/startupbg2.png',
+            fit: BoxFit.cover,
           ),
-        ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildProfileHeader(),
+                  const SizedBox(height: 20),
+                  _buildProfileInfo(),
+                  const SizedBox(height: 20),
+                  _buildPerformanceOverview(),
+                  const SizedBox(height: 20),
+                  _buildActivityFeed(),
+                  const SizedBox(height: 20),
+                  _buildTeamMembers(),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            bottom: 120,
+            right: 180,
+            child: Column(
+              children: [
+                // New outer container wrapping both checkboxes
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF004C4C), // Outer container color
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      // Check-in container
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF008080),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text(
+                              'Mark Check in: ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
+                            ),
+                            if (!_isCheckedIn)
+                              Checkbox(
+                                value: _isCheckedIn,
+                                activeColor: const Color(0xFF800000),
+                                checkColor: Colors.white,
+                                onChanged: _hasPressedAttendance
+                                    ? null
+                                    : (bool? value) {
+                                  if (value != null && !_isCheckedIn) {
+                                    _saveAttendanceStatus(value);
+                                  }
+                                },
+                              ),
+                            if (_isCheckedIn)
+                              const Text(
+                                'Check in Approved',
+                                style: TextStyle(
+                                  color: Colors.lightGreenAccent,
+                                  fontSize: 18,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      if (_checkInTime != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            'Checked in at: ${_checkInTime.toString()}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      // Check-out container (only visible after check-in)
+                      if (_isCheckedIn)
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF008080),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Mark Check out: ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              if (!_isCheckedOut)
+                                Checkbox(
+                                  value: _isCheckedOut,
+                                  activeColor: const Color(0xFF800000),
+                                  checkColor: Colors.white,
+                                  onChanged: _isCheckedIn && !_hasPressedCheckout
+                                      ? (bool? value) {
+                                    if (value != null && !_isCheckedOut) {
+                                      _saveCheckoutStatus(value);
+                                    }
+                                  }
+                                      : null, // Disable checkout until check-in
+                                ),
+                              if (_isCheckedOut)
+                                const Text(
+                                  'Check out Approved',
+                                  style: TextStyle(
+                                    color: Colors.lightGreenAccent,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      if (_checkOutTime != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            'Checked out at: ${_checkOutTime.toString()}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -105,13 +266,13 @@ class HomeScreen extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: const Color(0xFFB0B0B0)), // Silvery icon
+      leading: Icon(icon, color: const Color(0xFFB0B0B0)),
       title: Text(
         label,
-        style: const TextStyle(color: Color(0xFFD0D0D0)), // Silvery text
+        style: const TextStyle(color: Color(0xFFD0D0D0)),
       ),
       onTap: onTap ??
-          () {
+              () {
             Navigator.pop(context);
             if (destination != null) {
               Navigator.push(
@@ -132,11 +293,11 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w600,
-            color: Color(0xFFD0D0D0), // Silvery text color
+            color: Colors.white,
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.edit, color: Color(0xFF5A5A5A)), // Subtle icon
+          icon: const Icon(Icons.edit, color: Color(0xFF5A5A5A)),
           onPressed: () {
             // Add edit functionality here
           },
@@ -163,7 +324,7 @@ class HomeScreen extends StatelessWidget {
                   radius: 50,
                   backgroundColor: const Color(0xFF3A3A3C), // Subtle border
                   backgroundImage: const AssetImage(
-                      'assets/profile_picture.png'), // Replace with actual profile image path
+                      'assets/profile_picture.png'), // Placeholder image
                 ),
                 const SizedBox(width: 20),
                 Column(
@@ -172,8 +333,8 @@ class HomeScreen extends StatelessWidget {
                     Text(
                       'John Doe',
                       style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                         color: Color(0xFFD0D0D0), // Silvery text color
                       ),
                     ),
@@ -203,11 +364,9 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            _buildProfileDetailRow(
-                Icons.date_range, 'Member since: January 2022'),
+            _buildProfileDetailRow(Icons.date_range, 'Member since: January 2022'),
             _buildProfileDetailRow(Icons.badge, 'Position: Associate'),
-            _buildProfileDetailRow(
-                Icons.location_on, 'Location: City, Country'),
+            _buildProfileDetailRow(Icons.location_on, 'Location: City, Country'),
           ],
         ),
       ),
