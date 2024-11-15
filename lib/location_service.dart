@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 class LocationService {
   static const double centerLatitude = 14.067882127247886;
   static const double centerLongitude = 121.32713395416246;
-  static const double radiusInMeters = 15.0;
+  static const double radiusInMeters = 20.0;
 
   static Future<bool> checkLocationService(
       Function(String) showLocationErrorDialog) async {

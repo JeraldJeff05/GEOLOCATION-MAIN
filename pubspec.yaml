@@ -43,8 +43,8 @@ dependencies:
   google_maps_flutter: ^2.9.0
   geolocator_web: ^4.1.1
   table_calendar: ^3.1.2
-  video_player: ^2.6.0 
-  
+  video_player: ^2.6.0
+
     
 
 dev_dependencies:
@@ -78,6 +78,7 @@ flutter:
     - assets/CorporateBG1.png
     - assets/startupbg2.png
     - assets/finallogo(1).png
+    - assets/HomeBG.png
   
   fonts:
     - family: CustomFont

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'kanban_board.dart';
-import 'calendar_section.dart';
-import 'todolist_section.dart';
+import 'features/calendar_section.dart';
 import 'settings_section.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -10,247 +8,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isCheckedIn = false;
-  bool _isCheckedOut = false;
-  bool _hasPressedAttendance = false;
-  bool _hasPressedCheckout = false;
-  DateTime? _checkInTime;
-  DateTime? _checkOutTime;
-
-  void _saveAttendanceStatus(bool value) {
-    setState(() {
-      _isCheckedIn = value;
-      _hasPressedAttendance = true;
-      _checkInTime = DateTime.now();
-    });
-  }
-
-  void _saveCheckoutStatus(bool value) {
-    setState(() {
-      _isCheckedOut = value;
-      _hasPressedCheckout = true;
-      _checkOutTime = DateTime.now();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0D98BA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1F1F1F),
-        elevation: 1,
-        title: const Text(
-          'FDSASYA PHILIPPINES INC',
-          style: TextStyle(
-            fontFamily: 'CustomFont',
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFD0D0D0),
-          ),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFFD0D0D0)),
-      ),
-      drawer: Drawer(
-        backgroundColor: const Color(0xFF1C1C1E),
-        child: ListView(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF2C2C2E)),
-              child: const Center(
-                child: Text(
-                  'Welcome',
-                  style: TextStyle(
-                    color: Color(0xFFD0D0D0),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.calendar_today,
-              label: 'Calendar',
-              context: context,
-              destination: CalendarSection(),
-            ),
-            _buildDrawerItem(
-              icon: Icons.list,
-              label: 'To-Do List',
-              context: context,
-              destination: ToDoListSection(),
-            ),
-            _buildDrawerItem(
-              icon: Icons.view_kanban,
-              label: 'Kanban Board',
-              context: context,
-              destination: KanbanBoard(),
-            ),
-            _buildDrawerItem(
-              icon: Icons.settings,
-              label: 'Settings',
-              context: context,
-              destination: SettingsSection(),
-            ),
-            _buildDrawerItem(
-              icon: Icons.logout,
-              label: 'Logout',
-              context: context,
-              onTap: () => Navigator.pushReplacementNamed(context, '/'),
-            ),
-          ],
-        ),
-      ),
-      body: Stack(
-        fit: StackFit.expand,
+      backgroundColor: const Color(0xFF2A2A2A),
+      body: Row(
         children: [
-          Image.asset(
-            'assets/startupbg2.png',
-            fit: BoxFit.cover,
-          ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildProfileHeader(),
-                  const SizedBox(height: 20),
-                  _buildProfileInfo(),
-                  const SizedBox(height: 20),
-                  _buildPerformanceOverview(),
-                  const SizedBox(height: 20),
-                  _buildActivityFeed(),
-                  const SizedBox(height: 20),
-                  _buildTeamMembers(),
-                ],
-              ),
-            ),
-          ),
-
-          Positioned(
-            bottom: 120,
-            right: 180,
-            child: Column(
-              children: [
-                // New outer container wrapping both checkboxes
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF004C4C), // Outer container color
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      // Check-in container
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF008080),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            const Text(
-                              'Mark Check in: ',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                            if (!_isCheckedIn)
-                              Checkbox(
-                                value: _isCheckedIn,
-                                activeColor: const Color(0xFF800000),
-                                checkColor: Colors.white,
-                                onChanged: _hasPressedAttendance
-                                    ? null
-                                    : (bool? value) {
-                                  if (value != null && !_isCheckedIn) {
-                                    _saveAttendanceStatus(value);
-                                  }
-                                },
-                              ),
-                            if (_isCheckedIn)
-                              const Text(
-                                'Check in Approved',
-                                style: TextStyle(
-                                  color: Colors.lightGreenAccent,
-                                  fontSize: 18,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      if (_checkInTime != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            'Checked in at: ${_checkInTime.toString()}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: 20),
-                      // Check-out container (only visible after check-in)
-                      if (_isCheckedIn)
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF008080),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text(
-                                'Mark Check out: ',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              if (!_isCheckedOut)
-                                Checkbox(
-                                  value: _isCheckedOut,
-                                  activeColor: const Color(0xFF800000),
-                                  checkColor: Colors.white,
-                                  onChanged: _isCheckedIn && !_hasPressedCheckout
-                                      ? (bool? value) {
-                                    if (value != null && !_isCheckedOut) {
-                                      _saveCheckoutStatus(value);
-                                    }
-                                  }
-                                      : null, // Disable checkout until check-in
-                                ),
-                              if (_isCheckedOut)
-                                const Text(
-                                  'Check out Approved',
-                                  style: TextStyle(
-                                    color: Colors.lightGreenAccent,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      if (_checkOutTime != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            'Checked out at: ${_checkOutTime.toString()}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+          // Navigation Drawer
+          _buildNavigationDrawer(),
+          // Main Content Area
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildProfileInfo(),
+                    const SizedBox(height: 16),
+                    _buildKanbanBoard(),
+                    const SizedBox(height: 16),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _buildAttendanceSystem()),
+                        const SizedBox(width: 16),
+                        Expanded(child: _buildCalendar()),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ],
@@ -258,189 +47,438 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String label,
-    required BuildContext context,
-    Widget? destination,
-    VoidCallback? onTap,
-  }) {
+  Widget _buildNavigationDrawer() {
+    return Container(
+      width: 280,
+      color: const Color(0xFF363636),
+      child: Column(
+        children: [
+          Container(
+            height: 150,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF555555), Color(0xFF3B3B3B)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(
+                    radius: 35,
+                    backgroundColor: Colors.white,
+                    child: Icon(Icons.person, size: 30, color: Colors.black),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Welcome, John!',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge!
+                        .copyWith(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection()),
+          _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
+          _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
+      {bool isLogout = false}) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFB0B0B0)),
       title: Text(
         label,
-        style: const TextStyle(color: Color(0xFFD0D0D0)),
+        style: const TextStyle(color: Color(0xFFE0E0E0)),
       ),
-      onTap: onTap ??
-              () {
-            Navigator.pop(context);
-            if (destination != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => destination),
-              );
-            }
-          },
-    );
-  }
-
-  Widget _buildProfileHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'My Dashboard',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.edit, color: Color(0xFF5A5A5A)),
-          onPressed: () {
-            // Add edit functionality here
-          },
-        ),
-      ],
+      onTap: () {
+        if (isLogout) {
+          Navigator.pushReplacementNamed(context, '/');
+        } else if (destination != null) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => destination));
+        }
+      },
     );
   }
 
   Widget _buildProfileInfo() {
     return Card(
-      color: const Color(0xFF1C1C1E), // Dark silvery background
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+          ),
+        ),
+        child: Row(
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: const Color(0xFF3A3A3C), // Subtle border
-                  backgroundImage: const AssetImage(
-                      'assets/profile_picture.png'), // Placeholder image
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'John Doe',
-                      style: TextStyle(
+            const CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/profile_picture.png'),
+            ),
+            const SizedBox(width: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text('John Doe',
+                    style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFD0D0D0), // Silvery text color
-                      ),
-                    ),
-                    Text(
-                      'john.doe@example.com',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF9A9A9A), // Subtle silvery-grey text
-                      ),
-                    ),
-                  ],
-                ),
+                        color: Colors.white)),
+                SizedBox(height: 5),
+                Text('john.doe@example.com',
+                    style: TextStyle(fontSize: 14, color: Colors.grey)),
+                SizedBox(height: 5),
+                Text('Role: Employee',
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ],
             ),
-            const SizedBox(height: 20),
-            const Divider(
-              color: Color(0xFF3A3A3C), // Dark divider
-              thickness: 1,
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Additional Information',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFFD0D0D0), // Silvery text color
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildProfileDetailRow(Icons.date_range, 'Member since: January 2022'),
-            _buildProfileDetailRow(Icons.badge, 'Position: Associate'),
-            _buildProfileDetailRow(Icons.location_on, 'Location: City, Country'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileDetailRow(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: const Color(0xFFB0B0B0)), // Silvery icon
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color(0xFFD0D0D0), // Silvery text color
+  Widget _buildKanbanBoard() {
+    List<String> wishlistTasks = ['Task A', 'Task B', 'Task C'];
+    List<String> doingTasks = ['Task D', 'Task E'];
+    List<String> finishedTasks = ['Task F'];
+
+    void moveTask(String task, List<String> fromList, List<String> toList) {
+      setState(() {
+        fromList.remove(task);
+        toList.add(task);
+      });
+    }
+
+    void addTask(String task, List<String> targetList) {
+      setState(() {
+        targetList.add(task);
+      });
+    }
+
+    void editTask(String oldTask, String newTask, List<String> taskList) {
+      setState(() {
+        final index = taskList.indexOf(oldTask);
+        if (index != -1) {
+          taskList[index] = newTask;
+        }
+      });
+    }
+
+    void deleteTask(String task, List<String> taskList) {
+      setState(() {
+        taskList.remove(task);
+      });
+    }
+
+    Widget buildKanbanColumn(String title, List<String> tasks,
+        List<String> Function() getTargetList) {
+      return Expanded(
+        child: Card(
+          elevation: 4,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      onPressed: () {
+                        TextEditingController taskController =
+                            TextEditingController();
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Add Task'),
+                            content: TextField(
+                              controller: taskController,
+                              decoration: const InputDecoration(
+                                hintText: 'Task Name',
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  if (taskController.text.isNotEmpty) {
+                                    addTask(
+                                        taskController.text, getTargetList());
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                child: const Text('Add'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: DragTarget<String>(
+                    builder: (context, candidateData, rejectedData) {
+                      return ListView(
+                        children: tasks.map((task) {
+                          return Draggable<String>(
+                            data: task,
+                            feedback: Material(
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                color: const Color(0xFF00E676),
+                                child: Text(
+                                  task,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade800,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onDoubleTap: () {
+                                      TextEditingController editController =
+                                          TextEditingController(text: task);
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Edit Task'),
+                                          content: TextField(
+                                            controller: editController,
+                                            decoration: const InputDecoration(
+                                              hintText: 'Task Name',
+                                            ),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                editTask(task,
+                                                    editController.text, tasks);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Save'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      task,
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () => deleteTask(task, tasks),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                    onWillAcceptWithDetails: (details) {
+                      final data = details.data;
+                      final fromList = [
+                        wishlistTasks,
+                        doingTasks,
+                        finishedTasks
+                      ].firstWhere((list) => list.contains(data));
+                      return fromList != getTargetList();
+                    },
+                    onAcceptWithDetails: (details) {
+                      final data = details.data;
+                      final fromList = [
+                        wishlistTasks,
+                        doingTasks,
+                        finishedTasks
+                      ].firstWhere((list) => list.contains(data));
+                      moveTask(data, fromList, getTargetList());
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
+    }
 
-  Widget _buildPerformanceOverview() {
     return Card(
-      color: const Color(0xFF1C1C1E), // Dark card
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: const Text(
-          'Performance Overview (e.g., graphs or stats)',
-          style: TextStyle(
-            fontSize: 18,
-            color: Color(0xFFD0D0D0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        height: 300,
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
           ),
+        ),
+        child: Row(
+          children: [
+            buildKanbanColumn('Wishlist', wishlistTasks, () => wishlistTasks),
+            const SizedBox(width: 8),
+            buildKanbanColumn('Doing', doingTasks, () => doingTasks),
+            const SizedBox(width: 8),
+            buildKanbanColumn('Finished', finishedTasks, () => finishedTasks),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildActivityFeed() {
-    return Card(
-      color: const Color(0xFF1C1C1E), // Dark card
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: const Text(
-          'Activity Feed (e.g., notifications or updates)',
-          style: TextStyle(
-            fontSize: 18,
-            color: Color(0xFFD0D0D0),
-          ),
-        ),
-      ),
+  Widget _buildAttendanceSystem() {
+    List<Map<String, dynamic>> attendanceTasks = [
+      {'task': 'Check in for daily report', 'checked': false, 'time': null},
+      {
+        'task': 'Check in for team meeting at 10 AM',
+        'checked': false,
+        'time': null
+      },
+      {
+        'task': 'Check in for project proposal submission by 3 PM',
+        'checked': false,
+        'time': null
+      },
+    ];
+
+    void toggleCheckIn(int index) {
+      setState(() {
+        if (!attendanceTasks[index]['checked']) {
+          attendanceTasks[index]['checked'] = true;
+          attendanceTasks[index]['time'] = DateTime.now();
+        } else {
+          attendanceTasks[index]['checked'] = false;
+          attendanceTasks[index]['time'] = null;
+        }
+      });
+    }
+
+    return _buildFeatureCard(
+      'Attendance System',
+      [
+        ...attendanceTasks.asMap().entries.map((entry) {
+          int index = entry.key;
+          Map<String, dynamic> task = entry.value;
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  task['task'],
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+              Checkbox(
+                value: task['checked'],
+                onChanged: (value) => toggleCheckIn(index),
+                checkColor: Colors.white,
+                fillColor: WidgetStateProperty.resolveWith<Color>(
+                  (states) => states.contains(WidgetState.selected)
+                      ? Colors.green
+                      : Colors.grey,
+                ),
+              ),
+              if (task['time'] != null)
+                Text(
+                  'Checked in at: ${task['time'].hour}:${task['time'].minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+            ],
+          );
+        }).toList(),
+      ],
+      height: 300, // Adjust height as needed
     );
   }
 
-  Widget _buildTeamMembers() {
+  Widget _buildCalendar() {
+    return _buildFeatureCard(
+      'Calendar/Schedule',
+      [
+        const Text('Upcoming Meeting: 10 AM',
+            style: TextStyle(color: Colors.white)),
+        const Text('Project Deadline: 3 PM',
+            style: TextStyle(color: Colors.white)),
+      ],
+      height: 300, // Set a taller height to match To-Do List
+    );
+  }
+
+// Updated to accept height for consistent sizes
+  Widget _buildFeatureCard(String title, List<Widget> children,
+      {double height = 250}) {
     return Card(
-      color: const Color(0xFF1C1C1E), // Dark card
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: const Text(
-          'Team Members (e.g., profile pictures and names)',
-          style: TextStyle(
-            fontSize: 18,
-            color: Color(0xFFD0D0D0),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
           ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 10),
+            ...children,
+          ],
         ),
       ),
     );

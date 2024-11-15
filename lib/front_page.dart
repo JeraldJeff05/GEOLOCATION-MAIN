@@ -15,7 +15,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? _savedUsername, _savedPassword;
 
   // Initial and target positions for the login form
-  double _leftPosition = -620; // Start off-screen to the left
+  double _leftPosition = 50; // Start off-screen to the left
   final double _targetLeftPosition =
       0; // Will calculate final position dynamically
 
@@ -108,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 800),
+            duration: const Duration(milliseconds: 1000),
             curve: Curves.easeInOut,
             top: 100,
             // Fixed position vertically
