@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'features/calendar_section.dart';
-import 'settings_section.dart';
+// import 'settings_section.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection()),
-          _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
+          // _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),

@@ -1,8 +1,5 @@
 import 'dart:async'; // Import for delayed execution
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'location_service.dart';
-import 'sign_in.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -12,12 +9,12 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
-  String? _savedUsername, _savedPassword;
 
   // Initial and target positions for the login form
-  double _leftPosition = 50; // Start off-screen to the left
-  final double _targetLeftPosition =
-      0; // Will calculate final position dynamically
+  double _topPosition = -500; // Start off-screen above
+  final double _targetTopPosition = 275; // Desired final position
+
+  bool _showOverlay = false; // State to control overlay visibility
 
   @override
   void initState() {
@@ -25,27 +22,42 @@ class _MyHomePageState extends State<MyHomePage> {
     // Delay the animation to allow the widget to build
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
-        _leftPosition = _targetLeftPosition;
+        _topPosition = _targetTopPosition;
       });
     });
   }
 
-  Future<void> _getCurrentLocationAndLogin() async {
-    if (!await LocationService.checkLocationService(_showLocationErrorDialog)) {
-      return;
-    }
-    Position position = await LocationService.getCurrentPosition();
-    if (!LocationService.isLocationInRange(
-        position.latitude, position.longitude)) {
-      _showLocationErrorDialog(
-          "You are not within the allowed location range and cannot access this site.");
-    } else {
-      _login();
+  void _login() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _formKey.currentState?.save();
+
+      setState(() {
+        _showOverlay = true; // Show overlay when login is clicked
+      });
+
+      // Simulate a delay to show the overlay effect
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          _showOverlay = false; // Hide overlay after a delay
+        });
+        if (_username == 'admin' && _password == 'admin') {
+          _showWelcomeDialog();
+        } else {
+          _showSnackbar('Invalid username or password');
+        }
+      });
     }
   }
 
-  void _showLocationErrorDialog(String message) {
-    _showDialog('Access Denied', message);
+  void _showWelcomeDialog() {
+    _showDialog('Welcome', 'Welcome to FDS!');
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  void _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   void _showDialog(String title, String content) {
@@ -66,35 +78,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _login() {
-    if (_formKey.currentState?.validate() ?? false) {
-      _formKey.currentState?.save();
-
-      if (_username == _savedUsername && _password == _savedPassword) {
-        _showWelcomeDialog();
-      } else if (_username == 'admin' && _password == 'admin') {
-        _showWelcomeDialog();
-      } else {
-        _showSnackbar('Invalid username or password');
-      }
-    }
-  }
-
-  void _showWelcomeDialog() {
-    _showDialog('Welcome', 'Welcome to FDS!');
-    Navigator.pushReplacementNamed(context, '/home');
-  }
-
-  void _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final double centerLeftPosition =
-        MediaQuery.of(context).size.width / 2 - 250;
+        MediaQuery.of(context).size.width / 2 - -140;
 
     return Scaffold(
       body: Stack(
@@ -102,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/CorporateBG1.png'),
+                image: AssetImage('assets/FinalBG.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -110,13 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 1000),
             curve: Curves.easeInOut,
-            top: 100,
-            // Fixed position vertically
-            left: _leftPosition == _targetLeftPosition
-                ? centerLeftPosition
-                : _leftPosition,
+            top: _topPosition, // Animated vertical position
+            left: centerLeftPosition, // Centered horizontally
             child: _buildLoginForm(),
           ),
+          if (_showOverlay)
+            _buildOverlay(), // Show overlay if _showOverlay is true
         ],
       ),
     );
@@ -125,14 +111,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildLoginForm() {
     return Container(
       width: 500,
-      height: 620,
+      height: 500,
       padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
-        color: Color(0xFFE6F3FA).withOpacity(0.9),
+        color: Color(0xFFE6F3FA).withOpacity(0),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0),
             spreadRadius: 2,
             blurRadius: 5,
             offset: const Offset(0, 0),
@@ -147,14 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10.5),
-                Image.asset(
-                  'assets/finallogo(1).png',
-                  width: 400,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 45),
+                const SizedBox(height: 34),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
                   validator: (value) {
@@ -165,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   onSaved: (value) => _username = value,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 _buildTextFieldWithValidation(
                   icon: Icons.lock,
                   validator: (value) {
@@ -177,81 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   onSaved: (value) => _password = value,
                   obscureText: true,
                 ),
-                const SizedBox(height: 20.5),
-                _buildGradientButton('Login', _getCurrentLocationAndLogin),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Divider(thickness: 2, color: Color(0xFF6D4C41)),
-                    ),
-                    const SizedBox(width: 20),
-                    const Text(
-                      style: TextStyle(
-                        fontFamily: 'CustomFont',
-                        fontSize: 12,
-                      ),
-                      "Sign up ",
-                    ),
-                    GestureDetector(
-                      onTap: _signIn,
-                      child: Text(
-                        "Here",
-                        style: TextStyle(
-                          color: Color(0xFF630606),
-                          fontFamily: 'CustomFont',
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Divider(thickness: 2, color: Color(0xFF6D4C41)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                const Text(
-                  "Today is your opportunity to build the tomorrow you want",
-                  style: TextStyle(
-                    color: Color(0xFF630606),
-                    fontSize: 20,
-                    fontFamily: 'CustomFont',
-                    fontWeight: FontWeight.normal,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 35),
-                Divider(thickness: 2, color: Color(0xFF6D4C41)),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.language, color: Color(0xFF000000), size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      'https://fdsap-ph.fortress-asya.com',
-                      style: TextStyle(
-                        color: Color(0xFF6D4C41),
-                        fontSize: 14,
-                        fontFamily: 'CustomFont',
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    Icon(Icons.phone, color: Color(0xFF000000), size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      '+63 947 362 3226',
-                      style: TextStyle(
-                        color: Color(0xFF6D4C41),
-                        fontSize: 14,
-                        fontFamily: 'CustomFont',
-                      ),
-                    ),
-                  ],
-                ),
+                const SizedBox(height: 1.5),
+                _buildGifButton(_login),
               ],
             ),
           ),
@@ -260,69 +166,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _signIn() {
-    showSignInDialog(
-      context: context,
-      onSignIn: (username, password) {
-        setState(() {
-          _savedUsername = username;
-          _savedPassword = password;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text(
-                  "Sign-up successful! Use the new credentials to log in.")),
-        );
-      },
-    );
-  }
-
-  Widget _buildGradientButton(String text, VoidCallback onPressed) {
+  Widget _buildGifButton(VoidCallback onPressed) {
     return Center(
-      child: SizedBox(
-        height: 30,
-        width: 130, // Slightly wider for better appearance
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            elevation: 3,
-            padding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-          child: Ink(
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  Colors.transparent
-                ], // New gradient
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 0,
-                  offset: Offset(0, 0),
-                ),
-              ],
-            ),
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontFamily: 'CustomFont',
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+      child: GestureDetector(
+        onTap: onPressed,
+        child: SizedBox(
+          height: 100,
+          width: 250,
+          child: Image.asset(
+            'assets/Legit.gif',
+            fit: BoxFit.contain,
           ),
         ),
       ),
@@ -339,33 +192,32 @@ class _MyHomePageState extends State<MyHomePage> {
       obscureText: obscureText,
       decoration: InputDecoration(
         prefixIcon: Icon(icon),
-        // Add the icon here
         filled: true,
-        fillColor: Color(0xFF111111).withOpacity(0.4),
-        // Background color
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15.0, horizontal: 7.0),
-        // Padding inside the text field
-
-        // Add rounded corners
+        fillColor: Color(0xFFCBCACB).withOpacity(1),
+        hintStyle: TextStyle(color: Colors.red.withOpacity(0.4)),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide.none, // No border line
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide.none, // No border line
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.0),
-          borderSide: BorderSide(
-            color: Colors.blue, // Optional border color on focus
-            width: 2.0,
-          ),
+          borderRadius: BorderRadius.circular(100),
         ),
       ),
       validator: validator,
       onSaved: onSaved,
+    );
+  }
+
+  Widget _buildOverlay() {
+    return Container(
+      color: Colors.black.withOpacity(0.8), // Dark transparent overlay
+      child: Center(
+        child: Text(
+          'We listen, We anticipate, We deliver',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

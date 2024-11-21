@@ -44,7 +44,8 @@ dependencies:
   geolocator_web: ^4.1.1
   table_calendar: ^3.1.2
   video_player: ^2.6.0
-
+  http: ^1.0.0
+  
     
 
 dev_dependencies:
@@ -68,17 +69,17 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-   
-    - assets/Fjustthename.png
-    - assets/Autumn.png
-    - assets/FINALFDS.png
+  
+
     - assets/profile_picture.png
-    - assets/FDSLOGOJEFF.png
-    - assets/JEFFDSLOGOSC.png
     - assets/CorporateBG1.png
-    - assets/startupbg2.png
-    - assets/finallogo(1).png
     - assets/HomeBG.png
+    - assets/loadingwhite.gif
+    - assets/geobg.png
+    - assets/LoginButton.gif
+    - assets/Legit.gif
+    - assets/GeofenceBG.png
+    - assets/FinalBG.png
   
   fonts:
     - family: CustomFont
