@@ -36,7 +36,6 @@ class _MyHomePageState extends State<MyHomePage> {
         _showOverlay = true; // Show overlay when login is clicked
       });
 
-      // Create an instance of ApiLogin
       final apiLogin = ApiLogin();
       final isLoggedIn = await apiLogin.login(
         id: _username!,
@@ -48,9 +47,9 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       if (isLoggedIn) {
-        _showWelcomeDialog();
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
-        _showSnackbar('Invalid username or password');
+        _showDialog('Error', 'Wrong credentials. Please try again.');
       }
     }
   }
@@ -142,6 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 34),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
+                  labelText: 'Employee ID', // Add label
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your ID number';
@@ -153,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 16),
                 _buildTextFieldWithValidation(
                   icon: Icons.lock,
+                  labelText: 'Password', // Add label
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -193,10 +194,15 @@ class _MyHomePageState extends State<MyHomePage> {
     required FormFieldValidator<String> validator,
     required FormFieldSetter<String> onSaved,
     bool obscureText = false,
+    required String labelText,
+    Color labelColor = Colors.black87, // Add labelText as a required parameter
   }) {
     return TextFormField(
       obscureText: obscureText,
       decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle:
+            TextStyle(color: labelColor), // Set the label for the text field
         prefixIcon: Icon(icon),
         filled: true,
         fillColor: Color(0xFFCBCACB).withOpacity(1),
