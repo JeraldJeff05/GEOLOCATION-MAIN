@@ -1,5 +1,6 @@
 import 'dart:async'; // Import for delayed execution
 import 'package:flutter/material.dart';
+import 'api_login.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -27,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
@@ -35,17 +36,22 @@ class _MyHomePageState extends State<MyHomePage> {
         _showOverlay = true; // Show overlay when login is clicked
       });
 
-      // Simulate a delay to show the overlay effect
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _showOverlay = false; // Hide overlay after a delay
-        });
-        if (_username == 'admin' && _password == 'admin') {
-          _showWelcomeDialog();
-        } else {
-          _showSnackbar('Invalid username or password');
-        }
+      // Create an instance of ApiLogin
+      final apiLogin = ApiLogin();
+      final isLoggedIn = await apiLogin.login(
+        id: _username!,
+        password: _password!,
+      );
+
+      setState(() {
+        _showOverlay = false; // Hide overlay after API call
       });
+
+      if (isLoggedIn) {
+        _showWelcomeDialog();
+      } else {
+        _showSnackbar('Invalid username or password');
+      }
     }
   }
 
@@ -138,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: Icons.person,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your username';
+                      return 'Please enter your ID number';
                     }
                     return null;
                   },
