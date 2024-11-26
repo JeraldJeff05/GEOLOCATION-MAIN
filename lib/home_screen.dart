@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'nearbyfriends.dart'; // Assuming NearbyFriendsScreen is in nearby_friends.dart
 import 'features/calendar_section.dart';
 // import 'settings_section.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,6 +11,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isCheckedIn = true; // Start as checked-in
+  bool _isCheckedOut = false;
+  bool _hasPressedAttendance = true; // Considered already checked-in
+  bool _hasPressedCheckout = false;
+  DateTime? _checkInTime;
+  DateTime? _checkOutTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // Automatically set the check-in state after logging in
+    _isCheckedIn = true;
+    _hasPressedAttendance = true;
+    _checkInTime = DateTime.now();
+  }
+
+  void _saveAttendanceStatus(bool value) {
+    setState(() {
+      _isCheckedIn = value;
+      _hasPressedAttendance = true;
+      _checkInTime = DateTime.now();
+    });
+  }
+
+  void _saveCheckoutStatus(bool value) {
+    setState(() {
+      _isCheckedOut = value;
+      _hasPressedCheckout = true;
+      _checkOutTime = DateTime.now();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,10 +79,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NearbyFriendsScreen()),
+          );
+        },
+        backgroundColor: Colors.blue,
+        child: Icon(Icons.person_search),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
-  Widget _buildNavigationDrawer() {
+Widget _buildNavigationDrawer() {
     return Container(
       width: 280,
       color: const Color(0xFF363636),
@@ -379,108 +425,179 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildAttendanceSystem() {
-    List<Map<String, dynamic>> attendanceTasks = [
-      {'task': 'Check in for daily report', 'checked': false, 'time': null},
-      {
-        'task': 'Check in for team meeting at 10 AM',
-        'checked': false,
-        'time': null
-      },
-      {
-        'task': 'Check in for project proposal submission by 3 PM',
-        'checked': false,
-        'time': null
-      },
-    ];
-
-    void toggleCheckIn(int index) {
-      setState(() {
-        if (!attendanceTasks[index]['checked']) {
-          attendanceTasks[index]['checked'] = true;
-          attendanceTasks[index]['time'] = DateTime.now();
-        } else {
-          attendanceTasks[index]['checked'] = false;
-          attendanceTasks[index]['time'] = null;
-        }
-      });
+    // Format for Date (MM/DD/YY)
+    String formatDate(DateTime dateTime) {
+      return DateFormat('MM/dd/yy').format(dateTime);
     }
 
-    return _buildFeatureCard(
-      'Attendance System',
-      [
-        ...attendanceTasks.asMap().entries.map((entry) {
-          int index = entry.key;
-          Map<String, dynamic> task = entry.value;
+    // Format for Time (12-hour format with AM/PM)
+    String formatTime(DateTime dateTime) {
+      return DateFormat('hh:mm a').format(dateTime); // 12-hour format with AM/PM
+    }
 
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  task['task'],
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              Checkbox(
-                value: task['checked'],
-                onChanged: (value) => toggleCheckIn(index),
-                checkColor: Colors.white,
-                fillColor: WidgetStateProperty.resolveWith<Color>(
-                  (states) => states.contains(WidgetState.selected)
-                      ? Colors.green
-                      : Colors.grey,
-                ),
-              ),
-              if (task['time'] != null)
-                Text(
-                  'Checked in at: ${task['time'].hour}:${task['time'].minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-            ],
-          );
-        }).toList(),
-      ],
-      height: 300, // Adjust height as needed
-    );
-  }
-
-  Widget _buildCalendar() {
-    return _buildFeatureCard(
-      'Calendar/Schedule',
-      [
-        const Text('Upcoming Meeting: 10 AM',
-            style: TextStyle(color: Colors.white)),
-        const Text('Project Deadline: 3 PM',
-            style: TextStyle(color: Colors.white)),
-      ],
-      height: 300, // Set a taller height to match To-Do List
-    );
-  }
-
-// Updated to accept height for consistent sizes
-  Widget _buildFeatureCard(String title, List<Widget> children,
-      {double height = 250}) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        height: height,
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title,
-                style: const TextStyle(color: Colors.white, fontSize: 18)),
-            const SizedBox(height: 10),
-            ...children,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Attendance System',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    // Implement Log History navigation or function
+                    Navigator.pushNamed(context, '/logHistory'); // Example route
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey.shade800,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8), // Adjust padding
+                  ),
+                  child: const Text(
+                    'Log History',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _isCheckedIn
+                      ? 'Log In: ${formatDate(_checkInTime!)} at ${formatTime(_checkInTime!)}'
+                      : 'Not Log In',
+                  style: TextStyle(
+                    color: _isCheckedIn ? Colors.green : Colors.white,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: !_hasPressedAttendance
+                      ? () {
+                    _saveAttendanceStatus(true);
+                    setState(() {
+                      _isCheckedIn = true;
+                      _checkInTime = DateTime.now();
+                      _hasPressedAttendance = true; // Disable button
+                    });
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                    _hasPressedAttendance ? Colors.blueGrey : Colors.white,
+                  ),
+                  child: Text(
+                    !_hasPressedAttendance ? 'Log in' : 'Log In Approved',
+                    style: TextStyle(
+                      color: !_hasPressedAttendance ? Colors.black : Colors.green,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _isCheckedOut
+                      ? 'Log Out: ${formatDate(_checkOutTime!)} at ${formatTime(_checkOutTime!)}'
+                      : 'Logging Out?',
+                  style: TextStyle(
+                    color: _isCheckedOut ? Colors.green : Colors.white,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: !_hasPressedCheckout
+                      ? () {
+                    _saveCheckoutStatus(true);
+                    setState(() {
+                      _isCheckedOut = true;
+                      _checkOutTime = DateTime.now();
+                      _hasPressedCheckout = true; // Disable button
+                    });
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                    _hasPressedCheckout ? Colors.blueGrey : Colors.white,
+                  ),
+                  child: Text(
+                    !_hasPressedCheckout ? 'Log Out' : 'Log Out Approved',
+                    style: TextStyle(
+                      color: !_hasPressedCheckout ? Colors.black : Colors.green,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildCalendar() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        height: 400, // Reduced height
+        padding: const EdgeInsets.all(8), // Reduced padding
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(colors: [Color(0xFF707070), Color(0xFF4A4A4A)]),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 1), // Reduced spacing
+            Expanded(
+              child: TableCalendar(
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: DateTime.now(),
+                calendarStyle: CalendarStyle(
+                  todayDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                  selectedDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                  defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 12), // Smaller font
+                  weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 12),
+                  outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 10),
+                ),
+                headerStyle: HeaderStyle(
+                  formatButtonVisible: false,
+                  titleTextStyle: const TextStyle(color: Colors.white, fontSize: 14), // Reduced font size
+                  leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 16),
+                  rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 16),
+                ),
+                daysOfWeekStyle: const DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(color: Colors.white, fontSize: 10), // Smaller font
+                  weekendStyle: TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
