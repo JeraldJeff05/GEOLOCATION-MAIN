@@ -1,10 +1,125 @@
+import 'package:check_loc/features/Otherfeatures.dart';
 import 'package:flutter/material.dart';
-import 'nearbyfriends.dart'; // Assuming NearbyFriendsScreen is in nearby_friends.dart
 import 'features/calendar_section.dart';
 // import 'settings_section.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+class ChartData {
+  ChartData(this.task, this.value);
+  final String task;
+  final double value;
+}
+class MoodTracker extends StatefulWidget {
+  @override
+  _MoodTrackerState createState() => _MoodTrackerState();
+}
+
+class _MoodTrackerState extends State<MoodTracker> {
+  final List<String> moods = ["😄", "😐", "😞"]; // Emojis representing moods
+  String? selectedMood;
+  List<String> moodHistory = [];
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMoodHistory();
+  }
+
+  // Load mood history from shared preferences
+  Future<void> _loadMoodHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      moodHistory = prefs.getStringList(currentDate) ?? [];
+    });
+  }
+
+  // Save the selected mood to shared preferences
+  Future<void> _saveMood(String mood) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Limit mood history to 5 items for the current day
+    if (moodHistory.length < 5) {
+      moodHistory.add(mood); // Add the new mood
+      await prefs.setStringList(currentDate, moodHistory);
+    }
+  }
+
+  // Handle mood selection
+  void _onMoodSelected(String mood) {
+    if (moodHistory.length < 5) {
+      setState(() {
+        selectedMood = mood;
+      });
+      _saveMood(mood);
+    } else {
+      // Show a message if the limit is reached
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("You can only select up to 5 moods per day."),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView( // Wrap the Column in a SingleChildScrollView
+      child: Column(
+        children: [
+          Text(
+            "How do you feel today?",
+            style: TextStyle(fontSize: 20),
+          ),
+          SizedBox(height: 5),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: moods.map((mood) {
+              return GestureDetector(
+                onTap: () => _onMoodSelected(mood),
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    mood,
+                    style: TextStyle(fontSize: 48),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 3),
+          if (selectedMood != null)
+            Text(
+              "You selected: $selectedMood",
+              style: TextStyle(fontSize: 20),
+            ),
+          SizedBox(height: 3),
+          Text(
+            "Mood History:",
+            style: TextStyle(fontSize: 15),
+          ),
+          SizedBox(height: 3),
+          // Display mood history in a row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: moodHistory.map((mood) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 5),
+                child: Text(
+                  mood,
+                  style: TextStyle(fontSize: 24),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -43,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,17 +195,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => NearbyFriendsScreen()),
-          );
-        },
-        backgroundColor: Colors.blue,
-        child: Icon(Icons.person_search),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
@@ -131,11 +236,14 @@ Widget _buildNavigationDrawer() {
           ),
           _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection()),
           // _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
+          _buildDrawerItem(Icons.settings, 'Other Features', OtherFeatures()),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
+
     );
   }
+
 
   Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
       {bool isLogout = false}) {
@@ -197,45 +305,56 @@ Widget _buildNavigationDrawer() {
   }
 
   Widget _buildKanbanBoard() {
-    List<String> wishlistTasks = ['Task A', 'Task B', 'Task C'];
-    List<String> doingTasks = ['Task D', 'Task E'];
-    List<String> finishedTasks = ['Task F'];
+    // Clear the task lists
+    List<String> Tasksprogress = []; // Empty list for Wishlist
+    List<String> Quotes = []; // Empty list for Doing
+    List<String> Mood = []; // Empty list for Finished
 
-    void moveTask(String task, List<String> fromList, List<String> toList) {
-      setState(() {
-        fromList.remove(task);
-        toList.add(task);
-      });
+    // Sample data for the chart
+    List<ChartData> chartData = [
+      ChartData('Unfinished', 10),
+      ChartData('Finished', 20),
+    ];
+
+    // List of quotes
+    List<String> quotes = [
+      "The only way to do great work is to love what you do. - Steve Jobs",
+      "Success is not the key to happiness. Happiness is the key to success. - Albert Schweitzer",
+      "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+      "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+      "You are never too old to set another goal or to dream a new dream. - C.S. Lewis",
+      "Act as if what you do makes a difference. It does. - William James",
+      "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
+      "Opportunities don't happen. You create them. - Chris Grosser",
+      "I find that the harder I work, the more luck I seem to have. - Thomas Jefferson",
+      "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt"
+    ];
+
+
+    // Get the current date and use it to select a quote
+    int currentDay = DateTime.now().day;
+    String dailyQuote = quotes[currentDay % quotes.length]; // Select a quote based on the day
+
+    Widget buildChart() {
+      return SfCartesianChart(
+        title: ChartTitle(text: 'Task Distribution'),
+        primaryXAxis: CategoryAxis(),
+        series: <CartesianSeries>[
+          ColumnSeries<ChartData, String>(
+            dataSource: chartData,
+            xValueMapper: (ChartData data, _) => data.task,
+            yValueMapper: (ChartData data, _) => data.value,
+          )
+        ],
+      );
     }
 
-    void addTask(String task, List<String> targetList) {
-      setState(() {
-        targetList.add(task);
-      });
-    }
 
-    void editTask(String oldTask, String newTask, List<String> taskList) {
-      setState(() {
-        final index = taskList.indexOf(oldTask);
-        if (index != -1) {
-          taskList[index] = newTask;
-        }
-      });
-    }
-
-    void deleteTask(String task, List<String> taskList) {
-      setState(() {
-        taskList.remove(task);
-      });
-    }
-
-    Widget buildKanbanColumn(String title, List<String> tasks,
-        List<String> Function() getTargetList) {
+    Widget buildKanbanColumn(String title, List<String> tasks) {
       return Expanded(
         child: Card(
           elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
@@ -243,157 +362,47 @@ Widget _buildNavigationDrawer() {
                 colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+            child: SingleChildScrollView( // Allow scrolling within each column
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (title == 'Task Progress') // Insert chart in Task Progress column
+                    Container(
+                      height: 200, // Set a specific height for the chart
+                      child: buildChart(),
+                    ),
+                  if (title == 'Quotes') // Display the quote in the Quotes column
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: Text(
+                          dailyQuote,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      onPressed: () {
-                        TextEditingController taskController =
-                            TextEditingController();
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Add Task'),
-                            content: TextField(
-                              controller: taskController,
-                              decoration: const InputDecoration(
-                                hintText: 'Task Name',
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  if (taskController.text.isNotEmpty) {
-                                    addTask(
-                                        taskController.text, getTargetList());
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                child: const Text('Add'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                  if (title == 'Mood') // Add Mood Tracker in Finished column
+                    Container(
+                      height: 300, // Set a specific height for the MoodTracker
+                      child: SingleChildScrollView(
+                        child: MoodTracker(),
+                      ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: DragTarget<String>(
-                    builder: (context, candidateData, rejectedData) {
-                      return ListView(
-                        children: tasks.map((task) {
-                          return Draggable<String>(
-                            data: task,
-                            feedback: Material(
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                color: const Color(0xFF00E676),
-                                child: Text(
-                                  task,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade800,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                    onDoubleTap: () {
-                                      TextEditingController editController =
-                                          TextEditingController(text: task);
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('Edit Task'),
-                                          content: TextField(
-                                            controller: editController,
-                                            decoration: const InputDecoration(
-                                              hintText: 'Task Name',
-                                            ),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                editTask(task,
-                                                    editController.text, tasks);
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Save'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      task,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () => deleteTask(task, tasks),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                    onWillAcceptWithDetails: (details) {
-                      final data = details.data;
-                      final fromList = [
-                        wishlistTasks,
-                        doingTasks,
-                        finishedTasks
-                      ].firstWhere((list) => list.contains(data));
-                      return fromList != getTargetList();
-                    },
-                    onAcceptWithDetails: (details) {
-                      final data = details.data;
-                      final fromList = [
-                        wishlistTasks,
-                        doingTasks,
-                        finishedTasks
-                      ].firstWhere((list) => list.contains(data));
-                      moveTask(data, fromList, getTargetList());
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -404,7 +413,7 @@ Widget _buildNavigationDrawer() {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        height: 300,
+        height: 340,
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -413,17 +422,16 @@ Widget _buildNavigationDrawer() {
         ),
         child: Row(
           children: [
-            buildKanbanColumn('Wishlist', wishlistTasks, () => wishlistTasks),
+            buildKanbanColumn('Task Progress', Tasksprogress),
             const SizedBox(width: 8),
-            buildKanbanColumn('Doing', doingTasks, () => doingTasks),
+            buildKanbanColumn('Quotes', Quotes),
             const SizedBox(width: 8),
-            buildKanbanColumn('Finished', finishedTasks, () => finishedTasks),
+            buildKanbanColumn('Mood', Mood),
           ],
         ),
       ),
     );
   }
-
   Widget _buildAttendanceSystem() {
     // Format for Date (MM/DD/YY)
     String formatDate(DateTime dateTime) {
