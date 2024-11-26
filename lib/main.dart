@@ -4,6 +4,7 @@ import 'api_service.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
+import 'admin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        // '/start': (context) => const StartScreen(),
+        '/start': (context) => const StartScreen(),
         '/': (context) => MyHomePage(),
         '/home': (context) => HomeScreen(),
       },
@@ -106,7 +107,7 @@ class _StartScreenState extends State<StartScreen> {
         children: [
           // Background image
           Image.asset(
-            'assets/GeofenceBG.png',
+            'assets/reversebg.png',
             fit: BoxFit.cover,
           ),
           // Fade-out overlay
@@ -145,39 +146,22 @@ class _StartScreenState extends State<StartScreen> {
           ),
           // Positioned "Get Started" button
           if (_showButton) // Show the button only if _showButton is true
-            Align(
-              alignment:
-                  const Alignment(0.59, -0.12), // Adjust vertical alignment
-              child: ElevatedButton(
-                onPressed: _fadeOutAndNavigate,
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  backgroundColor: Colors.white, // White inside
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Curved sides
-                    side: const BorderSide(
-                      color: Color(0xFF630606), // Maroon border
-                      width: 2,
-                    ),
+            if (_showButton) // Show the button only if _showButton is true
+              Align(
+                alignment:
+                    const Alignment(-0.65, -0.1), // Adjust alignment as needed
+                child: GestureDetector(
+                  onTap:
+                      _fadeOutAndNavigate, // Trigger the function when the GIF is tapped
+                  child: Image.asset(
+                    'assets/startbutton.gif', // Path to the GIF file
+                    width: 200, // Adjust the size of the GIF
+                    height: 150, // Adjust height as needed
+                    fit: BoxFit
+                        .contain, // Ensure the GIF fits well within the bounds
                   ),
-                  elevation: 2, // Slight elevation for modern look
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Get Started',
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Color(0xFF630606), // Maroon text
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
                 ),
               ),
-            ),
         ],
       ),
     );

@@ -1,6 +1,7 @@
 import 'dart:async'; // Import for delayed execution
 import 'package:flutter/material.dart';
-import 'api_login.dart';
+import 'api/api_login.dart';
+import 'dart:ui'; // For ImageFilter.blur
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final double _targetTopPosition = 275; // Desired final position
 
   bool _showOverlay = false; // State to control overlay visibility
+  bool _showLoginForm = false; // State for opacity animation
 
   @override
   void initState() {
@@ -24,6 +26,11 @@ class _MyHomePageState extends State<MyHomePage> {
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         _topPosition = _targetTopPosition;
+      });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        setState(() {
+          _showLoginForm = true; // Trigger opacity animation
+        });
       });
     });
   }
@@ -99,12 +106,24 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+          // Blurred background for login form
+          if (!_showLoginForm)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(
+                color: Colors.black.withOpacity(0.1),
+              ),
+            ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 1000),
             curve: Curves.easeInOut,
             top: _topPosition, // Animated vertical position
             left: centerLeftPosition, // Centered horizontally
-            child: _buildLoginForm(),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 500),
+              opacity: _showLoginForm ? 1.0 : 0.0, // Fade in/out effect
+              child: _buildLoginForm(),
+            ),
           ),
           if (_showOverlay)
             _buildOverlay(), // Show overlay if _showOverlay is true
@@ -119,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 500,
       padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
-        color: Color(0xFFE6F3FA).withOpacity(0),
+        color: Colors.white.withOpacity(0), // Semi-transparent background
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
