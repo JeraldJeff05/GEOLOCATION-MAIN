@@ -83,6 +83,7 @@ flutter:
     - assets/FinalBG.png
     - assets/startbutton.gif
     - assets/reversebg.png
+    - assets/gettingloc.gif
   
   fonts:  
     - family: CustomFont

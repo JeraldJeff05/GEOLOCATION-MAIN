@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'location_service.dart';
-import 'api_service.dart';
+import 'location/location_service.dart';
+import 'api/api_service.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
-import 'admin_page.dart';
+import 'admin/admin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         '/start': (context) => const StartScreen(),
         '/': (context) => MyHomePage(),
         '/home': (context) => HomeScreen(),
+        '/admin': (context) => AdminPage(),
       },
     );
   }
@@ -146,22 +147,21 @@ class _StartScreenState extends State<StartScreen> {
           ),
           // Positioned "Get Started" button
           if (_showButton) // Show the button only if _showButton is true
-            if (_showButton) // Show the button only if _showButton is true
-              Align(
-                alignment:
-                    const Alignment(-0.65, -0.1), // Adjust alignment as needed
-                child: GestureDetector(
-                  onTap:
-                      _fadeOutAndNavigate, // Trigger the function when the GIF is tapped
-                  child: Image.asset(
-                    'assets/startbutton.gif', // Path to the GIF file
-                    width: 200, // Adjust the size of the GIF
-                    height: 150, // Adjust height as needed
-                    fit: BoxFit
-                        .contain, // Ensure the GIF fits well within the bounds
-                  ),
+            Align(
+              alignment:
+                  const Alignment(-0.65, -0.1), // Adjust alignment as needed
+              child: GestureDetector(
+                onTap:
+                    _fadeOutAndNavigate, // Trigger the function when the GIF is tapped
+                child: Image.asset(
+                  'assets/startbutton.gif', // Path to the GIF file
+                  width: 250, // Adjust the size of the GIF
+                  height: 200, // Adjust height as needed
+                  fit: BoxFit
+                      .contain, // Ensure the GIF fits well within the bounds
                 ),
               ),
+            ),
         ],
       ),
     );

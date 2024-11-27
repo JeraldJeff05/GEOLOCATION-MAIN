@@ -457,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-// Updated to accept height for consistent sizes
+  // Updated to accept height for consistent sizes
   Widget _buildFeatureCard(String title, List<Widget> children,
       {double height = 250}) {
     return Card(
