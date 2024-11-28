@@ -71,7 +71,6 @@ flutter:
   uses-material-design: true
   assets:
   
-
     - assets/profile_picture.png
     - assets/CorporateBG1.png
     - assets/HomeBG.png
@@ -84,6 +83,8 @@ flutter:
     - assets/startbutton.gif
     - assets/reversebg.png
     - assets/gettingloc.gif
+    - assets/startpagebg.png
+    - assets/silverbuttonlogin.png
   
   fonts:  
     - family: CustomFont

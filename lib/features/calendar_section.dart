@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarSection extends StatefulWidget {
+  const CalendarSection({super.key});
+
   @override
   _CalendarSectionState createState() => _CalendarSectionState();
 }
@@ -14,7 +16,7 @@ class Task {
 }
 
 class _CalendarSectionState extends State<CalendarSection> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  final CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   final Map<DateTime, List<Task>> _tasks = {}; // Map to store tasks for specific dates
@@ -91,7 +93,7 @@ class _CalendarSectionState extends State<CalendarSection> {
                           },
                         ),
                       );
-                    }).toList(),
+                    }),
                     ElevatedButton(
                       onPressed: () => _addTaskDialog(_selectedDay!),
                       child: const Text('Add Task'),

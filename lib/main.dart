@@ -24,16 +24,16 @@ class MyApp extends StatelessWidget {
       initialRoute: '/start',
       routes: {
         '/start': (context) => const StartScreen(),
-        '/': (context) => MyHomePage(),
-        '/home': (context) => HomeScreen(),
-        '/admin': (context) => AdminPage(),
+        '/': (context) => const MyHomePage(),
+        '/home': (context) => const HomeScreen(),
+        '/admin': (context) => const AdminPage(),
       },
     );
   }
 }
 
 class StartScreen extends StatefulWidget {
-  const StartScreen({Key? key}) : super(key: key);
+  const StartScreen({super.key});
 
   @override
   _StartScreenState createState() => _StartScreenState();
@@ -108,7 +108,7 @@ class _StartScreenState extends State<StartScreen> {
         children: [
           // Background image
           Image.asset(
-            'assets/reversebg.png',
+            'assets/startpagebg.png',
             fit: BoxFit.cover,
           ),
           // Fade-out overlay
@@ -149,14 +149,14 @@ class _StartScreenState extends State<StartScreen> {
           if (_showButton) // Show the button only if _showButton is true
             Align(
               alignment:
-                  const Alignment(-0.65, -0.1), // Adjust alignment as needed
+                  const Alignment(-0.6, 0.1), // Adjust alignment as needed
               child: GestureDetector(
                 onTap:
                     _fadeOutAndNavigate, // Trigger the function when the GIF is tapped
                 child: Image.asset(
-                  'assets/startbutton.gif', // Path to the GIF file
-                  width: 250, // Adjust the size of the GIF
-                  height: 200, // Adjust height as needed
+                  'assets/silverbuttonlogin.png', // Path to the GIF file
+                  width: 150, // Adjust the size of the GIF
+                  height: 120, // Adjust height as needed
                   fit: BoxFit
                       .contain, // Ensure the GIF fits well within the bounds
                 ),

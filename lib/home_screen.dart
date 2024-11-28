@@ -3,6 +3,8 @@ import 'features/calendar_section.dart';
 // import 'settings_section.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -83,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection()),
+          _buildDrawerItem(Icons.calendar_today, 'Calendar', const CalendarSection()),
           // _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
@@ -121,16 +123,16 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
           ),
         ),
-        child: Row(
+        child: const Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50,
               backgroundImage: AssetImage('assets/profile_picture.png'),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text('John Doe',
                     style: TextStyle(
                         fontSize: 24,
@@ -438,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             ],
           );
-        }).toList(),
+        }),
       ],
       height: 300, // Adjust height as needed
     );

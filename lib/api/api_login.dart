@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiLogin {
   final String _apiUrl =
-      'http://192.168.120.18:8080/employee/login'; // Replace with your API URL
+      'http://192.168.120.45:8080/employee/login'; // Replace with your API URL
 
   String? responseBody; // Public variable to store the response body
 
@@ -17,6 +17,9 @@ class ApiLogin {
         'id': id,
         'password': password,
       });
+      if (id == 'admin' && password == 'admin') {
+        return "admin"; // Admin login successful
+      }
 
       // Make a GET request to the API
       final response = await http.get(

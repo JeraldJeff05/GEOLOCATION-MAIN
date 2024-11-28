@@ -6,6 +6,8 @@ import 'dart:ui';
 import 'admin/admin_page.dart'; // Import AdminPage
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -60,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => AdminPage()), // Navigate to Admin Page
+              builder: (context) => const AdminPage()), // Navigate to Admin Page
         );
       } else {
         _showDialog('Error', 'Wrong credentials. Please try again.');
@@ -217,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
         labelStyle: TextStyle(color: labelColor),
         prefixIcon: Icon(icon),
         filled: true,
-        fillColor: Color(0xFFCBCACB).withOpacity(1),
+        fillColor: const Color(0xFFCBCACB).withOpacity(1),
         hintStyle: TextStyle(color: Colors.red.withOpacity(0.4)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(100),
@@ -231,7 +233,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildOverlay() {
     return Container(
       color: Colors.black.withOpacity(0.8),
-      child: Center(
+      child: const Center(
         child: Text(
           'We listen, We anticipate, We deliver',
           style: TextStyle(
