@@ -85,6 +85,9 @@ flutter:
     - assets/gettingloc.gif
     - assets/startpagebg.png
     - assets/silverbuttonlogin.png
+    - assets/cleansilvbut.png
+    - assets/rollingball.gif
+    - assets/whitefdslogo.png
   
   fonts:  
     - family: CustomFont

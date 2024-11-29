@@ -62,7 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => const AdminPage()), // Navigate to Admin Page
+              builder: (context) =>
+                  const AdminPage()), // Navigate to Admin Page
         );
       } else {
         _showDialog('Error', 'Wrong credentials. Please try again.');
@@ -114,8 +115,12 @@ class _MyHomePageState extends State<MyHomePage> {
           AnimatedPositioned(
             duration: const Duration(milliseconds: 100),
             curve: Curves.easeInOut,
-            top: _topPosition,
-            left: centerLeftPosition,
+            top: MediaQuery.of(context).size.height > 600
+                ? _topPosition
+                : MediaQuery.of(context).size.height / 2 - 250,
+            left: MediaQuery.of(context).size.width > 1200
+                ? centerLeftPosition
+                : MediaQuery.of(context).size.width / 2 - 250,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 1000),
               opacity: _showLoginForm ? 1.0 : 0.0,
@@ -129,16 +134,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildLoginForm() {
+    bool isScreenMinimized = MediaQuery.of(context).size.width < 1200;
+
     return Container(
       width: 500,
-      height: 500,
+      height: 330,
       padding: const EdgeInsets.all(40.0),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0),
+        color: isScreenMinimized
+            ? Colors.black26.withOpacity(0.8)
+            : Colors.white.withOpacity(0),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0),
+            color: Colors.black.withOpacity(isScreenMinimized ? 0.5 : 0),
             spreadRadius: 2,
             blurRadius: 5,
             offset: const Offset(0, 0),
@@ -177,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   onSaved: (value) => _password = value,
                   obscureText: true,
+                  onSubmit: _login, // Trigger login on Enter
                 ),
                 const SizedBox(height: 1.5),
                 _buildGifButton(_login),
@@ -211,6 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
     bool obscureText = false,
     required String labelText,
     Color labelColor = Colors.black87,
+    VoidCallback? onSubmit,
   }) {
     return TextFormField(
       obscureText: obscureText,
@@ -227,6 +238,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       validator: validator,
       onSaved: onSaved,
+      onFieldSubmitted: (value) {
+        if (onSubmit != null) {
+          onSubmit();
+        }
+      },
     );
   }
 

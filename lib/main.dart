@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        '/start': (context) => const StartScreen(),
+        //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -46,58 +46,135 @@ class _StartScreenState extends State<StartScreen> {
   String _message = ""; // Initial message
   bool _isLoading = false; // To control loading animation visibility
   bool _showButton = true; // Tracks visibility of the button
+  bool _showGif = false; // Controls visibility of the rolling ball GIF
+  bool _showMessage = false; // Controls visibility of the message text
+  late Timer _typingTimer; // Timer for typing animation
+  int _messageIndex = 0; // Index to track the typing animation
+  String _currentMessage = ""; // Current message being typed
+
+  // Method to start typing animation and loop it
+  void _startTypingAnimation(String message, VoidCallback onComplete) {
+    _messageIndex = 0;
+    _currentMessage = message;
+    setState(() {
+      _message = ""; // Reset message
+    });
+
+    _typingTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (_messageIndex < message.length) {
+        setState(() {
+          _message += message[_messageIndex]; // Append each character
+        });
+        _messageIndex++;
+      } else {
+        // Stop the typing animation and trigger the next step
+        _typingTimer.cancel();
+        onComplete(); // Call the callback when typing is complete
+      }
+    });
+  }
 
   void _fadeOutAndNavigate() async {
     setState(() {
       _showButton = false; // Hide the button when clicked
-      _opacity = 1.0; // Start darkening animation
-      _message = "Getting current location"; // First message
-      _isLoading = true; // Show loading animation
+      _opacity = 0.3; // Start darkening animation
+      _showGif = true; // Show the rolling ball GIF
+      _showMessage = true; // Show message in place of the button
     });
 
-    // Wait for 1.5 seconds to display "Getting current location"
+    // Wait for 1.5 seconds before showing the GIF
     await Future.delayed(const Duration(seconds: 1));
 
-    // Fetch user's location
-    await _locationService.getCurrentLocation();
+    // Start the typing animation for "Getting Current location..."
+    _startTypingAnimation("Getting Current location...", () async {
+      // Fetch user's location
+      await _locationService.getCurrentLocation();
 
-    // If location is available, send it to the API
-    if (_locationService.lat != null && _locationService.lng != null) {
-      String response = await _apiService.sendCoordinates(
-        _locationService.lat!.toString(),
-        _locationService.lng!.toString(),
-      );
+      // If location is available, send it to the API
+      if (_locationService.lat != null && _locationService.lng != null) {
+        String response = await _apiService.sendCoordinates(
+          _locationService.lat!.toString(),
+          _locationService.lng!.toString(),
+        );
 
-      if (response == "Location is allowed") {
-        setState(() {
-          _message =
-              "Location is within the premises, redirecting..."; // Update message
-        });
-
-        // Wait for 2 seconds before navigating to the next page
-        await Future.delayed(const Duration(seconds: 2));
-        Navigator.pushNamed(context, '/');
-      } else if (response == "Location not allowed") {
-        setState(() {
-          _message = "Outside Specified Area";
-        });
+        if (response == "Location is allowed") {
+          // Loop typing animation for "Location is within the premises"
+          _startTypingAnimation("Location is within the geofence", () async {
+            // Wait for 2 seconds before navigating to the next page
+            await Future.delayed(const Duration(seconds: 1));
+            Navigator.pushNamed(context, '/');
+          });
+        } else if (response == "Location not allowed") {
+          setState(() {
+            _message = "Outside Specified Area";
+          });
+        } else {
+          setState(() {
+            _message = "Cannot connect to API. Please refresh the site.";
+          });
+        }
       } else {
         setState(() {
-          _message = "Cannot connect to API. Please refresh the site.";
+          _message = "Unable to fetch location.";
         });
-      }
-    } else {
-      setState(() {
-        _message = "Unable to fetch location.";
-      });
-    }
 
-    // Reset opacity and loading state after the check
-    setState(() {
-      _opacity = 0.0; // Reset darkening animation
-      _isLoading = false; // Hide loading animation
-      _showButton = true; // Show the button again if needed
+        // Show a dialog with a warning icon when the location can't be fetched
+        _showLocationErrorDialog();
+      }
+
+      // Reset opacity and loading state after the check
+      setState(() {
+        _opacity = 0.0; // Reset darkening animation
+        _isLoading = false; // Hide loading animation
+        _showGif = false; // Hide the rolling ball GIF
+      });
     });
+  }
+
+  void _showLocationErrorDialog() {
+    // Hide the button and message upon location error
+    setState(() {
+      _showButton = false;
+      _showMessage = false;
+    });
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: const [
+              Icon(
+                Icons.warning,
+                color: Colors.yellow,
+              ),
+              SizedBox(
+                width: 50,
+                height: 200,
+              ),
+              Text('Location Denied'),
+            ],
+          ),
+          content:
+              const Text('Please agree towards the user of location services'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    // Dispose the typing timer when the screen is disposed
+    _typingTimer.cancel();
+    super.dispose();
   }
 
   @override
@@ -117,48 +194,49 @@ class _StartScreenState extends State<StartScreen> {
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             child: Container(
-              color: Colors.black
-                  .withOpacity(0.85), // Semi-transparent black overlay
+              color: Colors.black.withOpacity(0.85),
             ),
           ),
           // Centered message showing the API response
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _message,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+          if (_showMessage)
+            Positioned(
+              top: 425, // Aligns the message where the button was
+              left: 240,
+              child: Text(
+                _message,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                if (_isLoading) // Show GIF when loading
-                  const SizedBox(height: 20),
-                if (_isLoading)
-                  Image.asset(
-                    'assets/loadingwhite.gif', // Path to your GIF
-                    width: 50, // Adjust the size as needed
-                    height: 50,
-                  ),
-              ],
+              ),
             ),
-          ),
           // Positioned "Get Started" button
-          if (_showButton) // Show the button only if _showButton is true
+          if (_showButton)
             Align(
-              alignment:
-                  const Alignment(-0.6, 0.1), // Adjust alignment as needed
+              alignment: const Alignment(-0.6, 0.13),
               child: GestureDetector(
-                onTap:
-                    _fadeOutAndNavigate, // Trigger the function when the GIF is tapped
+                onTap: _fadeOutAndNavigate,
                 child: Image.asset(
-                  'assets/silverbuttonlogin.png', // Path to the GIF file
-                  width: 150, // Adjust the size of the GIF
-                  height: 120, // Adjust height as needed
-                  fit: BoxFit
-                      .contain, // Ensure the GIF fits well within the bounds
+                  'assets/cleansilvbut.png',
+                  width: 170,
+                  height: 130,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          // GIF on the right side of the screen (shows when clicked)
+          if (_showGif)
+            Align(
+              alignment: const Alignment(0.83, -0.3),
+              // Aligns to the right center
+              child: Padding(
+                padding: const EdgeInsets.only(right: 20.0), // Add some padding
+                child: Image.asset(
+                  'assets/rollingball.gif', // Path to your GIF
+                  width: 630, // Adjust the width as needed
+                  height: 650, // Adjust the height as needed
+                  fit: BoxFit.cover,
                 ),
               ),
             ),

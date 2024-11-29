@@ -242,7 +242,10 @@ class _AdminPageState extends State<AdminPage> {
       title: Text(label, style: const TextStyle(color: Colors.white)),
       onTap: () {
         if (isLogout) {
-          // Add logout logic
+          Navigator.pushReplacementNamed(context, '/');
+        } else if (destination != null) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => destination));
         }
       },
     );
