@@ -3,17 +3,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class EmployeesLogWidget extends StatelessWidget {
-  // Function to send POST request with extended logging
-  Future<void> _sendPostRequest() async {
-    final url =
-        Uri.parse('http://192.168.120.19:8080/employee/info'); // API URL
-    final headers = {'Content-Type': 'application/json'};
-    final body = json.encode({'Keyword': 'strawberry shortcake'});
+  // Function to send GET request with extended logging
+  Future<void> _sendGetRequest() async {
+    final url = Uri.parse(
+        'http://192.168.120.19:8080/employee/info?keyword=strawberry+shortcake'); // API URL
 
-    print('Sending POST request to $url with body $body');
+    print('Sending GET request to $url');
 
+    final client = http.Client();
     try {
-      final response = await http.post(url, headers: headers, body: body);
+      final response = await client.get(url);
 
       if (response.statusCode == 200) {
         // Print response body if successful
@@ -26,6 +25,8 @@ class EmployeesLogWidget extends StatelessWidget {
     } catch (e) {
       // Enhanced exception handling
       print('Error occurred: $e');
+    } finally {
+      client.close();
     }
   }
 
@@ -37,8 +38,8 @@ class EmployeesLogWidget extends StatelessWidget {
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: _sendPostRequest, // Trigger POST request on button press
-          child: Text('Send POST Request'),
+          onPressed: _sendGetRequest, // Trigger GET request on button press
+          child: Text('Send GET Request'),
         ),
       ),
     );
