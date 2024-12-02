@@ -165,7 +165,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 34),
                 _buildTextFieldWithValidation(
                   icon: Icons.person,
-                  labelText: 'Employee ID',
+                  labelText: '',
+                  hintText: 'User ID',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your ID number';
@@ -177,7 +178,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 16),
                 _buildTextFieldWithValidation(
                   icon: Icons.lock,
-                  labelText: 'Password',
+                  labelText: '',
+                  hintText: 'User ID',
+
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
@@ -220,6 +223,7 @@ class _MyHomePageState extends State<MyHomePage> {
     required FormFieldSetter<String> onSaved,
     bool obscureText = false,
     required String labelText,
+    required String hintText,
     Color labelColor = Colors.black87,
     VoidCallback? onSubmit,
   }) {
@@ -227,11 +231,12 @@ class _MyHomePageState extends State<MyHomePage> {
       obscureText: obscureText,
       decoration: InputDecoration(
         labelText: labelText,
+        hintText: hintText,
         labelStyle: TextStyle(color: labelColor),
         prefixIcon: Icon(icon),
         filled: true,
         fillColor: const Color(0xFFCBCACB).withOpacity(1),
-        hintStyle: TextStyle(color: Colors.red.withOpacity(0.4)),
+        hintStyle: TextStyle(color: Colors.black.withOpacity(1)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(100),
         ),

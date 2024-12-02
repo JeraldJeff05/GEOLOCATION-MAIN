@@ -28,7 +28,7 @@ class _AdminPageState extends State<AdminPage> {
   Widget _getActiveFeature(String title) {
     switch (title) {
       case 'Employees Log':
-        return const EmployeesLogWidget();
+        return EmployeesLogWidget();
       case 'Geofencing':
         return const GeofencingWidget();
       case 'Calendar':
