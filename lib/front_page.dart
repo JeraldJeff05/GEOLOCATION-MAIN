@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage>
     // Define animation for button movement
     _buttonAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0.0, -0.05), // Adjust the range of movement
+      end: const Offset(0.0, -0.10), // Adjust the range of movement
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
@@ -223,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage>
             ),
           ),
           Positioned(
-            bottom: 210, // Adjust as needed
+            bottom: 220, // Adjust as needed
             right: 168, // Adjust as needed
             child: _buildGifButton(_login),
           ),
@@ -241,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage>
           height: 30,
           width: 120,
           decoration: BoxDecoration(
-            color: Color(0xFFC9C8C9),
+            color: Color(0xFF726F72).withOpacity(0.8),
             borderRadius: BorderRadius.circular(13),
             border: Border.all(color: Colors.black, width: 0.5),
           ),
@@ -251,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage>
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.white,
                 letterSpacing: 10.5, // Adjust letter spacing here
               ),
             ),
@@ -271,7 +271,8 @@ class _MyHomePageState extends State<MyHomePage>
     Color labelColor = Colors.black87,
     VoidCallback? onSubmit,
     double width = 400, // Default width
-    double height = 40, // Default height
+    double height = 40,
+    // Default height
   }) {
     return SizedBox(
       width: width, // Set the desired width
@@ -284,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage>
           labelStyle: TextStyle(color: labelColor),
           prefixIcon: Icon(icon),
           filled: true,
-          fillColor: const Color(0xFFCBCACB).withOpacity(0.5),
+          fillColor: const Color(0xFF726F72).withOpacity(0.8),
           hintStyle: TextStyle(color: Colors.black.withOpacity(1)),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(100),

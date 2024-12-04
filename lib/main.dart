@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        //'/start': (context) => const StartScreen(),
+        '/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -44,18 +44,18 @@ class _StartScreenState extends State<StartScreen> {
   final LocationService _locationService = LocationService();
   final ApiService _apiService = ApiService();
   String _message = ""; // Initial message
-  bool _isLoading = false; // To control loading animation visibility
+  // To control loading animation visibility
   bool _showButton = true; // Tracks visibility of the button
   bool _showGif = false; // Controls visibility of the rolling ball GIF
   bool _showMessage = false; // Controls visibility of the message text
   late Timer _typingTimer; // Timer for typing animation
   int _messageIndex = 0; // Index to track the typing animation
-  String _currentMessage = ""; // Current message being typed
+  // Current message being typed
 
   // Method to start typing animation and loop it
   void _startTypingAnimation(String message, VoidCallback onComplete) {
     _messageIndex = 0;
-    _currentMessage = message;
+
     setState(() {
       _message = ""; // Reset message
     });
@@ -124,11 +124,6 @@ class _StartScreenState extends State<StartScreen> {
       }
 
       // Reset opacity and loading state after the check
-      setState(() {
-        _opacity = 0.0; // Reset darkening animation
-        _isLoading = false; // Hide loading animation
-        _showGif = false; // Hide the rolling ball GIF
-      });
     });
   }
 
