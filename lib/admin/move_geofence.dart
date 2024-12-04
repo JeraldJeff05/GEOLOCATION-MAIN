@@ -39,20 +39,20 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
       // Prepare the points
       final points = {
         'point1': {
-          'latitude': _controllers['lat1']!.text,
-          'longitude': _controllers['lng1']!.text,
+          'latitude': double.parse(_controllers['lat1']!.text),
+          'longitude': double.parse(_controllers['lng1']!.text),
         },
         'point2': {
-          'latitude': _controllers['lat2']!.text,
-          'longitude': _controllers['lng2']!.text,
+          'latitude': double.parse(_controllers['lat2']!.text),
+          'longitude': double.parse(_controllers['lng2']!.text),
         },
         'point3': {
-          'latitude': _controllers['lat3']!.text,
-          'longitude': _controllers['lng3']!.text,
+          'latitude': double.parse(_controllers['lat3']!.text),
+          'longitude': double.parse(_controllers['lng3']!.text),
         },
         'point4': {
-          'latitude': _controllers['lat4']!.text,
-          'longitude': _controllers['lng4']!.text,
+          'latitude': double.parse(_controllers['lat4']!.text),
+          'longitude': double.parse(_controllers['lng4']!.text),
         },
       };
 
@@ -61,7 +61,7 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
 
       // API URL with concatenated JSON data
       final String url =
-          'http://192.168.120.47:8080/employee/login?data=$jsonData';
+          'http://192.168.120.19:8080/coordinates?data=$jsonData';
 
       debugPrint('URL: $url');
       debugPrint('Payload (JSON): $jsonData');
@@ -117,6 +117,9 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please enter latitude';
                       }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
+                      }
                       return null;
                     },
                   ),
@@ -127,6 +130,9 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter longitude';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Please enter a valid number';
                       }
                       return null;
                     },
