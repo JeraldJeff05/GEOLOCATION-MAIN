@@ -531,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCalendar() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         height: 400, // Reduced height
         padding: const EdgeInsets.all(8), // Reduced padding
@@ -541,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 1), // Reduced spacing
+            const SizedBox(height: 2), // Reduced spacing
             Expanded(
               child: TableCalendar(
                 firstDay: DateTime.utc(2020, 1, 1),
@@ -550,19 +550,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 calendarStyle: CalendarStyle(
                   todayDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
                   selectedDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                  defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 12), // Smaller font
-                  weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 12),
-                  outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 10),
+                  defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 13), // Smaller font
+                  weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 13),
+                  outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 11),
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
-                  titleTextStyle: const TextStyle(color: Colors.white, fontSize: 14), // Reduced font size
-                  leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 16),
-                  rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 16),
+                  titleTextStyle: const TextStyle(color: Colors.white, fontSize: 15), // Reduced font size
+                  leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 17),
+                  rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 17),
                 ),
                 daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(color: Colors.white, fontSize: 10), // Smaller font
-                  weekendStyle: TextStyle(color: Colors.white, fontSize: 10),
+                  weekdayStyle: TextStyle(color: Colors.white, fontSize: 11), // Smaller font
+                  weekendStyle: TextStyle(color: Colors.white, fontSize: 11),
                 ),
               ),
             ),
