@@ -1,89 +1,289 @@
+import 'package:check_loc/features/Geofencing.dart';
+import 'package:check_loc/features/LocationBaseService.dart';
 import 'package:flutter/material.dart';
+import 'package:check_loc/features/RealTimeLocationTracking.dart';
 
-class OtherFeatures extends StatelessWidget {
+class OtherFeatures extends StatefulWidget {
+  @override
+  _OtherFeaturesState createState() => _OtherFeaturesState();
+}
+
+class _OtherFeaturesState extends State<OtherFeatures> {
+  // Define hover states for the containers
+  bool isHoveringFirst = false;
+  bool isHoveringSecond = false;
+  bool isHoveringThird = false;
+
+  // Define hover states for "Learn more" buttons
+  bool isHoveringLearnMoreFirst = false;
+  bool isHoveringLearnMoreSecond = false;
+  bool isHoveringLearnMoreThird = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Other Features'),
-      ),
-      body: ListView.builder(
-        itemCount: GeolocationFeatures.features.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(GeolocationFeatures.features[index]),
-            onTap: () {
-              // You can add more functionality here if needed
-              // For example, navigate to a detailed view of the feature
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => FeatureDetailScreen(feature: GeolocationFeatures.features[index]),
+      body: Column(
+        children: [
+          Container(
+            height: 56, // Height of the AppBar
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF90e0ef), Colors.lightBlue],
+                // Your gradient colors
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
-              );
-            },
-          );
-        },
+                Expanded(
+                  child: Text(
+                    'Other Geolocation Features',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildFeatureContainer(
+                    image: 'geo1.png',
+                    title: 'Real-Time Location Tracking',
+                    isHovering: isHoveringFirst,
+                    onHover: (hovering) {
+                      setState(() {
+                        isHoveringFirst = hovering;
+                      });
+                    },
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RealTimeLocationInfoScreen(),
+                        ),
+                      );
+                    },
+                    isHoveringLearnMore: isHoveringLearnMoreFirst,
+                    onHoverLearnMore: (hovering) {
+                      setState(() {
+                        isHoveringLearnMoreFirst = hovering;
+                      });
+                    },
+                  ),
+                  SizedBox(width: 50),
+                  _buildFeatureContainer(
+                    image: 'geo2.png',
+                    title: 'Geofencing',
+                    isHovering: isHoveringSecond,
+                    onHover: (hovering) {
+                      setState(() {
+                        isHoveringSecond = hovering;
+                      });
+                    },
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GeofencingScreen(),
+                        ),
+                      );
+                    },
+                    isHoveringLearnMore: isHoveringLearnMoreSecond,
+                    onHoverLearnMore: (hovering) {
+                      setState(() {
+                        isHoveringLearnMoreSecond = hovering;
+                      });
+                    },
+                  ),
+                  SizedBox(width: 50),
+                  _buildFeatureContainer(
+                    image: 'geo3.png',
+                    title: 'Location-Based Service',
+                    isHovering: isHoveringThird,
+                    onHover: (hovering) {
+                      setState(() {
+                        isHoveringThird = hovering;
+                      });
+                    },
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LocationBasedServicesScreen(),
+                        ),
+                      );
+                    },
+                    isHoveringLearnMore: isHoveringLearnMoreThird,
+                    onHoverLearnMore: (hovering) {
+                      setState(() {
+                        isHoveringLearnMoreThird = hovering;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-// Optional: A detail screen for each feature
-class FeatureDetailScreen extends StatelessWidget {
-  final String feature;
-
-  FeatureDetailScreen({required this.feature});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Feature Detail'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          feature,
-          style: TextStyle(fontSize: 18),
+  Widget _buildFeatureContainer({
+    required String image,
+    required String title,
+    required bool isHovering,
+    required void Function(bool) onHover,
+    required VoidCallback onTap,
+    required bool isHoveringLearnMore,
+    required void Function(bool) onHoverLearnMore,
+  }) {
+    return MouseRegion(
+      onEnter: (_) => onHover(true),
+      onExit: (_) => onHover(false),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+          width: isHovering ? 400 : 380,
+          height: isHovering ? 670 : 650,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(5),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isHovering
+                  ? [Colors.lightBlueAccent, Color(0xFF90e0ef)]
+                  : [Color(0xFF90e0ef), Colors.lightBlue],
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset(
+                image,
+                width: 220,
+                height: 220,
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (title == 'Real-Time Location Tracking') ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      width: isHovering ? 200 : 280, // Adjust width here
+                    child: Text(
+                      'Real-time location tracking continuously updates a user’s live location on a map.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 19,
+                      ),
+                    ),
+                    ),
+                  ],
+                  if (title == 'Geofencing') ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      width: isHovering ? 200 : 280,
+                      child: Text(
+                        'Geofencing creates virtual boundaries to trigger actions when entering or exiting them.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 19,
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (title == 'Location-Based Service') ...[
+                    const SizedBox(height: 8),
+                    Container(
+                      width: isHovering ? 200 : 280,
+                      child: Text(
+                        'Location-based services deliver features and content tailored to a users geographical location.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 19,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 20),
+              // Learn more button with slide color change effect on hover
+              MouseRegion(
+                onEnter: (_) => onHoverLearnMore(true),
+                onExit: (_) => onHoverLearnMore(false),
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 100),
+                  curve: Curves.easeInOut,
+                  width: 320,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    gradient: isHoveringLearnMore
+                        ? LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.blue.shade500,
+                        Colors.blue.shade500,
+                      ],
+                    )
+                        : LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFF023e8a),
+                        Color(0xFF023e8a),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Learn more',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
-class GeolocationFeatures {
-  static const List<String> features = [
-    "1. Real-Time Location Tracking: Use GPS or network-based geolocation to track the real-time location of users or assets.",
-    "2. Geofencing: Set up virtual boundaries that trigger alerts or actions when users enter or exit specific areas.",
-    "3. Location-Based Services: Provide users with services based on their current location, such as nearby restaurants, stores, or points of interest.",
-    "4. Indoor Navigation: Implement indoor positioning systems using beacons or Wi-Fi to help users navigate large buildings.",
-    "5. Route Optimization: Offer users the best routes to their destinations, considering real-time traffic data and road conditions.",
-    "6. Location Sharing: Allow users to share their location with friends or family for safety or coordination purposes.",
-    "7. Location History: Track and display users' location history for applications like fitness tracking or travel logs.",
-    "8. Personalized Marketing: Use geolocation data to send personalized promotions or advertisements to users based on their location.",
-    "9. Weather Updates: Provide localized weather information based on the user's current location.",
-    "10. Fraud Prevention: Compare the user's location with billing addresses to detect and prevent fraudulent transactions.",
-    "11. Event Check-In: Enable users to check in at events or locations, enhancing social interaction and engagement.",
-    "12. Emergency Services: Allow users to quickly share their location with emergency services in case of an emergency.",
-    "13. Delivery Tracking: Provide real-time tracking of deliveries, allowing users to see the status and estimated arrival time of their orders.",
-    "14. Fitness Tracking: Use geolocation to track outdoor activities like running, cycling, or hiking, providing users with statistics and routes.",
-    "15. Community Engagement: Enable users to participate in location-based community activities or events, fostering local engagement.",
-    "16. Augmented Reality Experiences: Integrate geolocation with augmented reality to create interactive experiences.",
-    "17. Public Transport Navigation: Offer users real-time information on public transport options based on their location.",
-    "18. Safety Alerts: Send alerts to users about nearby hazards or emergencies.",
-    "19. Local Recommendations: Provide personalized recommendations for activities, events, or places to visit based on the user's location.",
-    "20. Check-In Rewards: Implement a rewards system for users who check in at various locations.",
-    "21. Social Networking Features: Allow users to find and connect with friends or other users nearby.",
-    "22. Travel Planning: Help users plan trips by suggesting itineraries based on their current location.",
-    "23. Parking Assistance: Guide users to available parking spots based on their location.",
-    "24. Historical Location Data: Provide insights or analytics based on historical location data.",
-    "25. Customizable Location Alerts: Allow users to set alerts for specific locations."
-  ];
 
-  // Method to print all features
-  static void printFeatures() {
-    for (var feature in features) {
-      print(feature);
-    }
+  void main() {
+    runApp(MaterialApp(
+      home: OtherFeatures(),
+    ));
   }
 }

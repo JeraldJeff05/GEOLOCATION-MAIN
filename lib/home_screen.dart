@@ -12,6 +12,7 @@ class ChartData {
   final String task;
   final double value;
 }
+
 class MoodTracker extends StatefulWidget {
   @override
   _MoodTrackerState createState() => _MoodTrackerState();
@@ -72,7 +73,7 @@ class _MoodTrackerState extends State<MoodTracker> {
         children: [
           Text(
             "How do you feel today?",
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20, color: Colors.white), // Set text color to white
           ),
           SizedBox(height: 5),
           Row(
@@ -84,7 +85,7 @@ class _MoodTrackerState extends State<MoodTracker> {
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     mood,
-                    style: TextStyle(fontSize: 48),
+                    style: TextStyle(fontSize: 48, color: Colors.white), // Set text color to white
                   ),
                 ),
               );
@@ -94,12 +95,12 @@ class _MoodTrackerState extends State<MoodTracker> {
           if (selectedMood != null)
             Text(
               "You selected: $selectedMood",
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 20, color: Colors.white), // Set text color to white
             ),
           SizedBox(height: 3),
           Text(
             "Mood History:",
-            style: TextStyle(fontSize: 15),
+            style: TextStyle(fontSize: 15, color: Colors.white), // Set text color to white
           ),
           SizedBox(height: 3),
           // Display mood history in a row
@@ -110,7 +111,7 @@ class _MoodTrackerState extends State<MoodTracker> {
                 margin: EdgeInsets.symmetric(horizontal: 5),
                 child: Text(
                   mood,
-                  style: TextStyle(fontSize: 24),
+                  style: TextStyle(fontSize: 24, color: Colors.white), // Set text color to white
                 ),
               );
             }).toList(),
@@ -120,85 +121,105 @@ class _MoodTrackerState extends State<MoodTracker> {
     );
   }
 }
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isCheckedIn = true; // Start as checked-in
-  bool _isCheckedOut = false;
-  bool _hasPressedAttendance = true; // Considered already checked-in
-  bool _hasPressedCheckout = false;
-  DateTime? _checkInTime;
-  DateTime? _checkOutTime;
+  DateTime? _selectedDay;
+  bool _isAttendanceApproved = false; // Track attendance approval
+
+  Map<DateTime, List<Map<String, dynamic>>> _tasks = {};
+  Map<DateTime, List<String>> _finishedTasks = {};
 
   @override
   void initState() {
     super.initState();
-    // Automatically set the check-in state after logging in
-    _isCheckedIn = true;
-    _hasPressedAttendance = true;
-    _checkInTime = DateTime.now();
-  }
-
-  void _saveAttendanceStatus(bool value) {
-    setState(() {
-      _isCheckedIn = value;
-      _hasPressedAttendance = true;
-      _checkInTime = DateTime.now();
+    // Show the attendance dialog after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAttendanceDialog();
     });
   }
 
-  void _saveCheckoutStatus(bool value) {
-    setState(() {
-      _isCheckedOut = value;
-      _hasPressedCheckout = true;
-      _checkOutTime = DateTime.now();
-    });
+  void _showAttendanceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Checking your Attendance"),
+          content: Text("Please wait for the approval"),
+          backgroundColor: Colors.green[100], // Set the background color to light green
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the button
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isAttendanceApproved = true; // Mark attendance as approved
+                    });
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
+  void _onTasksUpdated(DateTime selectedDay, List<Map<String, dynamic>> tasks, List<String> finishedTasks) {
+    setState(() {
+      _selectedDay = selectedDay;
+      _tasks[selectedDay] = tasks;
+      _finishedTasks[selectedDay] = finishedTasks;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF2A2A2A),
-      body: Row(
-        children: [
-          // Navigation Drawer
-          _buildNavigationDrawer(),
-          // Main Content Area
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildProfileInfo(),
-                    const SizedBox(height: 16),
-                    _buildKanbanBoard(),
-                    const SizedBox(height: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: _buildAttendanceSystem()),
-                        const SizedBox(width: 16),
-                        Expanded(child: _buildCalendar()),
-                      ],
-                    ),
-                  ],
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF2A2A2A),
+        body: Row(
+          children: [
+            // Navigation Drawer
+            _buildNavigationDrawer(),
+            // Main Content Area
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildProfileInfo(),
+                      const SizedBox(height: 16),
+                      _buildKanbanBoard(),
+                      const SizedBox(height: 16),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(width: 16),
+                          Expanded(child: _buildCalendar()),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-Widget _buildNavigationDrawer() {
+  Widget _buildNavigationDrawer() {
     return Container(
       width: 280,
       color: const Color(0xFF363636),
@@ -234,34 +255,60 @@ Widget _buildNavigationDrawer() {
               ),
             ),
           ),
-          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection()),
-          // _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
-          _buildDrawerItem(Icons.settings, 'Other Features', OtherFeatures()),
+          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection(onTasksUpdated: _onTasksUpdated), isDisabled: !_isAttendanceApproved),
+          _buildDrawerItem(Icons.note, 'Other Features', OtherFeatures(), isDisabled: !_isAttendanceApproved),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
-
     );
   }
 
-
-  Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
-      {bool isLogout = false}) {
+  Widget _buildDrawerItem(IconData icon, String label, Widget? destination, {bool isLogout = false, bool isDisabled = false}) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFB0B0B0)),
       title: Text(
         label,
         style: const TextStyle(color: Color(0xFFE0E0E0)),
       ),
-      onTap: () {
+      onTap: isDisabled ? null : () {
         if (isLogout) {
-          Navigator.pushReplacementNamed(context, '/');
+          _showLogoutConfirmationDialog(); // Show logout confirmation dialog
         } else if (destination != null) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => destination));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => destination));
         }
       },
     );
+  }
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Log Out"),
+          content: Text("Do you want to log out?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Handle the logout logic here
+                _logout();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Log Out"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _logout() {
+    // Perform logout operations, such as clearing user data or navigating to the login screen
+    Navigator.of(context).pushReplacementNamed('/'); // Navigate to the login screen
   }
 
   Widget _buildProfileInfo() {
@@ -275,28 +322,50 @@ Widget _buildNavigationDrawer() {
             colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
           ),
         ),
-        child: Row(
+        child: Stack( // Use Stack to overlay the date/time
           children: [
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/profile_picture.png'),
-            ),
-            const SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('John Doe',
-                    style: TextStyle(
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage('assets/profile_picture.png'), // Ensure this image exists in your assets
+                ),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'John Doe',
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white)),
-                SizedBox(height: 5),
-                Text('john.doe@example.com',
-                    style: TextStyle(fontSize: 14, color: Colors.grey)),
-                SizedBox(height: 5),
-                Text('Role: Employee',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'john.doe@example.com',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Role: Employee',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ],
+                ),
               ],
+            ),
+            Positioned(
+              top: 16, // Adjust this value to position the text
+              right: 16, // Adjust this value to position the text
+              child: Text('Log In at : '
+                '${DateFormat('MM/dd/yy ').format(DateTime.now())} ${DateFormat('hh:mm a').format(DateTime.now())}', // Format the date and time
+                style: const TextStyle(
+                  color: Colors.green, // Set text color to green
+                  fontSize: 14, // Set font size
+                ),
+              ),
             ),
           ],
         ),
@@ -306,18 +375,25 @@ Widget _buildNavigationDrawer() {
 
   Widget _buildKanbanBoard() {
     // Clear the task lists
-    List<String> Tasksprogress = []; // Empty list for Wishlist
-    List<String> Quotes = []; // Empty list for Doing
-    List<String> Mood = []; // Empty list for Finished
+    List<String> tasksProgress = []; // Empty list for Task Progress
+    List<String> quotes = []; // Empty list for Quotes
+    List<String> mood = []; // Empty list for Mood
+
+    // Get the count of unfinished and finished tasks for the selected day
+    int unfinishedCount = _tasks[_selectedDay]?.length ?? 0;
+    int finishedCount = _finishedTasks[_selectedDay]?.length ?? 0;
 
     // Sample data for the chart
     List<ChartData> chartData = [
-      ChartData('Unfinished', 10),
-      ChartData('Finished', 20),
+      ChartData('Unfinished', unfinishedCount.toDouble()),
+      ChartData('Finished', finishedCount.toDouble()),
     ];
 
+    // Populate the tasksProgress list with unfinished tasks
+    tasksProgress = _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ?? [];
+
     // List of quotes
-    List<String> quotes = [
+    List<String> quotesList = [
       "The only way to do great work is to love what you do. - Steve Jobs",
       "Success is not the key to happiness. Happiness is the key to success. - Albert Schweitzer",
       "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
@@ -330,25 +406,33 @@ Widget _buildNavigationDrawer() {
       "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt"
     ];
 
-
     // Get the current date and use it to select a quote
     int currentDay = DateTime.now().day;
-    String dailyQuote = quotes[currentDay % quotes.length]; // Select a quote based on the day
+    String dailyQuote = quotesList[currentDay % quotesList.length]; // Select a quote based on the day
 
     Widget buildChart() {
       return SfCartesianChart(
-        title: ChartTitle(text: 'Task Distribution'),
-        primaryXAxis: CategoryAxis(),
+        title: ChartTitle(
+          text: 'Task Distribution',
+          textStyle: TextStyle(color: Colors.white), // Set title text color to white
+        ),
+        primaryXAxis: CategoryAxis(
+          labelStyle: TextStyle(color: Colors.white), // Set X-axis label color to white
+        ),
+        primaryYAxis: NumericAxis(
+          labelStyle: TextStyle(color: Colors.white), // Set Y-axis label color to white
+        ),
         series: <CartesianSeries>[
           ColumnSeries<ChartData, String>(
             dataSource: chartData,
             xValueMapper: (ChartData data, _) => data.task,
             yValueMapper: (ChartData data, _) => data.value,
+            color: Colors.blue, // Optional: Set the color of the columns
           )
         ],
+        backgroundColor: const Color(0xFF2A2A2A), // Optional: Set the background color of the chart
       );
     }
-
 
     Widget buildKanbanColumn(String title, List<String> tasks) {
       return Expanded(
@@ -401,6 +485,17 @@ Widget _buildNavigationDrawer() {
                         child: MoodTracker(),
                       ),
                     ),
+                  // Display tasks in the Task Progress column
+                  if (title == 'Task Progress' && tasks.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ...tasks.map((task) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        task,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    )).toList(),
+                  ],
                 ],
               ),
             ),
@@ -422,147 +517,16 @@ Widget _buildNavigationDrawer() {
         ),
         child: Row(
           children: [
-            buildKanbanColumn('Task Progress', Tasksprogress),
+            buildKanbanColumn('Task Progress', tasksProgress),
             const SizedBox(width: 8),
-            buildKanbanColumn('Quotes', Quotes),
+            buildKanbanColumn('Quotes', quotes),
             const SizedBox(width: 8),
-            buildKanbanColumn('Mood', Mood),
+            buildKanbanColumn('Mood', mood),
           ],
         ),
       ),
     );
   }
-  Widget _buildAttendanceSystem() {
-    // Format for Date (MM/DD/YY)
-    String formatDate(DateTime dateTime) {
-      return DateFormat('MM/dd/yy').format(dateTime);
-    }
-
-    // Format for Time (12-hour format with AM/PM)
-    String formatTime(DateTime dateTime) {
-      return DateFormat('hh:mm a').format(dateTime); // 12-hour format with AM/PM
-    }
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Attendance System',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement Log History navigation or function
-                    Navigator.pushNamed(context, '/logHistory'); // Example route
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.shade800,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8), // Adjust padding
-                  ),
-                  child: const Text(
-                    'Log History',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _isCheckedIn
-                      ? 'Log In: ${formatDate(_checkInTime!)} at ${formatTime(_checkInTime!)}'
-                      : 'Not Log In',
-                  style: TextStyle(
-                    color: _isCheckedIn ? Colors.green : Colors.white,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: !_hasPressedAttendance
-                      ? () {
-                    _saveAttendanceStatus(true);
-                    setState(() {
-                      _isCheckedIn = true;
-                      _checkInTime = DateTime.now();
-                      _hasPressedAttendance = true; // Disable button
-                    });
-                  }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    _hasPressedAttendance ? Colors.blueGrey : Colors.white,
-                  ),
-                  child: Text(
-                    !_hasPressedAttendance ? 'Log in' : 'Log In Approved',
-                    style: TextStyle(
-                      color: !_hasPressedAttendance ? Colors.black : Colors.green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _isCheckedOut
-                      ? 'Log Out: ${formatDate(_checkOutTime!)} at ${formatTime(_checkOutTime!)}'
-                      : 'Logging Out?',
-                  style: TextStyle(
-                    color: _isCheckedOut ? Colors.green : Colors.white,
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: !_hasPressedCheckout
-                      ? () {
-                    _saveCheckoutStatus(true);
-                    setState(() {
-                      _isCheckedOut = true;
-                      _checkOutTime = DateTime.now();
-                      _hasPressedCheckout = true; // Disable button
-                    });
-                  }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    _hasPressedCheckout ? Colors.blueGrey : Colors.white,
-                  ),
-                  child: Text(
-                    !_hasPressedCheckout ? 'Log Out' : 'Log Out Approved',
-                    style: TextStyle(
-                      color: !_hasPressedCheckout ? Colors.black : Colors.green,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
 
   Widget _buildCalendar() {
     return Card(
@@ -608,4 +572,3 @@ Widget _buildNavigationDrawer() {
     );
   }
 }
-
