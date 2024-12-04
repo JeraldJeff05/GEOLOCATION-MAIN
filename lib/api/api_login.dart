@@ -6,6 +6,9 @@ class ApiLogin {
       'http://192.168.120.19:8080/employee/login'; // Replace with your API URL
 
   String? responseBody; // Public variable to store the response body
+  String? role; // Variable to store the role ('employee' or 'admin')
+  String? firstName; // Variable to store the first name
+  String? lastName; // Variable to store the last name
 
   /// Method to log in a user
   Future<String?> login({
@@ -28,19 +31,38 @@ class ApiLogin {
       );
 
       responseBody = response.body;
-
-      // Debug the response body
+// Only print the response body once
       debugPrint('Response Body: $responseBody');
 
       if (response.statusCode == 200) {
-        if (responseBody == "employee") {
+        // Split the response body by spaces
+        List<String> responseParts = responseBody?.split(' ') ?? [];
+
+        // Detect role (first word)
+        role = responseParts.isNotEmpty ? responseParts[0] : null;
+
+        // Store remaining words as first name and last name
+        if (responseParts.length > 1) {
+          firstName = responseParts[1]; // Second word is first name
+        }
+        if (responseParts.length > 2) {
+          lastName = responseParts[2]; // Third word is last name
+        }
+
+        // Debug prints for first name and last name
+        debugPrint('First Name: $firstName');
+        debugPrint('Last Name: $lastName');
+
+        // Return role based on the first word
+        if (role == "employee") {
           return "employee"; // Employee login
-        } else if (responseBody == "admin") {
+        } else if (role == "admin") {
           return "admin"; // Admin login
         } else if (responseBody == "false") {
           return "false"; // Login failed
         }
       }
+
       return null; // Unexpected response
     } catch (e) {
       debugPrint('Error during login: $e');

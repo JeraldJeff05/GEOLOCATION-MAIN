@@ -88,6 +88,9 @@ flutter:
     - assets/cleansilvbut.png
     - assets/rollingball.gif
     - assets/whitefdslogo.png
+    - assets/itsgiving.png
+    - assets/itsgivinglogbut.gif
+    - assets/biglog.png
   
   fonts:  
     - family: CustomFont

@@ -4,7 +4,7 @@ import 'api/api_service.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
-import 'admin/admin_page.dart';
+import 'admin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -77,7 +77,7 @@ class _StartScreenState extends State<StartScreen> {
   void _fadeOutAndNavigate() async {
     setState(() {
       _showButton = false; // Hide the button when clicked
-      _opacity = 0.3; // Start darkening animation
+      _opacity = 0.8; // Start darkening animation
       _showGif = true; // Show the rolling ball GIF
       _showMessage = true; // Show message in place of the button
     });
@@ -99,7 +99,8 @@ class _StartScreenState extends State<StartScreen> {
 
         if (response == "Location is allowed") {
           // Loop typing animation for "Location is within the premises"
-          _startTypingAnimation("Location is within the geofence", () async {
+          _startTypingAnimation("Location is within the geofence... ",
+              () async {
             // Wait for 2 seconds before navigating to the next page
             await Future.delayed(const Duration(seconds: 1));
             Navigator.pushNamed(context, '/');
@@ -201,7 +202,7 @@ class _StartScreenState extends State<StartScreen> {
           if (_showMessage)
             Positioned(
               top: 425, // Aligns the message where the button was
-              left: 240,
+              left: 83,
               child: Text(
                 _message,
                 style: const TextStyle(

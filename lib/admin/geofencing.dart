@@ -7,19 +7,16 @@ class ApiService {
 
   Future<String> sendCoordinates(String lat, String lng) async {
     try {
-      // Validate latitude and longitude values
       if (lat.isEmpty || lng.isEmpty) {
         return "Latitude and Longitude cannot be empty";
       }
 
-      // Concatenate latitude and longitude as query parameters in the URL
       final url = Uri.parse("$_apiUrl?lat=$lat&lng=$lng");
 
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json',
       });
 
-      // Check if status code is 200
       if (response.statusCode == 200) {
         if (response.body.trim().toLowerCase() == 'true') {
           return "Location is allowed";
@@ -62,43 +59,109 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Text(
-            "Geofence Check",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF1e3c72), Color(0xFF2a5298)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          SizedBox(height: 16.0),
-          TextField(
-            controller: _latitudeController,
-            decoration: InputDecoration(
-              labelText: "Latitude",
-              border: OutlineInputBorder(),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Geofence Check",
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  Card(
+                    elevation: 8.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: _latitudeController,
+                            decoration: InputDecoration(
+                              labelText: "Latitude",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                          const SizedBox(height: 16.0),
+                          TextField(
+                            controller: _longitudeController,
+                            decoration: InputDecoration(
+                              labelText: "Longitude",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  ElevatedButton(
+                    onPressed: _checkGeofence,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 32.0),
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    child: const Text(
+                      "Check Geofence",
+                      style: TextStyle(
+                          fontSize: 18.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 24.0),
+                  AnimatedOpacity(
+                    opacity: _responseMessage.isEmpty ? 0 : 1,
+                    duration: const Duration(milliseconds: 500),
+                    child: Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: Text(
+                        _responseMessage,
+                        style: const TextStyle(
+                          fontSize: 16.0,
+                          color: Colors.black87,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            keyboardType: TextInputType.number,
           ),
-          SizedBox(height: 16.0),
-          TextField(
-            controller: _longitudeController,
-            decoration: InputDecoration(
-              labelText: "Longitude",
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.number,
-          ),
-          SizedBox(height: 16.0),
-          ElevatedButton(
-            onPressed: _checkGeofence,
-            child: Text("Check Geofence"),
-          ),
-          SizedBox(height: 16.0),
-          Text(
-            _responseMessage,
-            style: TextStyle(fontSize: 16.0, color: Colors.black),
-          ),
-        ],
+        ),
       ),
     );
   }
