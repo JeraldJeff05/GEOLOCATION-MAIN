@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(LocationBasedServicesScreen());
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: LocationBasedServicesScreen(),
+  ));
 }
 
-class LocationBasedServicesScreen extends StatelessWidget {
+class LocationBasedServicesScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: _LocationBasedServicesScreen(),
-    );
-  }
+  _LocationBasedServicesScreenState createState() =>
+      _LocationBasedServicesScreenState();
 }
 
-class _LocationBasedServicesScreen extends StatefulWidget {
-  @override
-  _LocationBasedServicesScreenState createState() => _LocationBasedServicesScreenState();
-}
-
-class _LocationBasedServicesScreenState extends State<_LocationBasedServicesScreen> with SingleTickerProviderStateMixin {
+class _LocationBasedServicesScreenState
+    extends State<LocationBasedServicesScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -41,6 +35,12 @@ class _LocationBasedServicesScreenState extends State<_LocationBasedServicesScre
       appBar: AppBar(
         title: const Text('Location-Based Services Overview'),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen.
+          },
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -132,18 +132,10 @@ class _LocationBasedServicesScreenState extends State<_LocationBasedServicesScre
           ),
           const SizedBox(height: 8),
           const Text(
-            ' 1. Navigation and Mapping:\n'
+            '1. Navigation and Mapping:\n'
                 '- LBS are widely used in navigation applications (e.g., Google Maps, Waze) to provide real-time directions, traffic updates, and estimated arrival times.\n'
                 '2. Geofencing:\n'
-                '- Businesses can create virtual boundaries (geofences) to trigger notifications or actions when users enter or exit a specified area. This is commonly used in marketing to send promotions to customers when they are near a store.\n'
-                '3. Social Networking:\n'
-                '- Many social media platforms (e.g., Facebook, Instagram) use LBS to allow users to check in at locations, share their whereabouts, and discover nearby friends or events.\n'
-                '4. Emergency Services:\n'
-                '- LBS play a crucial role in emergency response systems, enabling services like E911 to locate callers quickly and accurately during emergencies.\n'
-                '5. Fleet Management:\n'
-                '- Companies use LBS to track the location of vehicles in real-time, optimizing routes, improving delivery times, and enhancing overall operational efficiency.\n'
-                '6. Tourism and Travel:\n'
-                '- LBS can enhance the travel experience by providing location-specific information, such as nearby attractions, restaurants, and events.\n',
+                '- Businesses can create virtual boundaries (geofences) to trigger notifications or actions when users enter or exit a specified area. This is commonly used in marketing to send promotions to customers when they are near a store.\n',
             style: TextStyle(fontSize: 16),
           ),
         ],
@@ -166,9 +158,7 @@ class _LocationBasedServicesScreenState extends State<_LocationBasedServicesScre
             '1. Personalization:\n'
                 '- LBS can provide tailored experiences based on a user\'s location, preferences, and behavior.\n'
                 '2. Convenience:\n'
-                '- Users can access relevant information and services without needing to search manually, enhancing their overall experience.\n'
-                '3. Efficiency:\n'
-                '- Businesses can optimize operations, improve customer engagement, and streamline processes through real-time location data.\n',
+                '- Users can access relevant information and services without needing to search manually, enhancing their overall experience.\n',
             style: TextStyle(fontSize: 16),
           ),
         ],
@@ -189,13 +179,7 @@ class _LocationBasedServicesScreenState extends State<_LocationBasedServicesScre
           const SizedBox(height: 8),
           const Text(
             '1. Privacy Concerns:\n'
-                '- The collection and use of location data raise significant privacy issues. Users may be uncomfortable with their location being tracked, leading to potential misuse of data.\n'
-                '2. Data Security:\n'
-                '- Protecting location data from unauthorized access and breaches is crucial. Organizations must implement robust security measures to safeguard user information.\n'
-                '3. Accuracy and Reliability:\n'
-                '- The accuracy of LBS can vary based on the technology used and environmental factors. For example, GPS signals can be obstructed by buildings or natural features, affecting location accuracy.\n'
-                '4. Regulatory Compliance:\n'
-                '- Organizations must comply with local and international regulations regarding data protection and privacy, such as the General Data Protection Regulation (GDPR) in Europe.\n',
+                '- The collection and use of location data raise significant privacy issues. Users may be uncomfortable with their location being tracked, leading to potential misuse of data.\n',
             style: TextStyle(fontSize: 16),
           ),
         ],
