@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -15,17 +16,41 @@ class LocationBasedServicesScreen extends StatefulWidget {
 
 class _LocationBasedServicesScreenState
     extends State<LocationBasedServicesScreen> with SingleTickerProviderStateMixin {
+  late VideoPlayerController _videoController;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    _videoController = VideoPlayerController.asset('assets/LBSvid.mp4')
+      ..initialize().then((_) {
+        setState(() {});
+      });
+
+    // Auto-play video when switching tabs
+    _tabController.addListener(() {
+      // Check if the "Overview" tab (index 0) is selected
+      if (_tabController.index == 0 && !_videoController.value.isPlaying) {
+        if (_videoController.value.isInitialized) {
+          _videoController.play();
+        }
+      } else if (_tabController.index != 0 && _videoController.value.isPlaying) {
+        // Pause video when leaving the "Overview" tab
+        _videoController.pause();
+      }
+    });
+
+    // Start playing video if the Overview tab is initially selected
+    if (_tabController.index == 0 && !_videoController.value.isPlaying) {
+      _videoController.play();
+    }
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _videoController.dispose();
     super.dispose();
   }
 
@@ -38,7 +63,7 @@ class _LocationBasedServicesScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the previous screen.
+            Navigator.pop(context);
           },
         ),
         bottom: TabBar(
@@ -65,25 +90,9 @@ class _LocationBasedServicesScreenState
     );
   }
 
+  // Add the missing _buildOverviewTab function
   Widget _buildOverviewTab() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'What are Location-Based Services (LBS)?',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Location-Based Services (LBS) are applications that utilize the geographical location of a device to provide relevant information, services, or entertainment to the user. '
-                'These services leverage various technologies, including GPS, Wi-Fi, cellular networks, and Bluetooth, to determine the user\'s location in real-time.',
-            style: TextStyle(fontSize: 16),
-          ),
-        ],
-      ),
-    );
+    return _buildVideoTab();
   }
 
   Widget _buildKeyComponentsTab() {
@@ -182,6 +191,34 @@ class _LocationBasedServicesScreenState
                 '- The collection and use of location data raise significant privacy issues. Users may be uncomfortable with their location being tracked, leading to potential misuse of data.\n',
             style: TextStyle(fontSize: 16),
           ),
+        ],
+      ),
+    );
+  }
+
+  // Reusable video player widget
+  Widget _buildVideoTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'What are Location-Based Services (LBS)?',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Location-Based Services (LBS) are applications that utilize the geographical location of a device to provide relevant information, services, or entertainment to the user.',
+            style: TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 16),
+          _videoController.value.isInitialized
+              ? AspectRatio(
+            aspectRatio: _videoController.value.aspectRatio,
+            child: VideoPlayer(_videoController),
+          )
+              : const Center(child: CircularProgressIndicator()),
         ],
       ),
     );

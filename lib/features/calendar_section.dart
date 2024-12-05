@@ -3,10 +3,18 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+class ChartData {
+  final String label;
+  final double value;
+
+  ChartData(this.label, this.value);
+}
+
 class CalendarSection extends StatefulWidget {
   final Function(DateTime, List<Map<String, dynamic>>, List<String>) onTasksUpdated;
+  final Function(DateTime, List<ChartData>) onBarChartUpdate;
 
-  CalendarSection({required this.onTasksUpdated});
+  CalendarSection({required this.onTasksUpdated, required this.onBarChartUpdate});
 
   @override
   _CalendarSectionState createState() => _CalendarSectionState();
@@ -19,13 +27,12 @@ class _CalendarSectionState extends State<CalendarSection> {
   final Map<DateTime, String> _notes = {};
   final Map<DateTime, List<Map<String, dynamic>>> _tasks = {};
   final Map<DateTime, List<String>> _finishedTasks = {};
-
-  // Store current finished tasks for the selected day
   List<String> _currentFinishedTasks = [];
 
   @override
   void initState() {
     super.initState();
+    _selectedDay = DateTime.now();
     _loadData();
   }
 
@@ -34,8 +41,7 @@ class _CalendarSectionState extends State<CalendarSection> {
 
     // Load notes
     final savedNotes = prefs.getString('notes') ?? '{}';
-    final Map<String, String> loadedNotes = Map<String, String>.from(
-        jsonDecode(savedNotes));
+    final Map<String, String> loadedNotes = Map<String, String>.from(jsonDecode(savedNotes));
     loadedNotes.forEach((key, value) {
       _notes[DateTime.parse(key)] = value;
     });
@@ -50,14 +56,12 @@ class _CalendarSectionState extends State<CalendarSection> {
 
     // Load finished tasks
     final savedFinishedTasks = prefs.getString('finishedTasks') ?? '{}';
-    final Map<String, List<String>> loadedFinishedTasks = Map<String,
-        List<String>>.from(jsonDecode(savedFinishedTasks));
+    final Map<String, dynamic> loadedFinishedTasks = jsonDecode(savedFinishedTasks);
     loadedFinishedTasks.forEach((key, value) {
       _finishedTasks[DateTime.parse(key)] = List<String>.from(value);
     });
 
     setState(() {
-      // Ensure finished tasks are displayed for the selected day
       _displayFinishedTasksForSelectedDay();
     });
   }
@@ -69,10 +73,11 @@ class _CalendarSectionState extends State<CalendarSection> {
           _tasks[_selectedDay!] = [];
         }
         _tasks[_selectedDay!]!.add({'text': taskText, 'completed': false});
-
-        // No need to update finished tasks here
-        widget.onTasksUpdated(_selectedDay!, _tasks[_selectedDay!]!,
-            _finishedTasks[_selectedDay] ?? []);
+        widget.onTasksUpdated(
+          _selectedDay!,
+          _tasks[_selectedDay!]!,
+          _finishedTasks[_selectedDay] ?? [],
+        );
       });
       _saveData();
     }
@@ -88,27 +93,35 @@ class _CalendarSectionState extends State<CalendarSection> {
           actions: [
             TextButton(
               onPressed: () {
-                setState(() {
-                  if (_selectedDay != null) {
-                    _tasks[_selectedDay]!.remove(task);
-                    _finishedTasks.putIfAbsent(_selectedDay!, () => []);
-                    _finishedTasks[_selectedDay!]!.add(task['text']);
+                // Update the task and mark it as done
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    if (_selectedDay != null) {
+                      // Remove the task from _tasks and add it to finished tasks
+                      _tasks[_selectedDay]!.remove(task);
+                      _finishedTasks.putIfAbsent(_selectedDay!, () => []);
+                      _finishedTasks[_selectedDay!]!.add(task['text']);
+                      _currentFinishedTasks = _finishedTasks[_selectedDay!]!;
 
-                    // Update the current finished tasks for the selected day
-                    _currentFinishedTasks = _finishedTasks[_selectedDay!]!;
-                    widget.onTasksUpdated(_selectedDay!, _tasks[_selectedDay!]!,
-                        _currentFinishedTasks);
-                  }
+                      widget.onTasksUpdated(
+                        _selectedDay!,
+                        _tasks[_selectedDay!]!,
+                        _currentFinishedTasks,
+                      );
+                      widget.onBarChartUpdate(
+                        _selectedDay!,
+                        [_generateChartData()],
+                      );
+                    }
+                  });
+                  _saveData();
+                  Navigator.pop(context);
                 });
-                _saveData(); // Save finished tasks
-                Navigator.pop(context);
               },
               child: const Text("Yes"),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: const Text("No"),
             ),
           ],
@@ -118,12 +131,18 @@ class _CalendarSectionState extends State<CalendarSection> {
   }
 
   void _displayFinishedTasksForSelectedDay() {
-    // Update the current finished tasks for the selected day
-    if (_finishedTasks.containsKey(_selectedDay)) {
-      _currentFinishedTasks = _finishedTasks[_selectedDay]!;
-    } else {
-      _currentFinishedTasks = [];
+    if (_selectedDay != null) {
+      _currentFinishedTasks = _finishedTasks[_selectedDay] ?? [];
+      widget.onBarChartUpdate(
+        _selectedDay!,
+        [_generateChartData()],
+      );
     }
+  }
+
+  ChartData _generateChartData() {
+    double finishedTaskCount = _currentFinishedTasks.length.toDouble();
+    return ChartData('Finished Tasks', finishedTaskCount);
   }
 
   Future<void> _saveData() async {
@@ -145,36 +164,136 @@ class _CalendarSectionState extends State<CalendarSection> {
     prefs.setString('finishedTasks', jsonEncode(dataToSaveFinishedTasks));
   }
 
-  Future<void> _showNoteDialog(DateTime selectedDay) async {
-    TextEditingController noteController = TextEditingController();
+  Widget _buildNoteBox() {
+    return Card(
+      color: Colors.lightGreen[50],
+      child: Column(
+        children: [
+          const Text('Notes', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: ListView(
+              children: _notes.entries.map((entry) {
+                return ListTile(
+                  title: Text(entry.value),
+                  subtitle: Text(entry.key.toIso8601String()),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      setState(() {
+                        _notes.remove(entry.key);
+                        _saveData();
+                        widget.onTasksUpdated(
+                          _selectedDay!,
+                          _tasks[_selectedDay!] ?? [],
+                          _finishedTasks[_selectedDay] ?? [],
+                        );
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildTaskBox() {
+    return Card(
+      color: Colors.blue[50],
+      child: Column(
+        children: [
+          const Text('Tasks', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: ListView(
+              children: (_tasks[_selectedDay] ?? []).map((task) {
+                return ListTile(
+                  title: Text(task['text']),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.check_box_outline_blank),
+                        onPressed: () => _markTaskAsDone(task),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            _tasks[_selectedDay]!.remove(task);
+                            _saveData();
+                            widget.onTasksUpdated(
+                              _selectedDay!,
+                              _tasks[_selectedDay!]!,
+                              _finishedTasks[_selectedDay] ?? [],
+                            );
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFinishedTaskBox() {
+    return Card(
+      color: Colors.orange[50],
+      child: Column(
+        children: [
+          const Text('Finished Tasks', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: ListView(
+              children: _currentFinishedTasks.map((task) {
+                return ListTile(title: Text(task));
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNoteDialog() {
+    TextEditingController noteController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Add/Edit Note"),
+          backgroundColor: Colors.lightGreen[100],
+          title: const Text("Add Note"),
           content: TextField(
             controller: noteController,
-            decoration: const InputDecoration(
-              hintText: "Enter note",
-            ),
+            decoration: const InputDecoration(hintText: 'Enter note here'),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                if (noteController.text.isNotEmpty) {
+                String noteText = noteController.text.trim();
+                if (noteText.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a note.', style: TextStyle(color: Color(0xff04fb18)))),
+                  );
+                } else {
                   setState(() {
-                    _notes[selectedDay] = noteController.text;
+                    _notes[_selectedDay!] = noteText;
                   });
                   _saveData();
+                  widget.onTasksUpdated(
+                    _selectedDay!,
+                    _tasks[_selectedDay!] ?? [],
+                    _finishedTasks[_selectedDay] ?? [],
+                  );
+                  Navigator.pop(context);
                 }
-                Navigator.pop(context);
               },
               child: const Text("Save"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
             ),
           ],
         );
@@ -182,33 +301,32 @@ class _CalendarSectionState extends State<CalendarSection> {
     );
   }
 
-  Future<void> _showTaskDialog(DateTime selectedDay) async {
+  void _showTaskDialog() {
     TextEditingController taskController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.blue[100],
           title: const Text("Add Task"),
           content: TextField(
             controller: taskController,
-            decoration: const InputDecoration(
-              hintText: "Enter task",
-            ),
+            decoration: const InputDecoration(hintText: 'Enter task here'),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                if (taskController.text.isNotEmpty) {
-                  addTask(taskController.text);
+                String taskText = taskController.text.trim();
+                if (taskText.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a task.', style: TextStyle(color: Color(0xff04fb18)))),
+                  );
+                } else {
+                  addTask(taskText);
+                  Navigator.pop(context);
                 }
-                Navigator.pop(context);
               },
-              child: const Text("Add"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: const Text("Save"),
             ),
           ],
         );
@@ -234,177 +352,48 @@ class _CalendarSectionState extends State<CalendarSection> {
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   _selectedDay = selectedDay;
-                  // Fetch and display finished tasks for the selected day
+                  _focusedDay = focusedDay;
                   _displayFinishedTasksForSelectedDay();
                 });
               },
-              calendarBuilders: CalendarBuilders(
-                markerBuilder: (context, date, events) {
-                  if (_notes[date] != null ||
-                      _tasks[date]?.isNotEmpty == true) {
-                    return Positioned(
-                      bottom: 1,
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
+              onPageChanged: (focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay;
+                  _displayFinishedTasksForSelectedDay();
+                });
+              },
             ),
             const SizedBox(height: 20),
             if (_selectedDay != null) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(child: _buildNoteBox()),
-                  Expanded(child: _buildTaskBox()),
-                  Expanded(child: _buildFinishedTaskBox()),
+                  ElevatedButton(
+                    onPressed: _showNoteDialog,
+                    child: const Text('Add Note'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _showTaskDialog,
+                    child: const Text('Add Task'),
+                  ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: 500),
+                child: Row(
+                  children: [
+                    Expanded(child: _buildNoteBox()),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildTaskBox()),
+                    const SizedBox(width: 10),
+                    Expanded(child: _buildFinishedTaskBox()),
+                  ],
+                ),
               ),
             ],
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNoteBox() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blue),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Note for ${_selectedDay?.toLocal().toString().split(' ')[0]}",
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  setState(() {
-                    _notes.remove(_selectedDay);
-                  });
-                  _saveData();
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _notes[_selectedDay] ?? "No note for this day",
-            style: const TextStyle(fontSize: 16),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () => _showNoteDialog(_selectedDay!),
-            // Ensure _selectedDay is not null
-            child: const Text("Add/Edit Note"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTaskBox() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.green[50],
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.green),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Tasks for ${_selectedDay?.toLocal().toString().split(' ')[0]}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Column(
-            children: _tasks[_selectedDay]?.map((task) {
-              return CheckboxListTile(
-                title: Text(
-                  task['text'],
-                  style: TextStyle(
-                    decoration: task['completed']
-                        ? TextDecoration.lineThrough
-                        : null,
-                  ),
-                ),
-                value: task['completed'],
-                onChanged: (bool? value) {
-                  if (value != null && value) {
-                    _markTaskAsDone(task);
-                  }
-                },
-                secondary: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    setState(() {
-                      _tasks[_selectedDay]!.remove(task);
-                    });
-                    _saveData();
-                  },
-                ),
-              );
-            }).toList() ??
-                [const Text("No tasks for this day")],
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () => _showTaskDialog(_selectedDay!),
-            child: const Text("Add Task"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFinishedTaskBox() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.purple[50],
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.purple),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Finished Tasks for ${_selectedDay?.toLocal().toString().split(
-                ' ')[0]}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Column(
-            children: _currentFinishedTasks.map((task) {
-              return ListTile(
-                title: Text(task),
-              );
-            }).toList() ?? [const Text("No finished tasks for this day")],
-          ),
-        ],
       ),
     );
   }

@@ -8,10 +8,20 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChartData {
-  ChartData(this.task, this.value);
   final String task;
   final double value;
+  final DateTime date;
+
+  ChartData(this.task, this.value, this.date);
+
+  // Modify the factory constructor to accept the date parameter
+  factory ChartData.withDefaultDate(String task, double value, DateTime date) {
+    return ChartData(task, value, date); // Use the provided date
+  }
 }
+
+
+
 
 class MoodTracker extends StatefulWidget {
   @override
@@ -184,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: const Color(0xFF2A2A2A),
+        backgroundColor: const Color(0xFF153549),
         body: Row(
           children: [
             // Navigation Drawer
@@ -222,14 +232,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildNavigationDrawer() {
     return Container(
       width: 280,
-      color: const Color(0xFF363636),
+        color: Color(0xff28658a),
       child: Column(
         children: [
           Container(
             height: 150,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF555555), Color(0xFF3B3B3B)],
+                colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -255,8 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection(onTasksUpdated: _onTasksUpdated), isDisabled: !_isAttendanceApproved),
           _buildDrawerItem(Icons.note, 'Other Features', OtherFeatures(), isDisabled: !_isAttendanceApproved),
+          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection(
+            onTasksUpdated: _onTasksUpdated,
+            onBarChartUpdate: (date, chartData) {
+              // Handle bar chart update if needed
+            },
+          )),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
@@ -319,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
           ),
         ),
         child: Stack( // Use Stack to overlay the date/time
@@ -362,7 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text('Log In at : '
                 '${DateFormat('MM/dd/yy ').format(DateTime.now())} ${DateFormat('hh:mm a').format(DateTime.now())}', // Format the date and time
                 style: const TextStyle(
-                  color: Colors.green, // Set text color to green
+                  color: Color(0xFF70e000), // Set text color to green
                   fontSize: 14, // Set font size
                 ),
               ),
@@ -380,14 +395,23 @@ class _HomeScreenState extends State<HomeScreen> {
     List<String> mood = []; // Empty list for Mood
 
     // Get the count of unfinished and finished tasks for the selected day
-    int unfinishedCount = _tasks[_selectedDay]?.length ?? 0;
+    int unfinishedCount = _tasks[_selectedDay]?.where((task) => task['completed'] == false).length ?? 0;
     int finishedCount = _finishedTasks[_selectedDay]?.length ?? 0;
 
     // Sample data for the chart
     List<ChartData> chartData = [
-      ChartData('Unfinished', unfinishedCount.toDouble()),
-      ChartData('Finished', finishedCount.toDouble()),
+      ChartData.withDefaultDate(
+        'Unfinished',
+        unfinishedCount.toDouble(),
+        _selectedDay ?? DateTime.now(), // Use the current date as a fallback if _selectedDay is null
+      ),
+      ChartData.withDefaultDate(
+        'Finished',
+        finishedCount.toDouble(),
+        _selectedDay ?? DateTime.now(), // Use the current date as a fallback if _selectedDay is null
+      ),
     ];
+
 
     // Populate the tasksProgress list with unfinished tasks
     tasksProgress = _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ?? [];
@@ -418,6 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         primaryXAxis: CategoryAxis(
           labelStyle: TextStyle(color: Colors.white), // Set X-axis label color to white
+          title: AxisTitle(text: 'Task Status', textStyle: TextStyle(color: Colors.white)), // Add label for X-axis
         ),
         primaryYAxis: NumericAxis(
           labelStyle: TextStyle(color: Colors.white), // Set Y-axis label color to white
@@ -425,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
         series: <CartesianSeries>[
           ColumnSeries<ChartData, String>(
             dataSource: chartData,
-            xValueMapper: (ChartData data, _) => data.task,
+            xValueMapper: (ChartData data, _) => data.task, // Show 'Finished' and 'Unfinished' as categories
             yValueMapper: (ChartData data, _) => data.value,
             color: Colors.blue, // Optional: Set the color of the columns
           )
@@ -442,9 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
-              ),
+               color: Color(0xff28658a),
             ),
             child: SingleChildScrollView( // Allow scrolling within each column
               child: Column(
@@ -512,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
           ),
         ),
         child: Row(
@@ -536,7 +559,9 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 400, // Reduced height
         padding: const EdgeInsets.all(8), // Reduced padding
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xFF707070), Color(0xFF4A4A4A)]),
+          gradient: LinearGradient(
+            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

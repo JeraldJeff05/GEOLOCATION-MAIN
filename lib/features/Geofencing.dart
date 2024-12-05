@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(GeofencingApp());
@@ -68,7 +69,7 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   }
 
   Widget _buildOverviewTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,13 +85,18 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
                 'security, transportation, and other industries.',
             style: TextStyle(fontSize: 16),
           ),
+          const SizedBox(height: 16),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: VideoPlayerWidget(videoUrl: 'assets/Geofenz.mp4'), // Replace with your video URL
+          ),
         ],
       ),
     );
   }
 
   Widget _buildHowItWorksTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +127,7 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   }
 
   Widget _buildApplicationsTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +163,7 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   }
 
   Widget _buildBenefitsTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +186,7 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   }
 
   Widget _buildChallengesTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +222,7 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   }
 
   Widget _buildFutureTab() {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,5 +241,41 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
         ],
       ),
     );
+  }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerWidget({required this.videoUrl, Key? key}) : super(key: key);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.videoUrl)
+      ..initialize().then((_) {
+        setState(() {}); // Update the widget once the video is initialized
+        _controller.play();
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _controller.value.isInitialized
+        ? VideoPlayer(_controller)
+        : const Center(child: CircularProgressIndicator());
   }
 }
