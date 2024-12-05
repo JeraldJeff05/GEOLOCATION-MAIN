@@ -1,6 +1,8 @@
 import 'dart:convert'; // For JSON encoding
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,6 +11,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          bodyMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        ),
+      ),
       home: InputPointsScreen(),
     );
   }
@@ -20,77 +30,73 @@ class InputPointsScreen extends StatefulWidget {
 }
 
 class _InputPointsScreenState extends State<InputPointsScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final Map<String, TextEditingController> _controllers = {
-    'lat1': TextEditingController(),
-    'lng1': TextEditingController(),
-    'lat2': TextEditingController(),
-    'lng2': TextEditingController(),
-    'lat3': TextEditingController(),
-    'lng3': TextEditingController(),
-    'lat4': TextEditingController(),
-    'lng4': TextEditingController(),
-  };
-
+  final List<LatLng> _selectedPoints = [];
   String _response = '';
 
+  void _onMapTap(LatLng latLng) {
+    if (_selectedPoints.length < 4) {
+      setState(() {
+        _selectedPoints.add(latLng);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("You can only select 4 points.")),
+      );
+    }
+  }
+
   Future<void> _submitData() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      // Prepare the points
-      final points = {
-        'point1': {
-          'latitude': double.parse(_controllers['lat1']!.text),
-          'longitude': double.parse(_controllers['lng1']!.text),
-        },
-        'point2': {
-          'latitude': double.parse(_controllers['lat2']!.text),
-          'longitude': double.parse(_controllers['lng2']!.text),
-        },
-        'point3': {
-          'latitude': double.parse(_controllers['lat3']!.text),
-          'longitude': double.parse(_controllers['lng3']!.text),
-        },
-        'point4': {
-          'latitude': double.parse(_controllers['lat4']!.text),
-          'longitude': double.parse(_controllers['lng4']!.text),
-        },
-      };
+    if (_selectedPoints.length != 4) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please select exactly 4 points.")),
+      );
+      return;
+    }
 
-      // Encode data into JSON format
-      final String jsonData = jsonEncode(points);
+    // Prepare the points as JSON
+    final points = {
+      'point1': {
+        'latitude': _selectedPoints[0].latitude,
+        'longitude': _selectedPoints[0].longitude
+      },
+      'point2': {
+        'latitude': _selectedPoints[1].latitude,
+        'longitude': _selectedPoints[1].longitude
+      },
+      'point3': {
+        'latitude': _selectedPoints[2].latitude,
+        'longitude': _selectedPoints[2].longitude
+      },
+      'point4': {
+        'latitude': _selectedPoints[3].latitude,
+        'longitude': _selectedPoints[3].longitude
+      },
+    };
 
-      // API URL with concatenated JSON data
-      final String url =
-          'http://192.168.120.19:8080/coordinates?data=$jsonData';
+    final String jsonData = jsonEncode(points);
+    final String url = 'http://192.168.120.19:8080/coordinates?data=$jsonData';
 
-      debugPrint('URL: $url');
-      debugPrint('Payload (JSON): $jsonData');
+    debugPrint('Payload: $jsonData');
+    debugPrint('URL: $url');
 
-      try {
-        // Send GET request
-        final response = await http.get(Uri.parse(url));
+    try {
+      final response = await http.get(Uri.parse(url));
 
-        // Debug response details
-        debugPrint('Response Status Code: ${response.statusCode}');
-        debugPrint('Response Body: ${response.body}');
-
-        // Process response
-        if (response.statusCode == 200) {
-          setState(() {
-            _response = 'Response: ${response.body}';
-          });
-        } else {
-          setState(() {
-            _response =
-                'Failed to fetch data. Status Code: ${response.statusCode}';
-          });
-        }
-      } catch (e) {
-        debugPrint('Error occurred: $e');
+      if (response.statusCode == 200) {
         setState(() {
-          _response = 'Error: $e';
+          _response = 'Response: ${response.body}';
+        });
+      } else {
+        setState(() {
+          _response =
+              'Failed to fetch data. Status Code: ${response.statusCode}';
         });
       }
+    } catch (e) {
+      debugPrint('Error: $e');
+      setState(() {
+        _response = 'Error: $e';
+      });
     }
   }
 
@@ -99,56 +105,84 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Input Points'),
+        elevation: 4,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
+      body: Column(
+        children: [
+          Expanded(
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: LatLng(14.067833722868489, 121.3270708600162),
+                initialZoom: 15.0,
+                onTap: (_, latLng) => _onMapTap(latLng),
+              ),
               children: [
-                for (int i = 1; i <= 4; i++) ...[
-                  Text('Point $i', style: const TextStyle(fontSize: 18)),
-                  TextFormField(
-                    controller: _controllers['lat$i'],
-                    decoration: InputDecoration(labelText: 'Latitude'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter latitude';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _controllers['lng$i'],
-                    decoration: InputDecoration(labelText: 'Longitude'),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter longitude';
-                      }
-                      if (double.tryParse(value) == null) {
-                        return 'Please enter a valid number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                ],
-                ElevatedButton(
-                  onPressed: _submitData,
-                  child: const Text('Submit Data'),
+                TileLayer(
+                  urlTemplate:
+                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
                 ),
-                const SizedBox(height: 16),
-                Text(_response),
+                MarkerLayer(
+                  markers: _selectedPoints
+                      .map(
+                        (point) => Marker(
+                          width: 40.0,
+                          height: 40.0,
+                          point: point,
+                          child: const Icon(Icons.location_on,
+                              color: Colors.red,
+                              size: 30), // Use 'child' instead of 'builder'
+                        ),
+                      )
+                      .toList(),
+                ),
               ],
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Selected Points',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                ..._selectedPoints.asMap().entries.map((entry) {
+                  final index = entry.key + 1;
+                  final point = entry.value;
+                  return Text(
+                    'Point $index: (${point.latitude.toStringAsFixed(6)}, ${point.longitude.toStringAsFixed(6)})',
+                    style: const TextStyle(fontSize: 16),
+                  );
+                }),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _submitData,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child:
+                      const Text('Submit Data', style: TextStyle(fontSize: 16)),
+                ),
+                const SizedBox(height: 20),
+                if (_response.isNotEmpty)
+                  Text(
+                    _response,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: _response.contains('Failed')
+                          ? Colors.red
+                          : Colors.green,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'location/location_service.dart';
-import 'api/api_service.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        '/start': (context) => const StartScreen(),
+        //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -42,7 +41,7 @@ class StartScreen extends StatefulWidget {
 class _StartScreenState extends State<StartScreen> {
   double _opacity = 0.0;
   final LocationService _locationService = LocationService();
-  final ApiService _apiService = ApiService();
+
   String _message = ""; // Initial message
   // To control loading animation visibility
   bool _showButton = true; // Tracks visibility of the button
@@ -90,30 +89,13 @@ class _StartScreenState extends State<StartScreen> {
       // Fetch user's location
       await _locationService.getCurrentLocation();
 
-      // If location is available, send it to the API
+      // Check if the location is available
       if (_locationService.lat != null && _locationService.lng != null) {
-        String response = await _apiService.sendCoordinates(
-          _locationService.lat!.toString(),
-          _locationService.lng!.toString(),
-        );
-
-        if (response == "Location is allowed") {
-          // Loop typing animation for "Location is within the premises"
-          _startTypingAnimation("Location is within the geofence... ",
-              () async {
-            // Wait for 2 seconds before navigating to the next page
-            await Future.delayed(const Duration(seconds: 1));
-            Navigator.pushNamed(context, '/');
-          });
-        } else if (response == "Location not allowed") {
-          setState(() {
-            _message = "Outside Specified Area";
-          });
-        } else {
-          setState(() {
-            _message = "Cannot connect to API. Please refresh the site.";
-          });
-        }
+        _startTypingAnimation("Location fetched successfully!", () async {
+          // Wait for 2 seconds before navigating to the next page
+          await Future.delayed(const Duration(seconds: 1));
+          Navigator.pushNamed(context, '/');
+        });
       } else {
         setState(() {
           _message = "Unable to fetch location.";
@@ -122,8 +104,6 @@ class _StartScreenState extends State<StartScreen> {
         // Show a dialog with a warning icon when the location can't be fetched
         _showLocationErrorDialog();
       }
-
-      // Reset opacity and loading state after the check
     });
   }
 

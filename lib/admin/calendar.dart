@@ -49,7 +49,7 @@ class _CalendarWidgetState extends State<CalendarWidget>
     return LayoutBuilder(
       builder: (context, constraints) {
         // Show clock only if height is below 400
-        bool isSmallScreen = constraints.maxHeight < 450;
+        bool isSmallScreen = constraints.maxHeight < 300;
 
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -61,15 +61,27 @@ class _CalendarWidgetState extends State<CalendarWidget>
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TableCalendar(
-                    firstDay: firstDay,
-                    lastDay: lastDay,
-                    focusedDay: focusedDay,
-                    calendarFormat: CalendarFormat.month,
-                    onDaySelected: (selectedDay, focusedDay) {
-                      // Handle day selection
-                      print('Selected day: $selectedDay');
-                    },
+                  child: SizedBox(
+                    height:
+                        350, // Set the height of the calendar (you can adjust this)
+                    child: SingleChildScrollView(
+                      scrollDirection:
+                          Axis.vertical, // Allow vertical scrolling
+                      child: TableCalendar(
+                        firstDay: firstDay,
+                        lastDay: lastDay,
+                        focusedDay: focusedDay,
+                        selectedDayPredicate: (day) {
+                          // Highlight today (currentDay)
+                          return isSameDay(day, currentDay);
+                        },
+                        calendarFormat: CalendarFormat.month,
+                        onDaySelected: (selectedDay, focusedDay) {
+                          // Handle day selection
+                          print('Selected day: $selectedDay');
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -81,14 +93,14 @@ class _CalendarWidgetState extends State<CalendarWidget>
                 Icon(
                   Icons.access_time,
                   color: Colors.white,
-                  size: 30,
+                  size: 25,
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Text(
                   formattedTime,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 25,
                     fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
