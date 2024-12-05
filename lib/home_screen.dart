@@ -527,30 +527,43 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        height: 340,
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+return Card(
+  elevation: 4,
+  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  child: Container(
+    padding: const EdgeInsets.all(16),
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+      ),
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: AspectRatio(
+            aspectRatio: 1, // Set a 1:1 aspect ratio
+            child: buildKanbanColumn('Task Progress', tasksProgress),
           ),
         ),
-        child: Row(
-          children: [
-            buildKanbanColumn('Task Progress', tasksProgress),
-            const SizedBox(width: 8),
-            buildKanbanColumn('Quotes', quotes),
-            const SizedBox(width: 8),
-            buildKanbanColumn('Mood', mood),
-          ],
+        const SizedBox(width: 8),
+        Expanded(
+          child: AspectRatio(
+            aspectRatio: 1, // Set a 1:1 aspect ratio
+            child: buildKanbanColumn('Quotes', quotes),
+          ),
         ),
-      ),
-    );
+        const SizedBox(width: 8),
+        Expanded(
+          child: AspectRatio(
+            aspectRatio: 1, // Set a 1:1 aspect ratio
+            child: buildKanbanColumn('Mood', mood),
+          ),
+        ),
+      ],
+    ),
+  ),
+);
   }
-
   Widget _buildCalendar() {
     return Card(
       elevation: 4,
