@@ -62,7 +62,7 @@ class _OtherFeaturesState extends State<OtherFeatures> {
               minWidth: 800, // Minimum width
               maxWidth: 1200, // Maximum width
               minHeight: 600, // Minimum height
-              maxHeight: 800, // Maximum height
+              maxHeight: 600, // Maximum height
             ),
             child: FittedBox(
               child: Align(
