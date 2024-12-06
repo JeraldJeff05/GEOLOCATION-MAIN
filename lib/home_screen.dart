@@ -440,7 +440,27 @@ class _HomeScreenState extends State<HomeScreen> {
       "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
       "Opportunities don't happen. You create them. - Chris Grosser",
       "I find that the harder I work, the more luck I seem to have. - Thomas Jefferson",
-      "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt"
+      "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt",
+      "Believe you can and you're halfway there. - Theodore Roosevelt",
+      "It does not matter how slowly you go as long as you do not stop. - Confucius",
+      "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
+      "Do what you can with all you have, wherever you are. - Theodore Roosevelt",
+      "The best way to predict your future is to create it. - Abraham Lincoln",
+      "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart. - Roy T. Bennett",
+      "Keep your face always toward the sunshine—and shadows will fall behind you. - Walt Whitman",
+      "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
+      "If you want to lift yourself up, lift up someone else. - Booker T. Washington",
+      "The secret of getting ahead is getting started. - Mark Twain",
+      "Dream big and dare to fail. - Norman Vaughan",
+      "You are braver than you believe, stronger than you seem, and smarter than you think. - A.A. Milne",
+      "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty. - Winston Churchill",
+      "You miss 100% of the shots you don’t take. - Wayne Gretzky",
+      "Happiness is not something ready-made. It comes from your own actions. - Dalai Lama",
+      "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+      "Don't let yesterday take up too much of today. - Will Rogers",
+      "Your time is limited, so don’t waste it living someone else’s life. - Steve Jobs",
+      "Do one thing every day that scares you. - Eleanor Roosevelt",
+      "Strive not to be a success, but rather to be of value. - Albert Einstein"
     ];
 
     // Get the current date and use it to select a quote
@@ -614,7 +634,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       const SizedBox(width: 20), // Space between calendar and Kanban box
       Container(
-        width: 500, // Fixed width for Kanban box
+        width: 600, // Fixed width for Kanban box
         height: 400, // Same height as calendar to align properly
         child: Card(
           elevation: 4,
@@ -622,17 +642,15 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
-              ),
+              color: Color(0xff28658a),
             ),
             child: Column(
               children: [
                 // Insert the image inside the Kanban box
                 Image.asset(
                   'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
-                  width: 500, // Adjust the width as necessary
-                  height: 300, // Adjust the height as necessary
+                  width: 600, // Adjust the width as necessary
+                  height: 359, // Adjust the height as necessary
                   fit: BoxFit.cover, // Adjust the fit as necessary
                 ),
                 // Add your Kanban board contents here

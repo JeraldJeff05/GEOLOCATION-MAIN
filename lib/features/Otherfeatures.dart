@@ -59,15 +59,14 @@ class _OtherFeaturesState extends State<OtherFeatures> {
           ),
           ConstrainedBox(
             constraints: const BoxConstraints(
-              minWidth: 800, // Minimum width
-              maxWidth: 1200, // Maximum width
-              minHeight: 600, // Minimum height
-              maxHeight: 600, // Maximum height
+              minWidth: 600, // Minimum width
+              maxWidth: 1300, // Maximum width
+              minHeight: 700, // Minimum height
+              maxHeight: 800, // Maximum height
             ),
             child: FittedBox(
               child: Align(
-                alignment:
-                    Alignment.center, // Center both horizontally and vertically
+                alignment: Alignment.center, // Center both horizontally and vertically
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -149,7 +148,7 @@ class _OtherFeaturesState extends State<OtherFeatures> {
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
