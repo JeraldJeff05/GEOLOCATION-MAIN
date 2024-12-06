@@ -195,39 +195,52 @@ class _HomeScreenState extends State<HomeScreen> {
       canPop: false,
       child: Scaffold(
         backgroundColor: const Color(0xFF153549),
-        body: Row(
+        body: Stack(
           children: [
-            // Navigation Drawer
-            _buildNavigationDrawer(),
+            // Background Image
+            Positioned.fill(
+              child: Image.asset(
+                'bluebg.jpg', // Add the correct path to your image
+                fit: BoxFit.cover, // Adjust the image's fit as necessary
+              ),
+            ),
             // Main Content Area
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildProfileInfo(),
-                      const SizedBox(height: 16),
-                      _buildKanbanBoard(),
-                      const SizedBox(height: 16),
-                      Row(
+            Row(
+              children: [
+                // Navigation Drawer
+                _buildNavigationDrawer(),
+                // Main Content Area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(width: 16),
-                          Expanded(child: _buildCalendar()),
+                          _buildProfileInfo(),
+                          const SizedBox(height: 16),
+                          _buildKanbanBoard(),
+                          const SizedBox(height: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildCalendar()),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),
       ),
     );
   }
+
 
   Widget _buildNavigationDrawer() {
     return Container(
@@ -527,83 +540,108 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-return Card(
-  elevation: 4,
-  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  child: Container(
-    padding: const EdgeInsets.all(16),
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
-      ),
-    ),
-    child: Row(
-      children: [
-        Expanded(
-          child: AspectRatio(
-            aspectRatio: 1, // Set a 1:1 aspect ratio
-            child: buildKanbanColumn('Task Progress', tasksProgress),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: AspectRatio(
-            aspectRatio: 1, // Set a 1:1 aspect ratio
-            child: buildKanbanColumn('Quotes', quotes),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: AspectRatio(
-            aspectRatio: 1, // Set a 1:1 aspect ratio
-            child: buildKanbanColumn('Mood', mood),
-          ),
-        ),
-      ],
-    ),
-  ),
-);
-  }
-  Widget _buildCalendar() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        height: 400, // Reduced height
-        padding: const EdgeInsets.all(8), // Reduced padding
+        height: 340,
+        padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
           children: [
-            const SizedBox(height: 2), // Reduced spacing
+            buildKanbanColumn('Task Progress', tasksProgress),
+            const SizedBox(width: 8),
+            buildKanbanColumn('Quotes', quotes),
+            const SizedBox(width: 8),
+            buildKanbanColumn('Mood', mood),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendar() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
+          ),
+        ),
+        child: Row( // Use Row to align calendar and Kanban box side by side
+          children: [
             Expanded(
-              child: TableCalendar(
-                firstDay: DateTime.utc(2020, 1, 1),
-                lastDay: DateTime.utc(2030, 12, 31),
-                focusedDay: DateTime.now(),
-                calendarStyle: CalendarStyle(
-                  todayDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                  selectedDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                  defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 13), // Smaller font
-                  weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 13),
-                  outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 11),
-                ),
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  titleTextStyle: const TextStyle(color: Colors.white, fontSize: 15), // Reduced font size
-                  leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 17),
-                  rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 17),
-                ),
-                daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(color: Colors.white, fontSize: 11), // Smaller font
-                  weekendStyle: TextStyle(color: Colors.white, fontSize: 11),
+              child: Container(
+                height: 400, // Adjust height to ensure it fits well with the Kanban box
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 2), // Reduced spacing
+                    Expanded(
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: DateTime.now(),
+                        calendarStyle: CalendarStyle(
+                          todayDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                          selectedDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                          defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 13), // Smaller font
+                          weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 13),
+                          outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: false,
+                          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 15), // Reduced font size
+                          leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 17),
+                          rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 17),
+                        ),
+                        daysOfWeekStyle: const DaysOfWeekStyle(
+                          weekdayStyle: TextStyle(color: Colors.white, fontSize: 11), // Smaller font
+                          weekendStyle: TextStyle(color: Colors.white, fontSize: 11),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
+      const SizedBox(width: 20), // Space between calendar and Kanban box
+      Container(
+        width: 500, // Fixed width for Kanban box
+        height: 400, // Same height as calendar to align properly
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
+              ),
+            ),
+            child: Column(
+              children: [
+                // Insert the image inside the Kanban box
+                Image.asset(
+                  'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+                  width: 500, // Adjust the width as necessary
+                  height: 300, // Adjust the height as necessary
+                  fit: BoxFit.cover, // Adjust the fit as necessary
+                ),
+                // Add your Kanban board contents here
+                // For example: Task list, mood tracker, etc.
+              ],
+            ),
+          ),
+        ),
+    ),
           ],
         ),
       ),

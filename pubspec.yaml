@@ -87,6 +87,8 @@ flutter:
     - assets/RTLTvid.mp4
     - assets/Geofenz.mp4
     - assets/LBSvid.mp4
+    - assets/kanbanpic.jpg
+    - assets/bluebg.jpg
 
   
   fonts:
