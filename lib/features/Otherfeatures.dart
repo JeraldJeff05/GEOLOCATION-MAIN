@@ -57,86 +57,96 @@ class _OtherFeaturesState extends State<OtherFeatures> {
               ],
             ),
           ),
-          Expanded(
-            child: Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildFeatureContainer(
-                    image: 'geo1.png',
-                    title: 'Real-Time Location Tracking',
-                    isHovering: isHoveringFirst,
-                    onHover: (hovering) {
-                      setState(() {
-                        isHoveringFirst = hovering;
-                      });
-                    },
-                    isHoveringLearnMore: isHoveringLearnMoreFirst,
-                    onHoverLearnMore: (hovering) {
-                      setState(() {
-                        isHoveringLearnMoreFirst = hovering;
-                      });
-                    },
-                    onLearnMoreTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RealTimeLocationInfoScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 50),
-                  _buildFeatureContainer(
-                    image: 'geo2.png',
-                    title: 'Geofencing',
-                    isHovering: isHoveringSecond,
-                    onHover: (hovering) {
-                      setState(() {
-                        isHoveringSecond = hovering;
-                      });
-                    },
-                    isHoveringLearnMore: isHoveringLearnMoreSecond,
-                    onHoverLearnMore: (hovering) {
-                      setState(() {
-                        isHoveringLearnMoreSecond = hovering;
-                      });
-                    },
-                    onLearnMoreTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GeofencingScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(width: 50),
-                  _buildFeatureContainer(
-                    image: 'geo3.png',
-                    title: 'Location-Based Service',
-                    isHovering: isHoveringThird,
-                    onHover: (hovering) {
-                      setState(() {
-                        isHoveringThird = hovering;
-                      });
-                    },
-                    isHoveringLearnMore: isHoveringLearnMoreThird,
-                    onHoverLearnMore: (hovering) {
-                      setState(() {
-                        isHoveringLearnMoreThird = hovering;
-                      });
-                    },
-                    onLearnMoreTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LocationBasedServicesScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+          ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: 800, // Minimum width
+              maxWidth: 1200, // Maximum width
+              minHeight: 600, // Minimum height
+              maxHeight: 800, // Maximum height
+            ),
+            child: FittedBox(
+              child: Align(
+                alignment:
+                    Alignment.center, // Center both horizontally and vertically
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildFeatureContainer(
+                      image: 'geo1.png',
+                      title: 'Real-Time Location Tracking',
+                      isHovering: isHoveringFirst,
+                      onHover: (hovering) {
+                        setState(() {
+                          isHoveringFirst = hovering;
+                        });
+                      },
+                      isHoveringLearnMore: isHoveringLearnMoreFirst,
+                      onHoverLearnMore: (hovering) {
+                        setState(() {
+                          isHoveringLearnMoreFirst = hovering;
+                        });
+                      },
+                      onLearnMoreTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RealTimeLocationInfoScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 50),
+                    _buildFeatureContainer(
+                      image: 'geo2.png',
+                      title: 'Geofencing',
+                      isHovering: isHoveringSecond,
+                      onHover: (hovering) {
+                        setState(() {
+                          isHoveringSecond = hovering;
+                        });
+                      },
+                      isHoveringLearnMore: isHoveringLearnMoreSecond,
+                      onHoverLearnMore: (hovering) {
+                        setState(() {
+                          isHoveringLearnMoreSecond = hovering;
+                        });
+                      },
+                      onLearnMoreTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GeofencingScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 50),
+                    _buildFeatureContainer(
+                      image: 'geo3.png',
+                      title: 'Location-Based Service',
+                      isHovering: isHoveringThird,
+                      onHover: (hovering) {
+                        setState(() {
+                          isHoveringThird = hovering;
+                        });
+                      },
+                      isHoveringLearnMore: isHoveringLearnMoreThird,
+                      onHoverLearnMore: (hovering) {
+                        setState(() {
+                          isHoveringLearnMoreThird = hovering;
+                        });
+                      },
+                      onLearnMoreTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LocationBasedServicesScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -217,21 +227,21 @@ class _OtherFeaturesState extends State<OtherFeatures> {
                   decoration: BoxDecoration(
                     gradient: isHoveringLearnMore
                         ? LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Colors.blue.shade500,
-                        Colors.blue.shade500,
-                      ],
-                    )
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.blue.shade500,
+                              Colors.blue.shade500,
+                            ],
+                          )
                         : LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFF023e8a),
-                        Color(0xFF023e8a),
-                      ],
-                    ),
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF023e8a),
+                              Color(0xFF023e8a),
+                            ],
+                          ),
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Center(
