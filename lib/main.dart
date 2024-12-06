@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
 import 'location_service.dart';
 import 'api_service.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
+import 'package:window_size/window_size.dart';
+import 'dart:io';
+void main() { // Apply size constraints for the web.
+  if (html.window != null) {
+    html.window.onResize.listen((event) {
+      final width = html.window.innerWidth ?? 0;
+      final height = html.window.innerHeight ?? 0;
 
-void main() {
+      // Enforce minimum and maximum dimensions.
+      if (width < 800) {
+        html.window.resizeTo(800, height);
+      }
+      if (height < 600) {
+        html.window.resizeTo(width, 600);
+      }
+      if (width > 1200) {
+        html.window.resizeTo(1200, height);
+      }
+      if (height > 900) {
+        html.window.resizeTo(width, 900);
+      }
+    
+    });
+  }
   runApp(const MyApp());
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    WidgetsFlutterBinding.ensureInitialized();
+    setWindowTitle('My App');
+    setWindowMinSize(const Size(800, 600));
+    setWindowMaxSize(const Size(1200, 900));
+  }
 }
 
 class MyApp extends StatelessWidget {
