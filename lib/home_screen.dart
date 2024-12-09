@@ -21,6 +21,7 @@ class ChartData {
     return ChartData(task, value, date); // Use the provided date
   }
 }
+
 class ImageDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -100,37 +101,48 @@ class _MoodTrackerState extends State<MoodTracker> {
       } else if (neutralCount > happyCount && neutralCount > sadCount) {
         interpretationMessage = "You're feeling neutral today. Keep going! ⚖️";
       } else if (happyCount == 0 && sadCount == 0) {
-        interpretationMessage = "You're in a calm and balanced state. Well done! ✨";
+        interpretationMessage =
+            "You're in a calm and balanced state. Well done! ✨";
       } else if (happyCount == 1 && sadCount == 4) {
-        interpretationMessage = "It seems like you're having a tough time today. Hang in there! 💪";
+        interpretationMessage =
+            "It seems like you're having a tough time today. Hang in there! 💪";
       } else if (neutralCount == 2 && happyCount == 2 && sadCount == 1) {
-        interpretationMessage = "Your mood is all over the place today. Take it one step at a time. 🛤️";
+        interpretationMessage =
+            "Your mood is all over the place today. Take it one step at a time. 🛤️";
       } else if (happyCount == 5) {
         interpretationMessage = "You're on cloud nine! What a joyful day! ☁️💖";
       } else if (sadCount == 5) {
-        interpretationMessage = "Today might feel like a challenge. Reach out if you need support. 🤗";
+        interpretationMessage =
+            "Today might feel like a challenge. Reach out if you need support. 🤗";
       } else if (neutralCount == 5) {
-        interpretationMessage = "A steady day, neither good nor bad. It's okay to feel this way. ⚖️";
+        interpretationMessage =
+            "A steady day, neither good nor bad. It's okay to feel this way. ⚖️";
       } else if (happyCount == 4 && sadCount == 1) {
-        interpretationMessage = "You're mostly in a good mood today! Keep that positivity flowing. ✨";
+        interpretationMessage =
+            "You're mostly in a good mood today! Keep that positivity flowing. ✨";
       } else if (sadCount == 4 && neutralCount == 1) {
-        interpretationMessage = "It seems like you're struggling, but there's a spark of hope today. 🌱";
+        interpretationMessage =
+            "It seems like you're struggling, but there's a spark of hope today. 🌱";
       } else if (neutralCount == 3 && happyCount == 2) {
-        interpretationMessage = "You're mostly calm, but you're also feeling a bit positive. Great balance! ⚖️";
+        interpretationMessage =
+            "You're mostly calm, but you're also feeling a bit positive. Great balance! ⚖️";
       } else if (happyCount == 3 && sadCount == 2) {
-        interpretationMessage = "A mix of happiness and some difficulties. You're handling it well. 🌟";
+        interpretationMessage =
+            "A mix of happiness and some difficulties. You're handling it well. 🌟";
       } else if (sadCount == 3 && neutralCount == 2) {
-        interpretationMessage = "It looks like you're having a rough time, but don't forget to take breaks! 🧘‍♀️";
+        interpretationMessage =
+            "It looks like you're having a rough time, but don't forget to take breaks! 🧘‍♀️";
       } else if (happyCount == 2 && sadCount == 3) {
-        interpretationMessage = "Not every day is easy, but you're finding moments of joy! 🌻";
+        interpretationMessage =
+            "Not every day is easy, but you're finding moments of joy! 🌻";
       } else {
-        interpretationMessage = "Your day is a mix of emotions. Balance is key! 💡";
+        interpretationMessage =
+            "Your day is a mix of emotions. Balance is key! 💡";
       }
     } else {
       interpretationMessage = "";
     }
   }
-
 
   // Handle mood selection
   void _onMoodSelected(String mood) {
@@ -216,7 +228,6 @@ class _MoodTrackerState extends State<MoodTracker> {
     );
   }
 }
-
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -406,7 +417,8 @@ class _HomeScreenState extends State<HomeScreen> {
             // Assuming the String task only contains the task text, you can structure it like this
             return {
               'text': task,
-              'completedAt': DateTime.now().toIso8601String(), // Replace with actual completion time
+              'completedAt': DateTime.now()
+                  .toIso8601String(), // Replace with actual completion time
             };
           }).toList();
         });
@@ -415,7 +427,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ArchivePage(finishedTasks: formattedFinishedTasks, deletedTasks: {},),
+            builder: (context) => ArchivePage(
+              finishedTasks: formattedFinishedTasks,
+              deletedTasks: {},
+            ),
           ),
         );
       },
@@ -738,24 +753,57 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Row(
           children: [
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 1, // Set a 1:1 aspect ratio
-                child: buildKanbanColumn('Task Progress', tasksProgress),
+            Flexible(
+              child: SizedBox(
+                width: 600, // maximum width
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 300, // minimum width
+                    minHeight: 300, // minimum height
+                    maxWidth: 600, // maximum width
+                    maxHeight: 600, // maximum height
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1, // Set a 1:1 aspect ratio
+                    child: buildKanbanColumn('Task Progress', tasksProgress),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 1, // Set a 1:1 aspect ratio
-                child: buildKanbanColumn('Quotes', quotes),
+            Flexible(
+              child: SizedBox(
+                width: 600, // maximum width
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 300, // minimum width
+                    minHeight: 300, // minimum height
+                    maxWidth: 600, // maximum width
+                    maxHeight: 600, // maximum height
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1, // Set a 1:1 aspect ratio
+                    child: buildKanbanColumn('Quotes', quotes),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 8),
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 1, // Set a 1:1 aspect ratio
-                child: buildKanbanColumn('Mood', mood),
+            Flexible(
+              child: SizedBox(
+                width: 600, // maximum width
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: 300, // minimum width
+                    minHeight: 300, // minimum height
+                    maxWidth: 600, // maximum width
+                    maxHeight: 600, // maximum height
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1, // Set a 1:1 aspect ratio
+                    child: buildKanbanColumn('Mood', mood),
+                  ),
+                ),
               ),
             ),
           ],
@@ -780,7 +828,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child: Container(
-                height: 400, // Adjust height to ensure it fits well with the Kanban box
+                height:
+                    400, // Adjust height to ensure it fits well with the Kanban box
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -801,7 +850,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           weekendTextStyle: const TextStyle(
                               color: Colors.white, fontSize: 13),
                           outsideTextStyle:
-                          const TextStyle(color: Colors.grey, fontSize: 11),
+                              const TextStyle(color: Colors.grey, fontSize: 11),
                         ),
                         headerStyle: HeaderStyle(
                           formatButtonVisible: false,
@@ -818,7 +867,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.white,
                               fontSize: 11), // Smaller font
                           weekendStyle:
-                          TextStyle(color: Colors.white, fontSize: 11),
+                              TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ),
                     ),
