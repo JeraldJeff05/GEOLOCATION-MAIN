@@ -32,6 +32,7 @@ class _MoodTrackerState extends State<MoodTracker> {
   String? selectedMood;
   List<String> moodHistory = [];
   String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String interpretationMessage = ""; // Message for mood interpretation
 
   @override
   void initState() {
@@ -44,6 +45,7 @@ class _MoodTrackerState extends State<MoodTracker> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       moodHistory = prefs.getStringList(currentDate) ?? [];
+      _updateInterpretationMessage();
     });
   }
 
@@ -53,8 +55,32 @@ class _MoodTrackerState extends State<MoodTracker> {
 
     // Limit mood history to 5 items for the current day
     if (moodHistory.length < 5) {
-      moodHistory.add(mood); // Add the new mood
+      setState(() {
+        moodHistory.add(mood); // Add the new mood
+        _updateInterpretationMessage(); // Update the message
+      });
       await prefs.setStringList(currentDate, moodHistory);
+    }
+  }
+
+  // Update the interpretation message based on mood history
+  void _updateInterpretationMessage() {
+    if (moodHistory.length == 5) {
+      int happyCount = moodHistory.where((mood) => mood == "😄").length;
+      int neutralCount = moodHistory.where((mood) => mood == "😐").length;
+      int sadCount = moodHistory.where((mood) => mood == "😞").length;
+
+      if (happyCount > neutralCount && happyCount > sadCount) {
+        interpretationMessage = "You're having a cheerful day! 🌟";
+      } else if (sadCount > happyCount && sadCount > neutralCount) {
+        interpretationMessage = "It's been a tough day. Take some rest. 🛌";
+      } else if (neutralCount > happyCount && neutralCount > sadCount) {
+        interpretationMessage = "You're feeling neutral today. Keep going! ⚖️";
+      } else {
+        interpretationMessage = "Your day is a mix of emotions. Balance is key! 💡";
+      }
+    } else {
+      interpretationMessage = "";
     }
   }
 
@@ -68,8 +94,8 @@ class _MoodTrackerState extends State<MoodTracker> {
     } else {
       // Show a message if the limit is reached
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("You can only select up to 5 moods per day."),
+        const SnackBar(
+          content: Text("You have reached the limit of 5 moods for today."),
         ),
       );
     }
@@ -78,66 +104,71 @@ class _MoodTrackerState extends State<MoodTracker> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      // Wrap the Column in a SingleChildScrollView
-      child: Column(
-        children: [
-          Text(
-            "How do you feel today?",
-            style: TextStyle(
-                fontSize: 20, color: Colors.white), // Set text color to white
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: moods.map((mood) {
-              return GestureDetector(
-                onTap: () => _onMoodSelected(mood),
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "How do you feel today?",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: moods.map((mood) {
+                return GestureDetector(
+                  onTap: () => _onMoodSelected(mood),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      mood,
+                      style: const TextStyle(fontSize: 48, color: Colors.white),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 10),
+            if (selectedMood != null)
+              Text(
+                "You selected: $selectedMood",
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            const SizedBox(height: 10),
+            Text(
+              "Mood History:",
+              style: TextStyle(fontSize: 15, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: moodHistory.map((mood) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
                   child: Text(
                     mood,
-                    style: TextStyle(
-                        fontSize: 48,
-                        color: Colors.white), // Set text color to white
+                    style: const TextStyle(fontSize: 24, color: Colors.white),
                   ),
-                ),
-              );
-            }).toList(),
-          ),
-          SizedBox(height: 3),
-          if (selectedMood != null)
-            Text(
-              "You selected: $selectedMood",
-              style: TextStyle(
-                  fontSize: 20, color: Colors.white), // Set text color to white
+                );
+              }).toList(),
             ),
-          SizedBox(height: 3),
-          Text(
-            "Mood History:",
-            style: TextStyle(
-                fontSize: 15, color: Colors.white), // Set text color to white
-          ),
-          SizedBox(height: 3),
-          // Display mood history in a row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: moodHistory.map((mood) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 5),
-                child: Text(
-                  mood,
-                  style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.white), // Set text color to white
-                ),
-              );
-            }).toList(),
-          ),
-        ],
+            const SizedBox(height: 20),
+            if (interpretationMessage.isNotEmpty)
+              Text(
+                interpretationMessage,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
+          ],
+        ),
       ),
     );
   }
 }
+
 
 class HomeScreen extends StatefulWidget {
   @override
