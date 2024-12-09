@@ -19,7 +19,7 @@ class _MyHomePageState extends State<MyHomePage>
   String? _username, _password;
 
   double _topPosition = -500;
-  final double _targetTopPosition = 275;
+  final double _targetTopPosition = 260;
 
   bool _showLoginForm = false;
   bool _isLoading = false; // Loading indicator state
@@ -173,33 +173,26 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
-    final double centerLeftPosition =
-        MediaQuery.of(context).size.width / 2 - -170;
-
     return Scaffold(
       body: Stack(
         children: [
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/itsgiving.png'),
+                image: AssetImage('assets/realBACKGROUND.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.easeInOut,
-            top: MediaQuery.of(context).size.height > 600
-                ? _topPosition
-                : MediaQuery.of(context).size.height / 2 - 250,
-            left: MediaQuery.of(context).size.width > 1200
-                ? centerLeftPosition
-                : MediaQuery.of(context).size.width / 2 - 250,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 1000),
-              opacity: _showLoginForm ? 1.0 : 0.0,
-              child: _buildLoginForm(),
+          Align(
+            alignment: Alignment.centerRight, // Align to the left
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 25.0, right: 70.0),
+              // Add padding if needed
+              child: Opacity(
+                opacity: _showLoginForm ? 1.0 : 0.0,
+                child: _buildLoginForm(),
+              ),
             ),
           ),
           if (_isLoading)
@@ -212,15 +205,19 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Widget _buildLoginForm() {
-    bool isScreenMinimized = MediaQuery.of(context).size.width < 1200;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isScreenMinimized = screenWidth < 1350;
+
+    // Dynamic width based on screen size
+    final containerWidth =
+        isScreenMinimized ? (screenWidth * 0.9).toDouble() : 500.0;
 
     return Container(
-      width: 500,
-      height: 500,
-      padding: const EdgeInsets.all(40.0),
+      width: containerWidth,
+      padding: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: isScreenMinimized
-            ? Colors.black26.withOpacity(0.8)
+            ? Colors.black26.withOpacity(0.3)
             : Colors.white.withOpacity(0),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -232,51 +229,46 @@ class _MyHomePageState extends State<MyHomePage>
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 34),
-                _buildTextFieldWithValidation(
-                  icon: Icons.person,
-                  labelText: '',
-                  hintText: 'User ID',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your ID number';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) => _username = value,
-                ),
-                const SizedBox(height: 16),
-                _buildTextFieldWithValidation(
-                  icon: Icons.lock,
-                  labelText: '',
-                  hintText: 'Password',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) => _password = value,
-                  obscureText: true,
-                  onSubmit: _login, // Trigger login on Enter
-                ),
-              ],
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 34),
+            _buildTextFieldWithValidation(
+              icon: Icons.person,
+              labelText: '',
+              hintText: 'User ID',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your ID number';
+                }
+                return null;
+              },
+              onSaved: (value) => _username = value,
+              width: containerWidth * 0.8, // Adaptive width for text fields
             ),
-          ),
-          Positioned(
-            bottom: 220, // Adjust as needed
-            right: 168, // Adjust as needed
-            child: _buildGifButton(_login),
-          ),
-        ],
+            const SizedBox(height: 16),
+            _buildTextFieldWithValidation(
+              icon: Icons.lock,
+              labelText: '',
+              hintText: 'Password',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                return null;
+              },
+              onSaved: (value) => _password = value,
+              obscureText: true,
+              onSubmit: _login, // Trigger login on Enter
+              width: containerWidth * 0.8, // Adaptive width for text fields
+            ),
+            const SizedBox(
+                height: 32), // Add spacing between text fields and button
+            _buildGifButton(_login), // Place the login button here
+          ],
+        ),
       ),
     );
   }

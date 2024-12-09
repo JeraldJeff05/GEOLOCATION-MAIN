@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'location/location_service.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
 import 'admin_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Set the app to full screen
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   runApp(const MyApp());
 }
 

@@ -46,6 +46,10 @@ dependencies:
   video_player: ^2.6.0
   http: ^1.0.0
   flutter_map: ^7.0.2
+  fl_chart: ^0.69.2
+  one_clock: ^2.0.1
+  
+  
   
     
 
@@ -91,6 +95,7 @@ flutter:
     - assets/itsgiving.png
     - assets/itsgivinglogbut.gif
     - assets/biglog.png
+    - assets/realBACKGROUND.png
   
   fonts:  
     - family: CustomFont

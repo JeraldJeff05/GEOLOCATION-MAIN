@@ -74,7 +74,7 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
     };
 
     final String jsonData = jsonEncode(points);
-    final String url = 'http://192.168.120.19:8080/coordinates?data=$jsonData';
+    final String url = 'http://192.168.120.50:8080/coordinates?data=$jsonData';
 
     debugPrint('Payload: $jsonData');
     debugPrint('URL: $url');
@@ -107,39 +107,12 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
         title: const Text('Input Points'),
         elevation: 4,
       ),
-      body: Column(
+      body: Row(
         children: [
-          Expanded(
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(14.067833722868489, 121.3270708600162),
-                initialZoom: 15.0,
-                onTap: (_, latLng) => _onMapTap(latLng),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                  subdomains: ['a', 'b', 'c'],
-                ),
-                MarkerLayer(
-                  markers: _selectedPoints
-                      .map(
-                        (point) => Marker(
-                          width: 40.0,
-                          height: 40.0,
-                          point: point,
-                          child: const Icon(Icons.location_on,
-                              color: Colors.red,
-                              size: 30), // Use 'child' instead of 'builder'
-                        ),
-                      )
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-          Padding(
+          // First Column: Buttons and UI elements
+          Container(
+            width: MediaQuery.of(context).size.width * 0.2,
+            color: Colors.grey[200],
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,6 +152,37 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
                           : Colors.green,
                     ),
                   ),
+              ],
+            ),
+          ),
+
+          // Second Column: Map
+          Expanded(
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: LatLng(14.067833722868489, 121.3270708600162),
+                initialZoom: 18.0,
+                onTap: (_, latLng) => _onMapTap(latLng),
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: _selectedPoints
+                      .map(
+                        (point) => Marker(
+                          width: 40.0,
+                          height: 40.0,
+                          point: point,
+                          child: const Icon(Icons.location_on,
+                              color: Colors.red, size: 30),
+                        ),
+                      )
+                      .toList(),
+                ),
               ],
             ),
           ),

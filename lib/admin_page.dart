@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'admin/employees_log.dart';
 import 'admin/geofencing.dart';
-import 'admin/calendar.dart';
+import 'admin/clock.dart';
 import 'admin/register.dart';
 import 'admin/move_geofence.dart';
+import 'admin/corporate_dashboard.dart';
+import 'admin/quote_of_the_day.dart';
+import 'admin/news_feature.dart';
+import 'package:intl/intl.dart';
+import 'admin/info_devs.dart';
 
 class AdminPage extends StatefulWidget {
   final String? firstName;
@@ -22,7 +27,7 @@ class _AdminPageState extends State<AdminPage> {
   final List<String> _pageTitles = [
     'Employees Log',
     'Geofencing',
-    'Calendar',
+    'Clock',
     'Change Geofence',
     'Register',
   ];
@@ -30,7 +35,6 @@ class _AdminPageState extends State<AdminPage> {
   @override
   void initState() {
     super.initState();
-    // Listen to page changes
     _pageController.addListener(() {
       final newPage = _pageController.page?.round();
       if (newPage != null && _currentPage != newPage) {
@@ -43,7 +47,6 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   void dispose() {
-    // Dispose the controller to prevent memory leaks
     _pageController.dispose();
     super.dispose();
   }
@@ -54,8 +57,8 @@ class _AdminPageState extends State<AdminPage> {
         return EmployeesLogWidget();
       case 'Geofencing':
         return const GeofencingWidget();
-      case 'Calendar':
-        return const CalendarWidget();
+      case 'Clock':
+        return const ClockWidget();
       case 'Change Geofence':
         return InputPointsScreen();
       case 'Register':
@@ -69,11 +72,9 @@ class _AdminPageState extends State<AdminPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Profile Header
-        _buildHeader(
-            false), // You can use false here to indicate it's not a mobile view
+        _buildHeader(false),
         const SizedBox(height: 20),
-        _buildOptionsBar(), // Bar above the features
+        _buildOptionsBar(),
         const SizedBox(height: 20),
         Expanded(
           child: PageView.builder(
@@ -88,7 +89,7 @@ class _AdminPageState extends State<AdminPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 8),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -104,81 +105,10 @@ class _AdminPageState extends State<AdminPage> {
           ),
         ),
         const SizedBox(height: 20),
-        // Adding the two containers for 'Other Features' and 'News Features'
         Row(
           children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.only(right: 8),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Quote Of the Day',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    // Add your additional features here
-                    TextButton(
-                      onPressed: () {
-                        // Add action for other feature
-                      },
-                      child: const Text('Feature 1'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.only(left: 8),
-                decoration: BoxDecoration(
-                  color: Colors.blueGrey[50],
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 6,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'News Features',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 50),
-                    // Add your news features here
-                    TextButton(
-                      onPressed: () {
-                        // Add action for news feature
-                      },
-                      child: const Text('News Feature 1'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            Expanded(child: QuoteOfTheDay()),
+            Expanded(child: NewsFeature()),
           ],
         ),
       ],
@@ -191,10 +121,56 @@ class _AdminPageState extends State<AdminPage> {
       drawer: _buildNavigationDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
-          bool isMobile = constraints.maxWidth < 600;
+          bool isMobile =
+              constraints.maxWidth < 1000 || constraints.maxHeight < 500;
           bool isTablet =
-              constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+              constraints.maxWidth >= 1000 && constraints.maxWidth < 1000 ||
+                  constraints.maxHeight >= 500 && constraints.maxHeight < 1500;
 
+          if (isMobile) {
+            // Center the message and time for small screens
+            return Container(
+              color: Colors.black,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${TimeOfDay.now().format(context)}", // Displays the current time without seconds
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "${DateFormat('yyyy-MM-dd').format(DateTime.now())}", // Displays the current date and time with seconds
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "We Listen, We Anticipate, We Deliver",
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "Small Screen Is Currently Not Supported",
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Default layout for larger screens
           return Row(
             children: [
               if (!isMobile)
@@ -207,7 +183,6 @@ class _AdminPageState extends State<AdminPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      // Admin Features container
                       Expanded(
                         flex: 3,
                         child: Container(
@@ -215,49 +190,7 @@ class _AdminPageState extends State<AdminPage> {
                           child: _buildAdminFeatures(),
                         ),
                       ),
-                      // Other Features container
-                      Expanded(
-                        flex: 1,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[50],
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 6,
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Long Features Here',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // Add your additional features here
-                              TextButton(
-                                onPressed: () {
-                                  // Add action for other feature
-                                },
-                                child: const Text('Feature 1'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  // Add action for other feature
-                                },
-                                child: const Text('Feature 2'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      Expanded(child: CorporateDashboard()),
                     ],
                   ),
                 ),
@@ -268,7 +201,7 @@ class _AdminPageState extends State<AdminPage> {
       ),
       bottomNavigationBar: LayoutBuilder(
         builder: (context, constraints) {
-          bool isMobile = constraints.maxWidth < 600;
+          bool isMobile = constraints.maxWidth < 0;
           return isMobile
               ? _buildBottomNavigationBar()
               : const SizedBox.shrink();
@@ -278,39 +211,53 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildHeader(bool isMobile) {
-    return Row(
-      mainAxisAlignment:
-          isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
-      children: [
-        CircleAvatar(
-          radius: isMobile ? 25 : 30,
-          backgroundColor: Colors.white,
-          child: Icon(
-            Icons.person,
-            color: Colors.black,
-            size: isMobile ? 35 : 40,
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 4,
           ),
-        ),
-        if (!isMobile) const SizedBox(width: 16),
-        if (!isMobile)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${widget.firstName} ${widget.lastName}',
-                style: TextStyle(
-                  fontSize: isMobile ? 16 : 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment:
+            isMobile ? MainAxisAlignment.center : MainAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: isMobile ? 25 : 30,
+            backgroundColor: Colors.black,
+            child: Icon(
+              Icons.person,
+              color: Colors.black,
+              size: isMobile ? 35 : 40,
+            ),
+          ),
+          if (!isMobile) const SizedBox(width: 16),
+          if (!isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${widget.firstName} ${widget.lastName}',
+                  style: TextStyle(
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              Text(
-                'FDS ASYA PHILIPPINES INC',
-                style: TextStyle(color: Colors.black),
-              ),
-            ],
-          ),
-      ],
+                Text(
+                  'FDS ASYA PHILIPPINES INC',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 
@@ -325,10 +272,13 @@ class _AdminPageState extends State<AdminPage> {
       },
       items: _pageTitles.map((title) {
         return BottomNavigationBarItem(
-          icon: const Icon(Icons.circle),
+          icon: const Icon(Icons.circle, color: Colors.white),
           label: title,
         );
       }).toList(),
+      backgroundColor: Colors.black,
+      selectedItemColor: Colors.white,
+      unselectedItemColor: Colors.grey[400],
     );
   }
 
@@ -346,18 +296,11 @@ class _AdminPageState extends State<AdminPage> {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: _currentPage == index ? Colors.black : Colors.grey[400],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              margin: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text(
-                _pageTitles[index],
-                style: TextStyle(
-                  color:
-                      _currentPage == index ? Colors.white : Colors.grey[800],
-                  fontWeight: FontWeight.bold,
+              color: _currentPage == index ? Colors.grey[800] : Colors.black,
+              child: Center(
+                child: Text(
+                  _pageTitles[index],
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
             ),
@@ -369,60 +312,40 @@ class _AdminPageState extends State<AdminPage> {
 
   Widget _buildNavigationDrawer() {
     return Drawer(
-      child: Column(
+      backgroundColor: Colors.black,
+      child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          Container(
-            height: 150,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF333333), Color(0xFF222222)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+          DrawerHeader(
+            child: Center(
+              child: Text(
+                '${widget.firstName} ${widget.lastName}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                ),
               ),
             ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(
-                    radius: 35,
-                    backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 30, color: Colors.black),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Welcome, ${widget.lastName}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
+            decoration: BoxDecoration(
+              color: Colors.black,
             ),
           ),
-          _buildDrawerItem(Icons.home, 'Home', null),
-          _buildDrawerItem(Icons.settings, 'Settings', null),
-          _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
+          ListTile(
+            leading: const Icon(Icons.info_outline, color: Colors.white),
+            title: const Text('info', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              NamesList();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app, color: Colors.white),
+            title: const Text('Logout', style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
-      {bool isLogout = false}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(label, style: const TextStyle(color: Colors.black)),
-      onTap: () {
-        if (isLogout) {
-          Navigator.pushReplacementNamed(context, '/');
-        } else if (destination != null) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => destination));
-        }
-      },
     );
   }
 }

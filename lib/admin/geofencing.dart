@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 
 class ApiService {
   static const String _apiUrl =
-      "http://192.168.120.19:8080/geofence/check"; // Replace with your API URL
+      "http://192.168.120.50:8080/geofence/check"; // Replace with your API URL
 
   Future<String> sendCoordinates(String lat, String lng) async {
     try {
@@ -75,146 +75,171 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF1e3c72), Color(0xFF2a5298)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(
-                "Geofence Check",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmallScreen = constraints.maxWidth < 600;
+        return Scaffold(
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black54, Colors.black],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-              const SizedBox(height: 10.0),
-              Expanded(
-                child: Row(
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    // First column with geofence UI elements
-                    Expanded(
-                      flex: 1,
-                      child: Card(
-                        elevation: 8.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(0),
-                        ),
+                    Text(
+                      "Geofence Check",
+                      style: TextStyle(
+                        fontSize: isSmallScreen ? 24 : 32,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Box for selected location
-                              Container(
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey[200],
-                                ),
-                                child: Text(
-                                  _selectedLocation != null
-                                      ? 'Selected Location:\n${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}'
-                                      : "Select Location",
-                                  style: TextStyle(fontSize: 16),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              const SizedBox(height: 20.0),
-                              // Check Geofence Button
-                              ElevatedButton(
-                                onPressed: _checkGeofence,
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16.0, horizontal: 32.0),
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                ),
-                                child: const Text(
-                                  "Check Geofence",
-                                  style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              const SizedBox(height: 20.0),
-                              // Box for API Response
-                              Container(
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey[200],
-                                ),
-                                child: Text(
-                                  _responseMessage.isEmpty
-                                      ? "Waiting for the response.."
-                                      : _responseMessage,
-                                  style: const TextStyle(fontSize: 16.0),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    const SizedBox(width: 16.0),
-                    // Second column with the map
+                    const SizedBox(height: 20.0),
                     Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: double.infinity,
-                        child: FlutterMap(
-                          options: MapOptions(
-                            initialCenter:
-                                LatLng(14.067833722868489, 121.3270708600162),
-                            initialZoom: 20.0,
-                            onTap: (_, latLng) => _onTap(latLng),
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                              subdomains: ['a', 'b', 'c'],
+                      child: isSmallScreen
+                          ? Column(
+                              children: [
+                                _buildFirstColumn(isSmallScreen),
+                                const SizedBox(height: 16.0),
+                                _buildSecondColumn(),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: _buildFirstColumn(isSmallScreen),
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  flex: 2,
+                                  child: _buildSecondColumn(),
+                                ),
+                              ],
                             ),
-                            MarkerLayer(
-                              markers: _selectedLocation != null
-                                  ? [
-                                      Marker(
-                                        width: 80.0,
-                                        height: 80.0,
-                                        point: _selectedLocation!,
-                                        child: Icon(
-                                          Icons.location_on,
-                                          color: Colors.red,
-                                          size: 40,
-                                        ),
-                                      ),
-                                    ]
-                                  : [],
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFirstColumn(bool isSmallScreen) {
+    return Card(
+      elevation: 10.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      color: Colors.black,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 125,
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(0),
+                color: Colors.white,
+              ),
+              child: Text(
+                _selectedLocation != null
+                    ? 'Selected Location:\n${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}'
+                    : "Select Location",
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 14 : 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 5.0),
+            Container(
+              height: 90,
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(0),
+                color: Colors.white,
+              ),
+              child: Text(
+                _responseMessage.isEmpty
+                    ? "Waiting for the response..."
+                    : _responseMessage,
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 14 : 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: _checkGeofence,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 32.0,
+                ),
+                backgroundColor: Colors.grey,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0.0),
+                ),
+              ),
+              child: const Text(
+                "Check Geofence",
+                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSecondColumn() {
+    return Container(
+      height: double.infinity,
+      child: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(14.067833722868489, 121.3270708600162),
+          initialZoom: 20.0,
+          onTap: (_, latLng) => _onTap(latLng),
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            subdomains: ['a', 'b', 'c'],
+          ),
+          MarkerLayer(
+            markers: _selectedLocation != null
+                ? [
+                    Marker(
+                      width: 80.0,
+                      height: 80.0,
+                      point: _selectedLocation!,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.black,
+                        size: 40,
+                      ),
+                    ),
+                  ]
+                : [],
+          ),
+        ],
       ),
     );
   }

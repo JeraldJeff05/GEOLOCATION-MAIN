@@ -1,9 +1,10 @@
+import 'package:check_loc/admin/url.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiLogin {
   final String _apiUrl =
-      'http://192.168.120.19:8080/employee/login'; // Replace with your API URL
+      'http://192.168.120.50:8080/employee/login'; // Replace with your API URL
 
   String? responseBody; // Public variable to store the response body
   String? role; // Variable to store the role ('employee' or 'admin')
@@ -16,7 +17,8 @@ class ApiLogin {
     required String password,
   }) async {
     try {
-      final Uri apiUri = Uri.parse(_apiUrl).replace(queryParameters: {
+      final apiUri = Uri.parse(APIEndpoints.login).replace(queryParameters: {
+        // Uri.parse(_apiUrl).replace(queryParameters: {
         'id': id,
         'password': password,
       });
