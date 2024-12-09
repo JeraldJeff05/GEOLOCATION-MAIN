@@ -367,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ArchivePage(finishedTasks: formattedFinishedTasks),
+            builder: (context) => ArchivePage(finishedTasks: formattedFinishedTasks, deletedTasks: {},),
           ),
         );
       },

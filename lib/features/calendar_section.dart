@@ -21,6 +21,7 @@ class CalendarSection extends StatefulWidget {
 }
 
 class _CalendarSectionState extends State<CalendarSection> {
+  late Map<DateTime, List<Map<String, dynamic>>> _deletedTasks;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -30,6 +31,7 @@ class _CalendarSectionState extends State<CalendarSection> {
   List<String> _currentFinishedTasks = [];
   List<dynamic> _getEventsForDay(DateTime day) {
     return _tasks[day]?.isNotEmpty == true ? ['Task'] : [];
+
   }
 
   @override
@@ -37,6 +39,7 @@ class _CalendarSectionState extends State<CalendarSection> {
     super.initState();
     _selectedDay = DateTime.now();
     _loadData();
+    _deletedTasks = {};
   }
 
   Future<void> _loadData() async {
@@ -223,15 +226,8 @@ class _CalendarSectionState extends State<CalendarSection> {
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
-                          setState(() {
-                            _tasks[_selectedDay]!.remove(task);
-                            _saveData();
-                            widget.onTasksUpdated(
-                              _selectedDay!,
-                              _tasks[_selectedDay!]!,
-                              _finishedTasks[_selectedDay] ?? [],
-                            );
-                          });
+                          // Show confirmation dialog before deleting
+                          _showDeleteConfirmationDialog(task);
                         },
                       ),
                     ],
@@ -244,6 +240,57 @@ class _CalendarSectionState extends State<CalendarSection> {
       ),
     );
   }
+
+  void _showDeleteConfirmationDialog(Map<String, dynamic> task) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Task"),
+          content: const Text("Are you sure you want to delete this task?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  // Remove the task from the tasks list
+                  _tasks[_selectedDay]!.remove(task);
+
+                  // Add the task to the deleted tasks map
+                  DateTime now = DateTime.now();
+                  Map<String, dynamic> deletedTask = {
+                    ...task,
+                    'deletedAt': now.toIso8601String(), // Add the deletedAt timestamp
+                  };
+
+                  // Ensure deleted tasks are stored in the deletedTasks map
+                  _deletedTasks.putIfAbsent(_selectedDay!, () => []).add(deletedTask);
+
+                  // Save data if necessary
+                  _saveData();
+                  widget.onTasksUpdated(
+                    _selectedDay!,
+                    _tasks[_selectedDay!]!,
+                    _finishedTasks[_selectedDay] ?? [],
+                  );
+                });
+
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog without deleting
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
 
   Widget _buildFinishedTaskBox() {
     return Card(
@@ -337,6 +384,8 @@ class _CalendarSectionState extends State<CalendarSection> {
     );
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -408,3 +457,4 @@ class _CalendarSectionState extends State<CalendarSection> {
     );
   }
 }
+
