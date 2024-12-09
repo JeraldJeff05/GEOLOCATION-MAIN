@@ -28,6 +28,9 @@ class _CalendarSectionState extends State<CalendarSection> {
   final Map<DateTime, List<Map<String, dynamic>>> _tasks = {};
   final Map<DateTime, List<String>> _finishedTasks = {};
   List<String> _currentFinishedTasks = [];
+  List<dynamic> _getEventsForDay(DateTime day) {
+    return _tasks[day]?.isNotEmpty == true ? ['Task'] : [];
+  }
 
   @override
   void initState() {
@@ -362,6 +365,13 @@ class _CalendarSectionState extends State<CalendarSection> {
                   _displayFinishedTasksForSelectedDay();
                 });
               },
+              eventLoader: _getEventsForDay, // Added this line
+              calendarStyle: CalendarStyle(
+                markerDecoration: const BoxDecoration(
+                  color: Colors.blue, // Customize marker color
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             if (_selectedDay != null) ...[

@@ -1,4 +1,5 @@
 import 'package:check_loc/features/Otherfeatures.dart';
+import 'package:check_loc/features/archive_page.dart';
 import 'package:flutter/material.dart';
 import 'features/calendar_section.dart';
 // import 'settings_section.dart';
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'features/archive_page.dart';
 
 class ChartData {
   final String task;
@@ -302,9 +304,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Handle bar chart update if needed
                 },
               )),
+          _buildArchiveButton(), // Adding the Archive button here
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
+    );
+  }
+
+  Widget _buildArchiveButton() {
+    return ListTile(
+      leading: Icon(Icons.archive, color: const Color(0xFFB0B0B0)),
+      title: Text(
+        'Archive',
+        style: const TextStyle(color: Color(0xFFE0E0E0)),
+      ),
+      onTap: () {
+        // Convert finishedTasks to the expected format
+        Map<DateTime, List<Map<String, dynamic>>> formattedFinishedTasks = {};
+
+        _finishedTasks.forEach((date, tasks) {
+          formattedFinishedTasks[date] = tasks.map((task) {
+            // Assuming the String task only contains the task text, you can structure it like this
+            return {
+              'text': task,
+              'completedAt': DateTime.now().toIso8601String(), // Replace with actual completion time
+            };
+          }).toList();
+        });
+
+        // Navigate to the ArchivePage and pass formattedFinishedTasks
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArchivePage(finishedTasks: formattedFinishedTasks),
+          ),
+        );
+      },
     );
   }
 
