@@ -21,6 +21,29 @@ class ChartData {
     return ChartData(task, value, date); // Use the provided date
   }
 }
+class ImageDetailPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTap: () {
+          // Close the hero transition by popping the current page
+          Navigator.of(context).pop();
+        },
+        child: Center(
+          child: Hero(
+            tag: 'kanban_image', // Same tag as in the first page
+            child: Image.asset(
+              'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+              fit: BoxFit.contain, // Adjust the fit for the larger view
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class MoodTracker extends StatefulWidget {
   @override
@@ -757,8 +780,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Expanded(
               child: Container(
-                height:
-                    400, // Adjust height to ensure it fits well with the Kanban box
+                height: 400, // Adjust height to ensure it fits well with the Kanban box
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -779,7 +801,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           weekendTextStyle: const TextStyle(
                               color: Colors.white, fontSize: 13),
                           outsideTextStyle:
-                              const TextStyle(color: Colors.grey, fontSize: 11),
+                          const TextStyle(color: Colors.grey, fontSize: 11),
                         ),
                         headerStyle: HeaderStyle(
                           formatButtonVisible: false,
@@ -796,7 +818,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.white,
                               fontSize: 11), // Smaller font
                           weekendStyle:
-                              TextStyle(color: Colors.white, fontSize: 11),
+                          TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ),
                     ),
@@ -819,12 +841,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Column(
                     children: [
-                      // Insert the image inside the Kanban box
-                      Image.asset(
-                        'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
-                        width: 600, // Adjust the width as necessary
-                        height: 359, // Adjust the height as necessary
-                        fit: BoxFit.cover, // Adjust the fit as necessary
+                      // Insert the image inside the Kanban box with Hero transition
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to another page when tapped (for hero transition)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ImageDetailPage(),
+                            ),
+                          );
+                        },
+                        child: Hero(
+                          tag: 'kanban_image', // Unique tag for Hero transition
+                          child: Image.asset(
+                            'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+                            width: 600, // Adjust the width as necessary
+                            height: 359, // Adjust the height as necessary
+                            fit: BoxFit.cover, // Adjust the fit as necessary
+                          ),
+                        ),
                       ),
                       // Add your Kanban board contents here
                       // For example: Task list, mood tracker, etc.
