@@ -20,9 +20,6 @@ class ChartData {
   }
 }
 
-
-
-
 class MoodTracker extends StatefulWidget {
   @override
   _MoodTrackerState createState() => _MoodTrackerState();
@@ -78,12 +75,14 @@ class _MoodTrackerState extends State<MoodTracker> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView( // Wrap the Column in a SingleChildScrollView
+    return SingleChildScrollView(
+      // Wrap the Column in a SingleChildScrollView
       child: Column(
         children: [
           Text(
             "How do you feel today?",
-            style: TextStyle(fontSize: 20, color: Colors.white), // Set text color to white
+            style: TextStyle(
+                fontSize: 20, color: Colors.white), // Set text color to white
           ),
           SizedBox(height: 5),
           Row(
@@ -95,7 +94,9 @@ class _MoodTrackerState extends State<MoodTracker> {
                   margin: EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     mood,
-                    style: TextStyle(fontSize: 48, color: Colors.white), // Set text color to white
+                    style: TextStyle(
+                        fontSize: 48,
+                        color: Colors.white), // Set text color to white
                   ),
                 ),
               );
@@ -105,12 +106,14 @@ class _MoodTrackerState extends State<MoodTracker> {
           if (selectedMood != null)
             Text(
               "You selected: $selectedMood",
-              style: TextStyle(fontSize: 20, color: Colors.white), // Set text color to white
+              style: TextStyle(
+                  fontSize: 20, color: Colors.white), // Set text color to white
             ),
           SizedBox(height: 3),
           Text(
             "Mood History:",
-            style: TextStyle(fontSize: 15, color: Colors.white), // Set text color to white
+            style: TextStyle(
+                fontSize: 15, color: Colors.white), // Set text color to white
           ),
           SizedBox(height: 3),
           // Display mood history in a row
@@ -121,7 +124,9 @@ class _MoodTrackerState extends State<MoodTracker> {
                 margin: EdgeInsets.symmetric(horizontal: 5),
                 child: Text(
                   mood,
-                  style: TextStyle(fontSize: 24, color: Colors.white), // Set text color to white
+                  style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white), // Set text color to white
                 ),
               );
             }).toList(),
@@ -136,6 +141,7 @@ class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   DateTime? _selectedDay;
   bool _isAttendanceApproved = false; // Track attendance approval
@@ -159,7 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return AlertDialog(
           title: Text("Checking your Attendance"),
           content: Text("Please wait for the approval"),
-          backgroundColor: Colors.green[100], // Set the background color to light green
+          backgroundColor:
+              Colors.green[100], // Set the background color to light green
           actions: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center, // Center the button
@@ -167,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 TextButton(
                   onPressed: () {
                     setState(() {
-                      _isAttendanceApproved = true; // Mark attendance as approved
+                      _isAttendanceApproved =
+                          true; // Mark attendance as approved
                     });
                     Navigator.of(context).pop(); // Close the dialog
                   },
@@ -181,7 +189,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _onTasksUpdated(DateTime selectedDay, List<Map<String, dynamic>> tasks, List<String> finishedTasks) {
+  void _onTasksUpdated(DateTime selectedDay, List<Map<String, dynamic>> tasks,
+      List<String> finishedTasks) {
     setState(() {
       _selectedDay = selectedDay;
       _tasks[selectedDay] = tasks;
@@ -213,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -241,18 +251,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildNavigationDrawer() {
     return Container(
       width: 280,
-        color: Color(0xff28658a),
+      color: Color(0xff28658a),
       child: Column(
         children: [
           Container(
             height: 150,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+                colors: [
+                  Color(0xFF000814),
+                  Color(0xFF001d3d),
+                  Color(0xFF003566)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -278,35 +291,44 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          _buildDrawerItem(Icons.note, 'Other Features', OtherFeatures(), isDisabled: !_isAttendanceApproved),
-          _buildDrawerItem(Icons.calendar_today, 'Calendar', CalendarSection(
-            onTasksUpdated: _onTasksUpdated,
-            onBarChartUpdate: (date, chartData) {
-              // Handle bar chart update if needed
-            },
-          )),
+          _buildDrawerItem(Icons.note, 'Other Features', OtherFeatures(),
+              isDisabled: !_isAttendanceApproved),
+          _buildDrawerItem(
+              Icons.calendar_today,
+              'Calendar',
+              CalendarSection(
+                onTasksUpdated: _onTasksUpdated,
+                onBarChartUpdate: (date, chartData) {
+                  // Handle bar chart update if needed
+                },
+              )),
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String label, Widget? destination, {bool isLogout = false, bool isDisabled = false}) {
+  Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
+      {bool isLogout = false, bool isDisabled = false}) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFB0B0B0)),
       title: Text(
         label,
         style: const TextStyle(color: Color(0xFFE0E0E0)),
       ),
-      onTap: isDisabled ? null : () {
-        if (isLogout) {
-          _showLogoutConfirmationDialog(); // Show logout confirmation dialog
-        } else if (destination != null) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => destination));
-        }
-      },
+      onTap: isDisabled
+          ? null
+          : () {
+              if (isLogout) {
+                _showLogoutConfirmationDialog(); // Show logout confirmation dialog
+              } else if (destination != null) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => destination));
+              }
+            },
     );
   }
+
   void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
@@ -334,9 +356,11 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
   void _logout() {
     // Perform logout operations, such as clearing user data or navigating to the login screen
-    Navigator.of(context).pushReplacementNamed('/'); // Navigate to the login screen
+    Navigator.of(context)
+        .pushReplacementNamed('/'); // Navigate to the login screen
   }
 
   Widget _buildProfileInfo() {
@@ -347,16 +371,18 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: Stack( // Use Stack to overlay the date/time
+        child: Stack(
+          // Use Stack to overlay the date/time
           children: [
             Row(
               children: [
                 const CircleAvatar(
                   radius: 50,
-                  backgroundImage: AssetImage('assets/profile_picture.png'), // Ensure this image exists in your assets
+                  backgroundImage: AssetImage(
+                      'assets/profile_picture.png'), // Ensure this image exists in your assets
                 ),
                 const SizedBox(width: 20),
                 Column(
@@ -387,7 +413,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Positioned(
               top: 16, // Adjust this value to position the text
               right: 16, // Adjust this value to position the text
-              child: Text('Log In at : '
+              child: Text(
+                'Log In at : '
                 '${DateFormat('MM/dd/yy ').format(DateTime.now())} ${DateFormat('hh:mm a').format(DateTime.now())}', // Format the date and time
                 style: const TextStyle(
                   color: Color(0xFF70e000), // Set text color to green
@@ -408,7 +435,10 @@ class _HomeScreenState extends State<HomeScreen> {
     List<String> mood = []; // Empty list for Mood
 
     // Get the count of unfinished and finished tasks for the selected day
-    int unfinishedCount = _tasks[_selectedDay]?.where((task) => task['completed'] == false).length ?? 0;
+    int unfinishedCount = _tasks[_selectedDay]
+            ?.where((task) => task['completed'] == false)
+            .length ??
+        0;
     int finishedCount = _finishedTasks[_selectedDay]?.length ?? 0;
 
     // Sample data for the chart
@@ -416,18 +446,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ChartData.withDefaultDate(
         'Unfinished',
         unfinishedCount.toDouble(),
-        _selectedDay ?? DateTime.now(), // Use the current date as a fallback if _selectedDay is null
+        _selectedDay ??
+            DateTime
+                .now(), // Use the current date as a fallback if _selectedDay is null
       ),
       ChartData.withDefaultDate(
         'Finished',
         finishedCount.toDouble(),
-        _selectedDay ?? DateTime.now(), // Use the current date as a fallback if _selectedDay is null
+        _selectedDay ??
+            DateTime
+                .now(), // Use the current date as a fallback if _selectedDay is null
       ),
     ];
 
-
     // Populate the tasksProgress list with unfinished tasks
-    tasksProgress = _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ?? [];
+    tasksProgress =
+        _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ??
+            [];
 
     // List of quotes
     List<String> quotesList = [
@@ -465,30 +500,39 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Get the current date and use it to select a quote
     int currentDay = DateTime.now().day;
-    String dailyQuote = quotesList[currentDay % quotesList.length]; // Select a quote based on the day
+    String dailyQuote = quotesList[
+        currentDay % quotesList.length]; // Select a quote based on the day
 
     Widget buildChart() {
       return SfCartesianChart(
         title: ChartTitle(
           text: 'Task Distribution',
-          textStyle: TextStyle(color: Colors.white), // Set title text color to white
+          textStyle:
+              TextStyle(color: Colors.white), // Set title text color to white
         ),
         primaryXAxis: CategoryAxis(
-          labelStyle: TextStyle(color: Colors.white), // Set X-axis label color to white
-          title: AxisTitle(text: 'Task Status', textStyle: TextStyle(color: Colors.white)), // Add label for X-axis
+          labelStyle:
+              TextStyle(color: Colors.white), // Set X-axis label color to white
+          title: AxisTitle(
+              text: 'Task Status',
+              textStyle:
+                  TextStyle(color: Colors.white)), // Add label for X-axis
         ),
         primaryYAxis: NumericAxis(
-          labelStyle: TextStyle(color: Colors.white), // Set Y-axis label color to white
+          labelStyle:
+              TextStyle(color: Colors.white), // Set Y-axis label color to white
         ),
         series: <CartesianSeries>[
           ColumnSeries<ChartData, String>(
             dataSource: chartData,
-            xValueMapper: (ChartData data, _) => data.task, // Show 'Finished' and 'Unfinished' as categories
+            xValueMapper: (ChartData data, _) =>
+                data.task, // Show 'Finished' and 'Unfinished' as categories
             yValueMapper: (ChartData data, _) => data.value,
             color: Colors.blue, // Optional: Set the color of the columns
           )
         ],
-        backgroundColor: const Color(0xFF2A2A2A), // Optional: Set the background color of the chart
+        backgroundColor: const Color(
+            0xFF2A2A2A), // Optional: Set the background color of the chart
       );
     }
 
@@ -496,13 +540,15 @@ class _HomeScreenState extends State<HomeScreen> {
       return Expanded(
         child: Card(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-               color: Color(0xff28658a),
+              color: Color(0xff28658a),
             ),
-            child: SingleChildScrollView( // Allow scrolling within each column
+            child: SingleChildScrollView(
+              // Allow scrolling within each column
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -515,12 +561,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  if (title == 'Task Progress') // Insert chart in Task Progress column
+                  if (title ==
+                      'Task Progress') // Insert chart in Task Progress column
                     Container(
                       height: 200, // Set a specific height for the chart
                       child: buildChart(),
                     ),
-                  if (title == 'Quotes') // Display the quote in the Quotes column
+                  if (title ==
+                      'Quotes') // Display the quote in the Quotes column
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Center(
@@ -544,13 +592,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Display tasks in the Task Progress column
                   if (title == 'Task Progress' && tasks.isNotEmpty) ...[
                     const SizedBox(height: 10),
-                    ...tasks.map((task) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Text(
-                        task,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    )).toList(),
+                    ...tasks
+                        .map((task) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                task,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ))
+                        .toList(),
                   ],
                 ],
               ),
@@ -564,20 +614,34 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        height: 340,
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF000814),Color(0xFF001d3d),Color(0xFF003566)],
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
         child: Row(
           children: [
-            buildKanbanColumn('Task Progress', tasksProgress),
+            Expanded(
+              child: AspectRatio(
+                aspectRatio: 1, // Set a 1:1 aspect ratio
+                child: buildKanbanColumn('Task Progress', tasksProgress),
+              ),
+            ),
             const SizedBox(width: 8),
-            buildKanbanColumn('Quotes', quotes),
+            Expanded(
+              child: AspectRatio(
+                aspectRatio: 1, // Set a 1:1 aspect ratio
+                child: buildKanbanColumn('Quotes', quotes),
+              ),
+            ),
             const SizedBox(width: 8),
-            buildKanbanColumn('Mood', mood),
+            Expanded(
+              child: AspectRatio(
+                aspectRatio: 1, // Set a 1:1 aspect ratio
+                child: buildKanbanColumn('Mood', mood),
+              ),
+            ),
           ],
         ),
       ),
@@ -595,11 +659,13 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: Row( // Use Row to align calendar and Kanban box side by side
+        child: Row(
+          // Use Row to align calendar and Kanban box side by side
           children: [
             Expanded(
               child: Container(
-                height: 400, // Adjust height to ensure it fits well with the Kanban box
+                height:
+                    400, // Adjust height to ensure it fits well with the Kanban box
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -610,21 +676,34 @@ class _HomeScreenState extends State<HomeScreen> {
                         lastDay: DateTime.utc(2030, 12, 31),
                         focusedDay: DateTime.now(),
                         calendarStyle: CalendarStyle(
-                          todayDecoration: BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                          selectedDecoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                          defaultTextStyle: const TextStyle(color: Colors.white, fontSize: 13), // Smaller font
-                          weekendTextStyle: const TextStyle(color: Colors.white, fontSize: 13),
-                          outsideTextStyle: const TextStyle(color: Colors.grey, fontSize: 11),
+                          todayDecoration: BoxDecoration(
+                              color: Colors.green, shape: BoxShape.circle),
+                          selectedDecoration: BoxDecoration(
+                              color: Colors.blue, shape: BoxShape.circle),
+                          defaultTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13), // Smaller font
+                          weekendTextStyle: const TextStyle(
+                              color: Colors.white, fontSize: 13),
+                          outsideTextStyle:
+                              const TextStyle(color: Colors.grey, fontSize: 11),
                         ),
                         headerStyle: HeaderStyle(
                           formatButtonVisible: false,
-                          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 15), // Reduced font size
-                          leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white, size: 17),
-                          rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white, size: 17),
+                          titleTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15), // Reduced font size
+                          leftChevronIcon: const Icon(Icons.chevron_left,
+                              color: Colors.white, size: 17),
+                          rightChevronIcon: const Icon(Icons.chevron_right,
+                              color: Colors.white, size: 17),
                         ),
                         daysOfWeekStyle: const DaysOfWeekStyle(
-                          weekdayStyle: TextStyle(color: Colors.white, fontSize: 11), // Smaller font
-                          weekendStyle: TextStyle(color: Colors.white, fontSize: 11),
+                          weekdayStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11), // Smaller font
+                          weekendStyle:
+                              TextStyle(color: Colors.white, fontSize: 11),
                         ),
                       ),
                     ),
@@ -632,34 +711,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-      const SizedBox(width: 20), // Space between calendar and Kanban box
-      Container(
-        width: 600, // Fixed width for Kanban box
-        height: 400, // Same height as calendar to align properly
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xff28658a),
-            ),
-            child: Column(
-              children: [
-                // Insert the image inside the Kanban box
-                Image.asset(
-                  'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
-                  width: 600, // Adjust the width as necessary
-                  height: 359, // Adjust the height as necessary
-                  fit: BoxFit.cover, // Adjust the fit as necessary
+            const SizedBox(width: 20), // Space between calendar and Kanban box
+            Container(
+              width: 600, // Fixed width for Kanban box
+              height: 400, // Same height as calendar to align properly
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xff28658a),
+                  ),
+                  child: Column(
+                    children: [
+                      // Insert the image inside the Kanban box
+                      Image.asset(
+                        'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+                        width: 600, // Adjust the width as necessary
+                        height: 359, // Adjust the height as necessary
+                        fit: BoxFit.cover, // Adjust the fit as necessary
+                      ),
+                      // Add your Kanban board contents here
+                      // For example: Task list, mood tracker, etc.
+                    ],
+                  ),
                 ),
-                // Add your Kanban board contents here
-                // For example: Task list, mood tracker, etc.
-              ],
+              ),
             ),
-          ),
-        ),
-    ),
           ],
         ),
       ),
