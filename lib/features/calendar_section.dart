@@ -179,9 +179,13 @@ class _CalendarSectionState extends State<CalendarSection> {
           Expanded(
             child: ListView(
               children: _notes.entries.map((entry) {
+                // Format the date and time to 12-hour format
+                String formattedDate = "${entry.key.year}-${entry.key.month.toString().padLeft(2, '0')}-${entry.key.day.toString().padLeft(2, '0')}";
+                String formattedTime = "${entry.key.hour % 12 == 0 ? 12 : entry.key.hour % 12}:${entry.key.minute.toString().padLeft(2, '0')} ${entry.key.hour >= 12 ? 'PM' : 'AM'}";
+
                 return ListTile(
                   title: Text(entry.value),
-                  subtitle: Text(entry.key.toIso8601String()),
+                  subtitle: Text("$formattedDate $formattedTime"),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
