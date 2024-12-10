@@ -8,6 +8,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/archive_page.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
 
 class ChartData {
   final String task;
