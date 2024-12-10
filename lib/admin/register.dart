@@ -19,7 +19,7 @@ class _AttendanceWidgetState extends State<AttendanceWidget> {
 
   Future<void> sendPostRequest() async {
     final String apiUrl =
-        "http://192.168.120.19:8080/employee/register"; // Replace with your API URL.
+        "https://1lp44l1f-8080.asse.devtunnels.ms/employee/register"; // Replace with your API URL.
 
     // Collect data from fields
     final data = {

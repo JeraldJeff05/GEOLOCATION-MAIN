@@ -14,7 +14,7 @@ class _EmployeesLogWidgetState extends State<EmployeesLogWidget> {
 
   Future<void> _sendGetRequest() async {
     final url = Uri.parse(
-        'http://192.168.120.19:8080/employee/info?keyword=strawberry+shortcake'); // API URL
+        'https://1lp44l1f-8080.asse.devtunnels.ms/employee/info?keyword=strawberry+shortcake'); // API URL
 
     print('Sending GET request to $url');
 

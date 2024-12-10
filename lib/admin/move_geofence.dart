@@ -74,7 +74,8 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
     };
 
     final String jsonData = jsonEncode(points);
-    final String url = 'http://192.168.120.50:8080/coordinates?data=$jsonData';
+    final String url =
+        'https://1lp44l1f-8080.asse.devtunnels.ms/coordinates?data=$jsonData';
 
     debugPrint('Payload: $jsonData');
     debugPrint('URL: $url');

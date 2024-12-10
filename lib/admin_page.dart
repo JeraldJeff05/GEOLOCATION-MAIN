@@ -122,10 +122,10 @@ class _AdminPageState extends State<AdminPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           bool isMobile =
-              constraints.maxWidth < 1000 || constraints.maxHeight < 500;
+              constraints.maxWidth < 1100 || constraints.maxHeight < 700;
           bool isTablet =
-              constraints.maxWidth >= 1000 && constraints.maxWidth < 1000 ||
-                  constraints.maxHeight >= 500 && constraints.maxHeight < 1500;
+              constraints.maxWidth >= 1100 && constraints.maxWidth < 1100 ||
+                  constraints.maxHeight >= 700 && constraints.maxHeight < 400;
 
           if (isMobile) {
             // Center the message and time for small screens

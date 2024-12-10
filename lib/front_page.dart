@@ -18,9 +18,6 @@ class _MyHomePageState extends State<MyHomePage>
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
 
-  double _topPosition = -500;
-  final double _targetTopPosition = 260;
-
   bool _showLoginForm = false;
   bool _isLoading = false; // Loading indicator state
 
@@ -48,9 +45,7 @@ class _MyHomePageState extends State<MyHomePage>
 
     // Delayed animations for login form appearance
     Future.delayed(const Duration(milliseconds: 300), () {
-      setState(() {
-        _topPosition = _targetTopPosition;
-      });
+      setState(() {});
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           _showLoginForm = true;
@@ -171,7 +166,6 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -184,15 +178,15 @@ class _MyHomePageState extends State<MyHomePage>
               ),
             ),
           ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 80.0, right: 80),
-                child: Opacity(
-                  opacity: _showLoginForm ? 1.0 : 0.0,
-                  child: _buildLoginForm(),
-                ),
+          Align(
+            alignment:
+                Alignment.centerRight, // Aligns the child to the center-right
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(right: 50.0), // Add padding as needed
+              child: Opacity(
+                opacity: _showLoginForm ? 1.0 : 0.0,
+                child: _buildLoginForm(),
               ),
             ),
           ),
@@ -213,83 +207,76 @@ class _MyHomePageState extends State<MyHomePage>
     final containerWidth =
         isScreenMinimized ? (screenWidth * 0.9).toDouble() : 500.0;
 
-    return Positioned(
-      right: isScreenMinimized ? null : 70, // Fixed position when not minimized
-      top: isScreenMinimized
-          ? null
-          : 260, // Fixed vertical position when not minimized
-      child: Container(
-        width: containerWidth,
-        padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
-        decoration: BoxDecoration(
-          color: isScreenMinimized
-              ? Colors.black26.withOpacity(0.3)
-              : Colors.white.withOpacity(0),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(isScreenMinimized ? 0.5 : 0),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 0),
-            ),
-          ],
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 5),
-              // Add the cropped picture above the text fields
-              ClipRect(
-                child: Align(
-                  alignment: Alignment.topCenter,
-
-                  // Adjust to crop the desired top portion
-                  child: Image.asset(
-                    'assets/FLlogo.png',
-                    width: 350, // Adjust the width as needed
-                    height: 110, // Adjust the height as needed
-                    fit: BoxFit.cover, // Adjust the fit as needed
-                  ),
+    return Container(
+      width: containerWidth,
+      padding: const EdgeInsets.only(bottom: 15, right: 50, left: 10),
+      decoration: BoxDecoration(
+        color: isScreenMinimized
+            ? Colors.black26.withOpacity(0.1)
+            : Colors.white.withOpacity(0),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(isScreenMinimized ? 1 : 0),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 0),
+          ),
+        ],
+      ),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 5),
+            // Add the cropped picture above the text fields
+            ClipRect(
+              child: Align(
+                alignment: Alignment.topCenter,
+                // Adjust to crop the desired top portion
+                child: Image.asset(
+                  'assets/FLlogo.png',
+                  width: 350, // Adjust the width as needed
+                  height: 110, // Adjust the height as needed
+                  fit: BoxFit.cover, // Adjust the fit as needed
                 ),
               ),
-              const SizedBox(height: 20), // Add spacing after the picture
-              _buildTextFieldWithValidation(
-                icon: Icons.person,
-                labelText: '',
-                hintText: 'User ID',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your ID number';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _username = value,
-                width: containerWidth * 0.8, // Adaptive width for text fields
-              ),
-              const SizedBox(height: 16),
-              _buildTextFieldWithValidation(
-                icon: Icons.lock,
-                labelText: '',
-                hintText: 'Password',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _password = value,
-                obscureText: true,
-                onSubmit: _login, // Trigger login on Enter
-                width: containerWidth * 0.8, // Adaptive width for text fields
-              ),
-              const SizedBox(
-                  height: 32), // Add spacing between text fields and button
-              _buildGifButton(_login), // Place the login button here
-            ],
-          ),
+            ),
+            const SizedBox(height: 10), // Add spacing after the picture
+            _buildTextFieldWithValidation(
+              icon: Icons.person,
+              labelText: '',
+              hintText: 'User ID',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your ID number';
+                }
+                return null;
+              },
+              onSaved: (value) => _username = value,
+              width: containerWidth * 0.8, // Adaptive width for text fields
+            ),
+            const SizedBox(height: 16),
+            _buildTextFieldWithValidation(
+              icon: Icons.lock,
+              labelText: '',
+              hintText: 'Password',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your password';
+                }
+                return null;
+              },
+              onSaved: (value) => _password = value,
+              obscureText: true,
+              onSubmit: _login, // Trigger login on Enter
+              width: containerWidth * 0.8, // Adaptive width for text fields
+            ),
+            const SizedBox(
+                height: 32), // Add spacing between text fields and button
+            _buildGifButton(_login), // Place the login button here
+          ],
         ),
       ),
     );

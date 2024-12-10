@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String _apiUrl =
-      "http://192.168.120.50:8080/geofence/check"; // Replace with your API URL
+      "https://1lp44l1f-8080.asse.devtunnels.ms/geofence/check"; // Replace with your API URL
 
   Future<String> sendCoordinates(String lat, String lng) async {
     try {

@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        //'/start': (context) => const StartScreen(),
+        '/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -47,15 +47,13 @@ class StartScreen extends StatefulWidget {
 class _StartScreenState extends State<StartScreen> {
   double _opacity = 0.0;
   final LocationService _locationService = LocationService();
-
-  String _message = ""; // Initial message
-  // To control loading animation visibility
-  bool _showButton = true; // Tracks visibility of the button
-  bool _showGif = false; // Controls visibility of the rolling ball GIF
-  bool _showMessage = false; // Controls visibility of the message text
-  late Timer _typingTimer; // Timer for typing animation
-  int _messageIndex = 0; // Index to track the typing animation
-  // Current message being typed
+  String _message = "";
+  bool _showButton = true;
+  bool _showGif = false;
+  bool _showMessage = false;
+  late Timer _typingTimer;
+  int _messageIndex = 0;
+  bool _greyscaleEffect = false; // New flag to control the greyscale effect
 
   // Method to start typing animation and loop it
   void _startTypingAnimation(String message, VoidCallback onComplete) {
@@ -85,6 +83,8 @@ class _StartScreenState extends State<StartScreen> {
       _opacity = 0.8; // Start darkening animation
       _showGif = true; // Show the rolling ball GIF
       _showMessage = true; // Show message in place of the button
+      _greyscaleEffect =
+          true; // Enable greyscale effect when the button is clicked
     });
 
     // Wait for 1.5 seconds before showing the GIF
@@ -165,10 +165,17 @@ class _StartScreenState extends State<StartScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image
-          Image.asset(
-            'assets/startpagebg.png',
-            fit: BoxFit.cover,
+          // Background image with optional greyscale filter
+          ColorFiltered(
+            colorFilter: _greyscaleEffect
+                ? const ColorFilter.mode(
+                    Colors.grey, BlendMode.saturation) // Apply greyscale filter
+                : ColorFilter.mode(
+                    Colors.transparent, BlendMode.saturation), // No filter
+            child: Image.asset(
+              'assets/startpagebg.png',
+              fit: BoxFit.cover,
+            ),
           ),
           // Fade-out overlay
           AnimatedOpacity(
@@ -176,7 +183,7 @@ class _StartScreenState extends State<StartScreen> {
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
             child: Container(
-              color: Colors.black.withOpacity(0.85),
+              color: Colors.black.withOpacity(0),
             ),
           ),
           // Centered message showing the API response
