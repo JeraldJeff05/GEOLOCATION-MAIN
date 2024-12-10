@@ -751,62 +751,66 @@ class _HomeScreenState extends State<HomeScreen> {
             colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: Row(
-          children: [
-            Flexible(
-              child: SizedBox(
-                width: 600, // maximum width
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 300, // minimum width
-                    minHeight: 300, // minimum height
-                    maxWidth: 600, // maximum width
-                    maxHeight: 600, // maximum height
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: 1, // Set a 1:1 aspect ratio
-                    child: buildKanbanColumn('Task Progress', tasksProgress),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: SizedBox(
-                width: 600, // maximum width
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 300, // minimum width
-                    minHeight: 300, // minimum height
-                    maxWidth: 600, // maximum width
-                    maxHeight: 600, // maximum height
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: 1, // Set a 1:1 aspect ratio
-                    child: buildKanbanColumn('Quotes', quotes),
+        child: SizedBox(
+          height: 400, // minimum height
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Task Progress', tasksProgress),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: SizedBox(
-                width: 600, // maximum width
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 300, // minimum width
-                    minHeight: 300, // minimum height
-                    maxWidth: 600, // maximum width
-                    maxHeight: 600, // maximum height
-                  ),
-                  child: AspectRatio(
-                    aspectRatio: 1, // Set a 1:1 aspect ratio
-                    child: buildKanbanColumn('Mood', mood),
+              const SizedBox(width: 8),
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Quotes', quotes),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Mood', mood),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
