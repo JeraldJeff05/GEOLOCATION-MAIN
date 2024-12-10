@@ -76,14 +76,13 @@ flutter:
   assets:
   
     - assets/profile_picture.png
-    - assets/CorporateBG1.png
+  
     - assets/HomeBG.png
     - assets/loadingwhite.gif
-    - assets/geobg.png
+  
     - assets/LoginButton.gif
     - assets/Legit.gif
-    - assets/GeofenceBG.png
-    - assets/FinalBG.png
+
     - assets/startbutton.gif
     - assets/reversebg.png
     - assets/gettingloc.gif
@@ -96,6 +95,8 @@ flutter:
     - assets/itsgivinglogbut.gif
     - assets/biglog.png
     - assets/realBACKGROUND.png
+    - assets/LoginNoLogoBg.png
+    - assets/FLlogo.png
   
   fonts:  
     - family: CustomFont

@@ -179,19 +179,20 @@ class _MyHomePageState extends State<MyHomePage>
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/realBACKGROUND.png'),
+                image: AssetImage('assets/LoginNoLogoBg.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.centerRight, // Align to the left
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 25.0, right: 70.0),
-              // Add padding if needed
-              child: Opacity(
-                opacity: _showLoginForm ? 1.0 : 0.0,
-                child: _buildLoginForm(),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 80.0, right: 80),
+                child: Opacity(
+                  opacity: _showLoginForm ? 1.0 : 0.0,
+                  child: _buildLoginForm(),
+                ),
               ),
             ),
           ),
@@ -212,62 +213,83 @@ class _MyHomePageState extends State<MyHomePage>
     final containerWidth =
         isScreenMinimized ? (screenWidth * 0.9).toDouble() : 500.0;
 
-    return Container(
-      width: containerWidth,
-      padding: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: isScreenMinimized
-            ? Colors.black26.withOpacity(0.3)
-            : Colors.white.withOpacity(0),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isScreenMinimized ? 0.5 : 0),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 34),
-            _buildTextFieldWithValidation(
-              icon: Icons.person,
-              labelText: '',
-              hintText: 'User ID',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your ID number';
-                }
-                return null;
-              },
-              onSaved: (value) => _username = value,
-              width: containerWidth * 0.8, // Adaptive width for text fields
+    return Positioned(
+      right: isScreenMinimized ? null : 70, // Fixed position when not minimized
+      top: isScreenMinimized
+          ? null
+          : 260, // Fixed vertical position when not minimized
+      child: Container(
+        width: containerWidth,
+        padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+        decoration: BoxDecoration(
+          color: isScreenMinimized
+              ? Colors.black26.withOpacity(0.3)
+              : Colors.white.withOpacity(0),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(isScreenMinimized ? 0.5 : 0),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 0),
             ),
-            const SizedBox(height: 16),
-            _buildTextFieldWithValidation(
-              icon: Icons.lock,
-              labelText: '',
-              hintText: 'Password',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
-              },
-              onSaved: (value) => _password = value,
-              obscureText: true,
-              onSubmit: _login, // Trigger login on Enter
-              width: containerWidth * 0.8, // Adaptive width for text fields
-            ),
-            const SizedBox(
-                height: 32), // Add spacing between text fields and button
-            _buildGifButton(_login), // Place the login button here
           ],
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 5),
+              // Add the cropped picture above the text fields
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+
+                  // Adjust to crop the desired top portion
+                  child: Image.asset(
+                    'assets/FLlogo.png',
+                    width: 350, // Adjust the width as needed
+                    height: 110, // Adjust the height as needed
+                    fit: BoxFit.cover, // Adjust the fit as needed
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20), // Add spacing after the picture
+              _buildTextFieldWithValidation(
+                icon: Icons.person,
+                labelText: '',
+                hintText: 'User ID',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your ID number';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _username = value,
+                width: containerWidth * 0.8, // Adaptive width for text fields
+              ),
+              const SizedBox(height: 16),
+              _buildTextFieldWithValidation(
+                icon: Icons.lock,
+                labelText: '',
+                hintText: 'Password',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _password = value,
+                obscureText: true,
+                onSubmit: _login, // Trigger login on Enter
+                width: containerWidth * 0.8, // Adaptive width for text fields
+              ),
+              const SizedBox(
+                  height: 32), // Add spacing between text fields and button
+              _buildGifButton(_login), // Place the login button here
+            ],
+          ),
         ),
       ),
     );
@@ -311,8 +333,8 @@ class _MyHomePageState extends State<MyHomePage>
     required String hintText,
     Color labelColor = Colors.black87,
     VoidCallback? onSubmit,
-    double width = 400, // Default width
-    double height = 40,
+    double width = 200, // Default width
+    double height = 35,
   }) {
     return SizedBox(
       width: width,
