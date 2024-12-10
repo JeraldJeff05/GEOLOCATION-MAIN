@@ -95,10 +95,7 @@ class _ArchivePageState extends State<ArchivePage> {
                     fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            ...tasks
-                .asMap()
-                .entries
-                .map((taskEntry) {
+            ...tasks.asMap().entries.map((taskEntry) {
               int index = taskEntry.key;
               Map<String, dynamic> task = taskEntry.value;
 
@@ -110,15 +107,23 @@ class _ArchivePageState extends State<ArchivePage> {
                 subtitle: Text(
                   isDeleted
                       ? "Deleted at: ${DateFormat('h:mm a').format(actionTime)}"
-                      : "Completed at: ${DateFormat('h:mm a').format(
-                      actionTime)}",
+                      : "Completed at: ${DateFormat('h:mm a').format(actionTime)}",
                 ),
                 trailing: isDeleted
-                    ? null
+                    ? IconButton(
+                  icon: Icon(Icons.undo, color: Colors.green),
+                  onPressed: () {
+                    _restoreDeletedTask(date, index);
+                  },
+                )
                     : IconButton(
                   icon: Icon(Icons.delete, color: Colors.red),
                   onPressed: () {
-                    _moveTaskToTrash(date, index);
+                    // Show confirmation dialog
+                    _showDeleteConfirmationDialog(
+                      context,
+                          () => _moveTaskToTrash(date, index),
+                    );
                   },
                 ),
               );
@@ -127,6 +132,52 @@ class _ArchivePageState extends State<ArchivePage> {
           ],
         );
       }).toList(),
+    );
+  }
+  void _restoreDeletedTask(DateTime date, int index) {
+    setState(() {
+      // Retrieve the task from the deleted list
+      Map<String, dynamic> restoredTask = _deletedTasks[date]!.removeAt(index);
+
+      // Remove the date if no tasks remain under it
+      if (_deletedTasks[date]!.isEmpty) {
+        _deletedTasks.remove(date);
+      }
+
+      // Add the restored task back to finished tasks
+      _finishedTasks.putIfAbsent(date, () => []).add(restoredTask);
+    });
+
+    // Show a Snackbar to notify the user
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Task restored successfully!')),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, VoidCallback onConfirm) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Task"),
+          content: const Text("Are you sure you want to delete this task?"),
+          actions: [
+            TextButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                onConfirm(); // Call the function to delete the task
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

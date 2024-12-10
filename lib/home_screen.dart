@@ -903,7 +903,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Hero(
                           tag: 'kanban_image', // Unique tag for Hero transition
                           child: Image.asset(
-                            'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+                            'assets/kanbanpic.jpg',
                             width: 600, // Adjust the width as necessary
                             height: 359, // Adjust the height as necessary
                             fit: BoxFit.cover, // Adjust the fit as necessary
