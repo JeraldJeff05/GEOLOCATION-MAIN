@@ -201,23 +201,19 @@ class _MyHomePageState extends State<MyHomePage>
 
   Widget _buildLoginForm() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isScreenMinimized = screenWidth < 1350;
 
-    // Dynamic width based on screen size
-    final containerWidth =
-        isScreenMinimized ? (screenWidth * 0.9).toDouble() : 500.0;
+    // Dynamic width with constraints
+    final containerWidth = screenWidth.clamp(300.0, 500.0);
 
     return Container(
       width: containerWidth,
       padding: const EdgeInsets.only(bottom: 15, right: 50, left: 10),
       decoration: BoxDecoration(
-        color: isScreenMinimized
-            ? Colors.black26.withOpacity(0.1)
-            : Colors.white.withOpacity(0),
+        color: Colors.black26.withOpacity(0),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(isScreenMinimized ? 1 : 0),
+            color: Colors.grey.withOpacity(0),
             spreadRadius: 2,
             blurRadius: 5,
             offset: const Offset(0, 0),
@@ -230,20 +226,18 @@ class _MyHomePageState extends State<MyHomePage>
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 5),
-            // Add the cropped picture above the text fields
             ClipRect(
               child: Align(
                 alignment: Alignment.topCenter,
-                // Adjust to crop the desired top portion
                 child: Image.asset(
                   'assets/FLlogo.png',
-                  width: 350, // Adjust the width as needed
-                  height: 110, // Adjust the height as needed
-                  fit: BoxFit.cover, // Adjust the fit as needed
+                  width: 350,
+                  height: 110,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(height: 10), // Add spacing after the picture
+            const SizedBox(height: 10),
             _buildTextFieldWithValidation(
               icon: Icons.person,
               labelText: '',
@@ -255,7 +249,7 @@ class _MyHomePageState extends State<MyHomePage>
                 return null;
               },
               onSaved: (value) => _username = value,
-              width: containerWidth * 0.8, // Adaptive width for text fields
+              width: containerWidth * 0.8, // Adaptive width
             ),
             const SizedBox(height: 16),
             _buildTextFieldWithValidation(
@@ -270,12 +264,11 @@ class _MyHomePageState extends State<MyHomePage>
               },
               onSaved: (value) => _password = value,
               obscureText: true,
-              onSubmit: _login, // Trigger login on Enter
-              width: containerWidth * 0.8, // Adaptive width for text fields
+              onSubmit: _login,
+              width: containerWidth * 0.8, // Adaptive width
             ),
-            const SizedBox(
-                height: 32), // Add spacing between text fields and button
-            _buildGifButton(_login), // Place the login button here
+            const SizedBox(height: 32),
+            _buildGifButton(_login),
           ],
         ),
       ),
