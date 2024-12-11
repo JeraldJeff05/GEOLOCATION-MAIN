@@ -435,19 +435,19 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context) => ArchivePage(
               finishedTasks: formattedFinishedTasks,
               deletedTasks: {},
-              onUpdateFinishedTasks: (updatedFinishedTasks) {
-                setState(() {
-                  formattedFinishedTasks = updatedFinishedTasks;
-                });
-              },
-              onUpdateDeletedTasks: (updatedDeletedTasks) {
-                setState(() {
-                  // Update the deletedTasks state here if needed
-                });
+              onTaskChanged: (date, task, isRestored) {
+                // Implement the logic here to handle task changes
+                // Example:
+                if (isRestored) {
+                  // Add the restored task back to your calendar section
+                } else {
+                  // Remove the task from finished tasks in the calendar section
+                }
               },
             ),
           ),
         );
+
       },
     );
   }

@@ -30,11 +30,9 @@ class _CalendarSectionState extends State<CalendarSection> {
   final Map<DateTime, List<String>> _finishedTasks = {};
   List<String> _currentFinishedTasks = [];
   List<dynamic> _getEventsForDay(DateTime day) {
-    // Only show active tasks that are not deleted
-    var activeTasks = _tasks[day]?.where((task) => !_deletedTasks[day]!.contains(task)).toList();
-    return activeTasks?.isNotEmpty == true ? ['Task'] : [];
-  }
+    return _tasks[day]?.isNotEmpty == true ? ['Task'] : [];
 
+  }
 
   @override
   void initState() {
@@ -69,19 +67,10 @@ class _CalendarSectionState extends State<CalendarSection> {
       _finishedTasks[DateTime.parse(key)] = List<String>.from(value);
     });
 
-    // Load deleted tasks
-    final savedDeletedTasks = prefs.getString('deletedTasks') ?? '{}';
-    final Map<String, dynamic> loadedDeletedTasks = jsonDecode(savedDeletedTasks);
-    loadedDeletedTasks.forEach((key, value) {
-      DateTime date = DateTime.parse(key);
-      _deletedTasks[date] = List<Map<String, dynamic>>.from(value);
-    });
-
     setState(() {
       _displayFinishedTasksForSelectedDay();
     });
   }
-
   void deleteTaskFromFinished(DateTime date, Map<String, dynamic> task) {
     setState(() {
       _finishedTasks[date]?.remove(task);
@@ -193,15 +182,10 @@ class _CalendarSectionState extends State<CalendarSection> {
     prefs.setString('tasks', jsonEncode(dataToSaveTasks));
 
     // Save finished tasks
-    String finishedTasksJson = jsonEncode(_finishedTasks);
-    prefs.setString('finished_tasks', finishedTasksJson);
-
-    // Save deleted tasks
-    String deletedTasksJson = jsonEncode(_deletedTasks);
-    prefs.setString('deleted_tasks', deletedTasksJson);
-
+    final dataToSaveFinishedTasks = _finishedTasks.map((key, value) =>
+        MapEntry(key.toIso8601String(), value));
+    prefs.setString('finishedTasks', jsonEncode(dataToSaveFinishedTasks));
   }
-
 
   Widget _buildNoteBox() {
     return Card(
@@ -233,7 +217,6 @@ class _CalendarSectionState extends State<CalendarSection> {
       ),
     );
   }
-
 
 // Show confirmation dialog for deleting a note
   void _showDeleteNoteDialog(DateTime noteKey) {
@@ -481,12 +464,24 @@ class _CalendarSectionState extends State<CalendarSection> {
                   _displayFinishedTasksForSelectedDay();
                 });
               },
-              eventLoader: _getEventsForDay, // Added this line
+              eventLoader: _getEventsForDay, // Highlight days with events
               calendarStyle: CalendarStyle(
                 markerDecoration: const BoxDecoration(
-                  color: Colors.blue, // Customize marker color
+                  color: Colors.blue, // Customize marker color for tasks
                   shape: BoxShape.circle,
                 ),
+                markersMaxCount: 2, // Limit to two markers (for tasks and finished tasks)
+                outsideDaysVisible: false,
+                todayDecoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekendStyle: TextStyle(color: Colors.red),
+              ),
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
               ),
             ),
             const SizedBox(height: 20),
