@@ -67,8 +67,9 @@ class _RealTimeLocationTrackingScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Real-Time Location Tracking Overview'),
+        title: const Text('Real-Time Location Tracking Overview',style: TextStyle(color: Colors.white, fontSize: 20)),
         centerTitle: true,
+        backgroundColor: Color(0xff28658a),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
@@ -77,6 +78,9 @@ class _RealTimeLocationTrackingScreenState
         ),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Color(0xff63baed), // Color of the tab indicator
+          labelColor: Colors.white, // Color of the selected tab label
+          unselectedLabelColor: Color(0xff90e0ef),
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'How It Works'),

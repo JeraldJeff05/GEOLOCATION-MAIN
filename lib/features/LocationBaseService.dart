@@ -58,8 +58,9 @@ class _LocationBasedServicesScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Location-Based Services Overview'),
+        title: const Text('Location-Based Services Overview',style: TextStyle(color: Colors.white, fontSize: 20)),
         centerTitle: true,
+        backgroundColor: Color(0xff28658a),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -68,6 +69,9 @@ class _LocationBasedServicesScreenState
         ),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Color(0xff63baed), // Color of the tab indicator
+          labelColor: Colors.white, // Color of the selected tab label
+          unselectedLabelColor: Color(0xff90e0ef),
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'Key Components'),

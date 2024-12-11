@@ -40,10 +40,14 @@ class _GeofencingScreenState extends State<GeofencingScreen> with SingleTickerPr
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Geofencing Overview'),
+        title: const Text('Geofencing Overview',style: TextStyle(color: Colors.white, fontSize: 20)),
         centerTitle: true,
+        backgroundColor: Color(0xff28658a), // Custom app bar color
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: Color(0xff63baed), // Color of the tab indicator
+          labelColor: Colors.white, // Color of the selected tab label
+          unselectedLabelColor: Color(0xff90e0ef), // Color of the unselected tab label
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'How It Works'),

@@ -125,11 +125,15 @@ class _ArchivePageState extends State<ArchivePage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Task Archive'),
+          backgroundColor: Colors.teal,  // Set a color for the AppBar
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Active Archive'),
               Tab(text: 'Deleted Tasks'),
             ],
+            labelColor: Colors.white,  // Set the label color for active tabs
+            indicatorColor: Colors.white,  // Set the indicator color
+            unselectedLabelColor: Colors.white70,  // Set the color for inactive tabs
           ),
         ),
         body: TabBarView(
