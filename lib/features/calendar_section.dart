@@ -30,9 +30,11 @@ class _CalendarSectionState extends State<CalendarSection> {
   final Map<DateTime, List<String>> _finishedTasks = {};
   List<String> _currentFinishedTasks = [];
   List<dynamic> _getEventsForDay(DateTime day) {
-    return _tasks[day]?.isNotEmpty == true ? ['Task'] : [];
-
+    // Only show active tasks that are not deleted
+    var activeTasks = _tasks[day]?.where((task) => !_deletedTasks[day]!.contains(task)).toList();
+    return activeTasks?.isNotEmpty == true ? ['Task'] : [];
   }
+
 
   @override
   void initState() {
@@ -67,10 +69,36 @@ class _CalendarSectionState extends State<CalendarSection> {
       _finishedTasks[DateTime.parse(key)] = List<String>.from(value);
     });
 
+    // Load deleted tasks
+    final savedDeletedTasks = prefs.getString('deletedTasks') ?? '{}';
+    final Map<String, dynamic> loadedDeletedTasks = jsonDecode(savedDeletedTasks);
+    loadedDeletedTasks.forEach((key, value) {
+      DateTime date = DateTime.parse(key);
+      _deletedTasks[date] = List<Map<String, dynamic>>.from(value);
+    });
+
     setState(() {
       _displayFinishedTasksForSelectedDay();
     });
   }
+
+  void deleteTaskFromFinished(DateTime date, Map<String, dynamic> task) {
+    setState(() {
+      _finishedTasks[date]?.remove(task);
+      if (_finishedTasks[date]?.isEmpty ?? true) {
+        _finishedTasks.remove(date);
+      }
+      _saveData();
+    });
+  }
+
+  void restoreTaskToFinished(DateTime date, Map<String, dynamic> task) {
+    setState(() {
+      _finishedTasks.putIfAbsent(date, () => []).add(task as String);
+      _saveData();
+    });
+  }
+
 
   void addTask(String taskText) {
     if (_selectedDay != null) {
@@ -165,10 +193,15 @@ class _CalendarSectionState extends State<CalendarSection> {
     prefs.setString('tasks', jsonEncode(dataToSaveTasks));
 
     // Save finished tasks
-    final dataToSaveFinishedTasks = _finishedTasks.map((key, value) =>
-        MapEntry(key.toIso8601String(), value));
-    prefs.setString('finishedTasks', jsonEncode(dataToSaveFinishedTasks));
+    String finishedTasksJson = jsonEncode(_finishedTasks);
+    prefs.setString('finished_tasks', finishedTasksJson);
+
+    // Save deleted tasks
+    String deletedTasksJson = jsonEncode(_deletedTasks);
+    prefs.setString('deleted_tasks', deletedTasksJson);
+
   }
+
 
   Widget _buildNoteBox() {
     return Card(
@@ -189,15 +222,7 @@ class _CalendarSectionState extends State<CalendarSection> {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
-                      setState(() {
-                        _notes.remove(entry.key);
-                        _saveData();
-                        widget.onTasksUpdated(
-                          _selectedDay!,
-                          _tasks[_selectedDay!] ?? [],
-                          _finishedTasks[_selectedDay] ?? [],
-                        );
-                      });
+                      _showDeleteNoteDialog(entry.key); // Call dialog function
                     },
                   ),
                 );
@@ -208,6 +233,44 @@ class _CalendarSectionState extends State<CalendarSection> {
       ),
     );
   }
+
+
+// Show confirmation dialog for deleting a note
+  void _showDeleteNoteDialog(DateTime noteKey) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Delete Note"),
+          content: const Text("Are you sure you want to delete this note?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _notes.remove(noteKey); // Remove the note
+                  _saveData(); // Save changes
+                  widget.onTasksUpdated(
+                    _selectedDay!,
+                    _tasks[_selectedDay!] ?? [],
+                    _finishedTasks[_selectedDay] ?? [],
+                  );
+                });
+                Navigator.pop(context); // Close the dialog
+              },
+              child: const Text("Yes"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog without deleting
+              },
+              child: const Text("No"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   Widget _buildTaskBox() {
     return Card(

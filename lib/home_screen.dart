@@ -435,6 +435,16 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: (context) => ArchivePage(
               finishedTasks: formattedFinishedTasks,
               deletedTasks: {},
+              onUpdateFinishedTasks: (updatedFinishedTasks) {
+                setState(() {
+                  formattedFinishedTasks = updatedFinishedTasks;
+                });
+              },
+              onUpdateDeletedTasks: (updatedDeletedTasks) {
+                setState(() {
+                  // Update the deletedTasks state here if needed
+                });
+              },
             ),
           ),
         );
