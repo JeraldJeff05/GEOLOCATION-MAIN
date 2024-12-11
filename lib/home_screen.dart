@@ -329,7 +329,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(width: 16),
-                              Expanded(child: _buildCalendar()),
+                              Expanded(
+                                  child: _buildCalendar(
+                                context,
+                              )),
                             ],
                           ),
                         ],
@@ -668,78 +671,91 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     Widget buildKanbanColumn(String title, List<String> tasks) {
-      return Expanded(
-        child: Card(
-          elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: Color(0xff28658a),
-            ),
-            child: SingleChildScrollView(
-              // Allow scrolling within each column
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  if (title ==
-                      'Task Progress') // Insert chart in Task Progress column
-                    Container(
-                      height: 200, // Set a specific height for the chart
-                      child: buildChart(),
-                    ),
-                  if (title ==
-                      'Quotes') // Display the quote in the Quotes column
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Container(
-                        height: 250,
-                        alignment: Alignment.center,
-                        child: Text(
-                          dailyQuote,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontStyle: FontStyle.italic,
-                          ),
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = constraints.maxWidth;
+          final screenHeight = constraints.maxHeight;
+
+          return Expanded(
+            child: Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xff28658a),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: screenWidth < 600 ? 16 : 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  if (title == 'Mood') // Add Mood Tracker in Finished column
-                    Container(
-                      height: 300, // Set a specific height for the MoodTracker
-                      child: SingleChildScrollView(
-                        child: MoodTracker(),
-                      ),
-                    ),
-                  // Display tasks in the Task Progress column
-                  if (title == 'Task Progress' && tasks.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    ...tasks
-                        .map((task) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Text(
-                                task,
-                                style: const TextStyle(color: Colors.white),
+                      const SizedBox(height: 10),
+                      if (title ==
+                          'Task Progress') // Insert chart in Task Progress column
+                        Container(
+                          height: screenHeight < 800 ? 150 : 200,
+                          child: buildChart(),
+                        ),
+                      if (title ==
+                          'Quotes') // Display the quote in the Quotes column
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Container(
+                            height: screenHeight < 800 ? 200 : 250,
+                            alignment: Alignment.center,
+                            child: Text(
+                              dailyQuote,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontStyle: FontStyle.italic,
+                                fontSize: screenWidth < 600 ? 14 : 16,
                               ),
-                            ))
-                        .toList(),
-                  ],
-                ],
+                            ),
+                          ),
+                        ),
+                      if (title ==
+                          'Mood') // Add Mood Tracker in Finished column
+                        Container(
+                          height: screenHeight < 800 ? 250 : 300,
+                          child: SingleChildScrollView(
+                            child: MoodTracker(),
+                          ),
+                        ),
+                      // Display tasks in the Task Progress column
+                      if (title == 'Task Progress' && tasks.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        ...tasks
+                            .map((task) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  child: Text(
+                                    task,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: screenWidth < 600 ? 14 : 16,
+                                    ),
+                                  ),
+                                ))
+                            .toList(),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       );
     }
 
@@ -818,112 +834,122 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCalendar() {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
+  Widget _buildCalendar(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
+            ),
           ),
-        ),
-        child: Row(
-          // Use Row to align calendar and Kanban box side by side
-          children: [
-            Expanded(
-              child: Container(
-                height:
-                    400, // Adjust height to ensure it fits well with the Kanban box
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 2), // Reduced spacing
-                    Expanded(
-                      child: TableCalendar(
-                        firstDay: DateTime.utc(2020, 1, 1),
-                        lastDay: DateTime.utc(2030, 12, 31),
-                        focusedDay: DateTime.now(),
-                        calendarStyle: CalendarStyle(
-                          todayDecoration: BoxDecoration(
-                              color: Colors.green, shape: BoxShape.circle),
-                          selectedDecoration: BoxDecoration(
-                              color: Colors.blue, shape: BoxShape.circle),
-                          defaultTextStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13), // Smaller font
-                          weekendTextStyle: const TextStyle(
-                              color: Colors.white, fontSize: 13),
-                          outsideTextStyle:
-                              const TextStyle(color: Colors.grey, fontSize: 11),
-                        ),
-                        headerStyle: HeaderStyle(
-                          formatButtonVisible: false,
-                          titleTextStyle: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15), // Reduced font size
-                          leftChevronIcon: const Icon(Icons.chevron_left,
-                              color: Colors.white, size: 17),
-                          rightChevronIcon: const Icon(Icons.chevron_right,
-                              color: Colors.white, size: 17),
-                        ),
-                        daysOfWeekStyle: const DaysOfWeekStyle(
-                          weekdayStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 11), // Smaller font
-                          weekendStyle:
-                              TextStyle(color: Colors.white, fontSize: 11),
-                        ),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: screenHeight * 0.5, // Dynamically adjust height
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 2),
+                          Expanded(
+                            child: TableCalendar(
+                              firstDay: DateTime.utc(2020, 1, 1),
+                              lastDay: DateTime.utc(2030, 12, 31),
+                              focusedDay: DateTime.now(),
+                              calendarStyle: CalendarStyle(
+                                todayDecoration: BoxDecoration(
+                                    color: Colors.green,
+                                    shape: BoxShape.circle),
+                                selectedDecoration: BoxDecoration(
+                                    color: Colors.blue, shape: BoxShape.circle),
+                                defaultTextStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                                weekendTextStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 13),
+                                outsideTextStyle: const TextStyle(
+                                    color: Colors.grey, fontSize: 11),
+                              ),
+                              headerStyle: HeaderStyle(
+                                formatButtonVisible: false,
+                                titleTextStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 15),
+                                leftChevronIcon: const Icon(Icons.chevron_left,
+                                    color: Colors.white, size: 17),
+                                rightChevronIcon: const Icon(
+                                    Icons.chevron_right,
+                                    color: Colors.white,
+                                    size: 17),
+                              ),
+                              daysOfWeekStyle: const DaysOfWeekStyle(
+                                weekdayStyle: TextStyle(
+                                    color: Colors.white, fontSize: 11),
+                                weekendStyle: TextStyle(
+                                    color: Colors.white, fontSize: 11),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(width: 20), // Space between calendar and Kanban box
-            Container(
-              width: 600, // Fixed width for Kanban box
-              height: 400, // Same height as calendar to align properly
-              child: Card(
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xff28658a),
                   ),
-                  child: Column(
-                    children: [
-                      // Insert the image inside the Kanban box with Hero transition
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate to another page when tapped (for hero transition)
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ImageDetailPage(),
-                            ),
-                          );
-                        },
-                        child: Hero(
-                          tag: 'kanban_image', // Unique tag for Hero transition
-                          child: Image.asset(
-                            'assets/kanbanpic.jpg',
-                            width: 600, // Adjust the width as necessary
-                            height: 359, // Adjust the height as necessary
-                            fit: BoxFit.cover, // Adjust the fit as necessary
+                  const SizedBox(width: 20),
+                  Flexible(
+                    child: Container(
+                      width: screenWidth * 0.6, // Dynamically adjust width
+                      height: screenHeight *
+                          0.5, // Match calendar height dynamically
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: const BoxDecoration(
+                            color: Color(0xff28658a),
+                          ),
+                          child: Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ImageDetailPage(),
+                                    ),
+                                  );
+                                },
+                                child: Hero(
+                                  tag: 'kanban_image',
+                                  child: Image.asset(
+                                    'assets/kanbanpic.jpg',
+                                    width: screenWidth *
+                                        0.55, // Adjust based on screen width
+                                    height: screenHeight *
+                                        0.45, // Slightly increase height
+                                    fit: BoxFit
+                                        .cover, // Ensure image fits the container
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      // Add your Kanban board contents here
-                      // For example: Task list, mood tracker, etc.
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
