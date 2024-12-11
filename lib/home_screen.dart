@@ -1,50 +1,346 @@
+import 'package:check_loc/features/Otherfeatures.dart';
+import 'package:check_loc/features/archive_page.dart';
 import 'package:flutter/material.dart';
 import 'features/calendar_section.dart';
 // import 'settings_section.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'features/archive_page.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+class ChartData {
+  final String task;
+  final double value;
+  final DateTime date;
+
+  ChartData(this.task, this.value, this.date);
+
+  // Modify the factory constructor to accept the date parameter
+  factory ChartData.withDefaultDate(String task, double value, DateTime date) {
+    return ChartData(task, value, date); // Use the provided date
+  }
+}
+
+class ImageDetailPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onTap: () {
+          // Close the hero transition by popping the current page
+          Navigator.of(context).pop();
+        },
+        child: Center(
+          child: Hero(
+            tag: 'kanban_image', // Same tag as in the first page
+            child: Image.asset(
+              'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
+              fit: BoxFit.contain, // Adjust the fit for the larger view
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MoodTracker extends StatefulWidget {
+  @override
+  _MoodTrackerState createState() => _MoodTrackerState();
+}
+
+class _MoodTrackerState extends State<MoodTracker> {
+  final List<String> moods = ["😄", "😐", "😞"]; // Emojis representing moods
+  String? selectedMood;
+  List<String> moodHistory = [];
+  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  String interpretationMessage = ""; // Message for mood interpretation
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMoodHistory();
+  }
+
+  // Load mood history from shared preferences
+  Future<void> _loadMoodHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      moodHistory = prefs.getStringList(currentDate) ?? [];
+      _updateInterpretationMessage();
+    });
+  }
+
+  // Save the selected mood to shared preferences
+  Future<void> _saveMood(String mood) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Limit mood history to 5 items for the current day
+    if (moodHistory.length < 5) {
+      setState(() {
+        moodHistory.add(mood); // Add the new mood
+        _updateInterpretationMessage(); // Update the message
+      });
+      await prefs.setStringList(currentDate, moodHistory);
+    }
+  }
+
+  // Update the interpretation message based on mood history
+  void _updateInterpretationMessage() {
+    if (moodHistory.length == 5) {
+      int happyCount = moodHistory.where((mood) => mood == "😄").length;
+      int neutralCount = moodHistory.where((mood) => mood == "😐").length;
+      int sadCount = moodHistory.where((mood) => mood == "😞").length;
+
+      if (happyCount > neutralCount && happyCount > sadCount) {
+        interpretationMessage = "You're having a cheerful day! 🌟";
+      } else if (sadCount > happyCount && sadCount > neutralCount) {
+        interpretationMessage = "It's been a tough day. Take some rest. 🛌";
+      } else if (neutralCount > happyCount && neutralCount > sadCount) {
+        interpretationMessage = "You're feeling neutral today. Keep going! ⚖️";
+      } else if (happyCount == 0 && sadCount == 0) {
+        interpretationMessage =
+            "You're in a calm and balanced state. Well done! ✨";
+      } else if (happyCount == 1 && sadCount == 4) {
+        interpretationMessage =
+            "It seems like you're having a tough time today. Hang in there! 💪";
+      } else if (neutralCount == 2 && happyCount == 2 && sadCount == 1) {
+        interpretationMessage =
+            "Your mood is all over the place today. Take it one step at a time. 🛤️";
+      } else if (happyCount == 5) {
+        interpretationMessage = "You're on cloud nine! What a joyful day! ☁️💖";
+      } else if (sadCount == 5) {
+        interpretationMessage =
+            "Today might feel like a challenge. Reach out if you need support. 🤗";
+      } else if (neutralCount == 5) {
+        interpretationMessage =
+            "A steady day, neither good nor bad. It's okay to feel this way. ⚖️";
+      } else if (happyCount == 4 && sadCount == 1) {
+        interpretationMessage =
+            "You're mostly in a good mood today! Keep that positivity flowing. ✨";
+      } else if (sadCount == 4 && neutralCount == 1) {
+        interpretationMessage =
+            "It seems like you're struggling, but there's a spark of hope today. 🌱";
+      } else if (neutralCount == 3 && happyCount == 2) {
+        interpretationMessage =
+            "You're mostly calm, but you're also feeling a bit positive. Great balance! ⚖️";
+      } else if (happyCount == 3 && sadCount == 2) {
+        interpretationMessage =
+            "A mix of happiness and some difficulties. You're handling it well. 🌟";
+      } else if (sadCount == 3 && neutralCount == 2) {
+        interpretationMessage =
+            "It looks like you're having a rough time, but don't forget to take breaks! 🧘‍♀️";
+      } else if (happyCount == 2 && sadCount == 3) {
+        interpretationMessage =
+            "Not every day is easy, but you're finding moments of joy! 🌻";
+      } else {
+        interpretationMessage =
+            "Your day is a mix of emotions. Balance is key! 💡";
+      }
+    } else {
+      interpretationMessage = "";
+    }
+  }
+
+  // Handle mood selection
+  void _onMoodSelected(String mood) {
+    if (moodHistory.length < 5) {
+      setState(() {
+        selectedMood = mood;
+      });
+      _saveMood(mood);
+    } else {
+      // Show a message if the limit is reached
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("You have reached the limit of 5 moods for today."),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              "How do you feel today?",
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: moods.map((mood) {
+                return GestureDetector(
+                  onTap: () => _onMoodSelected(mood),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      mood,
+                      style: const TextStyle(fontSize: 48, color: Colors.white),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 10),
+            if (selectedMood != null)
+              Text(
+                "You selected: $selectedMood",
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            const SizedBox(height: 10),
+            Text(
+              "Mood History:",
+              style: TextStyle(fontSize: 15, color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: moodHistory.map((mood) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  child: Text(
+                    mood,
+                    style: const TextStyle(fontSize: 24, color: Colors.white),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+            if (interpretationMessage.isNotEmpty)
+              Text(
+                interpretationMessage,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontStyle: FontStyle.italic),
+                textAlign: TextAlign.center,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  DateTime? _selectedDay;
+  bool _isAttendanceApproved = false; // Track attendance approval
+
+  Map<DateTime, List<Map<String, dynamic>>> _tasks = {};
+  Map<DateTime, List<String>> _finishedTasks = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Show the attendance dialog after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showAttendanceDialog();
+    });
+  }
+
+  void _showAttendanceDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Checking your Attendance"),
+          content: Text("Please wait for the approval"),
+          backgroundColor:
+              Colors.green[100], // Set the background color to light green
+          actions: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the button
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _isAttendanceApproved =
+                          true; // Mark attendance as approved
+                    });
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _onTasksUpdated(DateTime selectedDay, List<Map<String, dynamic>> tasks,
+      List<String> finishedTasks) {
+    setState(() {
+      _selectedDay = selectedDay;
+      _tasks[selectedDay] = tasks;
+      _finishedTasks[selectedDay] = finishedTasks;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF2A2A2A),
-      body: Row(
-        children: [
-          // Navigation Drawer
-          _buildNavigationDrawer(),
-          // Main Content Area
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0, vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildProfileInfo(),
-                    const SizedBox(height: 16),
-                    _buildKanbanBoard(),
-                    const SizedBox(height: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: _buildAttendanceSystem()),
-                        const SizedBox(width: 16),
-                        Expanded(child: _buildCalendar()),
-                      ],
-                    ),
-                  ],
-                ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF153549),
+        body: Stack(
+          children: [
+            // Background Image
+            Positioned.fill(
+              child: Image.asset(
+                'bluebg.jpg', // Add the correct path to your image
+                fit: BoxFit.cover, // Adjust the image's fit as necessary
               ),
             ),
-          ),
-        ],
+            // Main Content Area
+            Row(
+              children: [
+                // Navigation Drawer
+                _buildNavigationDrawer(),
+                // Main Content Area
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildProfileInfo(),
+                          const SizedBox(height: 16),
+                          _buildKanbanBoard(),
+                          const SizedBox(height: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(width: 16),
+                              Expanded(child: _buildCalendar()),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -52,14 +348,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildNavigationDrawer() {
     return Container(
       width: 280,
-      color: const Color(0xFF363636),
+      color: Color(0xff28658a),
       child: Column(
         children: [
           Container(
             height: 150,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF555555), Color(0xFF3B3B3B)],
+                colors: [
+                  Color(0xFF000814),
+                  Color(0xFF001d3d),
+                  Color(0xFF003566)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -85,31 +385,113 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          _buildDrawerItem(Icons.calendar_today, 'Calendar', const CalendarSection()),
-          // _buildDrawerItem(Icons.settings, 'Settings', SettingsSection()),
+          _buildDrawerItem(Icons.note, 'Other Features', OtherFeatures(),
+              isDisabled: !_isAttendanceApproved),
+          _buildDrawerItem(
+              Icons.calendar_today,
+              'Calendar',
+              CalendarSection(
+                onTasksUpdated: _onTasksUpdated,
+                onBarChartUpdate: (date, chartData) {
+                  // Handle bar chart update if needed
+                },
+              )),
+          _buildArchiveButton(), // Adding the Archive button here
           _buildDrawerItem(Icons.logout, 'Logout', null, isLogout: true),
         ],
       ),
     );
   }
 
+  Widget _buildArchiveButton() {
+    return ListTile(
+      leading: Icon(Icons.archive, color: const Color(0xFFB0B0B0)),
+      title: Text(
+        'Archive',
+        style: const TextStyle(color: Color(0xFFE0E0E0)),
+      ),
+      onTap: () {
+        // Convert finishedTasks to the expected format
+        Map<DateTime, List<Map<String, dynamic>>> formattedFinishedTasks = {};
+
+        _finishedTasks.forEach((date, tasks) {
+          formattedFinishedTasks[date] = tasks.map((task) {
+            // Assuming the String task only contains the task text, you can structure it like this
+            return {
+              'text': task,
+              'completedAt': DateTime.now()
+                  .toIso8601String(), // Replace with actual completion time
+            };
+          }).toList();
+        });
+
+        // Navigate to the ArchivePage and pass formattedFinishedTasks
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArchivePage(
+              finishedTasks: formattedFinishedTasks,
+              deletedTasks: {},
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildDrawerItem(IconData icon, String label, Widget? destination,
-      {bool isLogout = false}) {
+      {bool isLogout = false, bool isDisabled = false}) {
     return ListTile(
       leading: Icon(icon, color: const Color(0xFFB0B0B0)),
       title: Text(
         label,
         style: const TextStyle(color: Color(0xFFE0E0E0)),
       ),
-      onTap: () {
-        if (isLogout) {
-          Navigator.pushReplacementNamed(context, '/');
-        } else if (destination != null) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => destination));
-        }
+      onTap: isDisabled
+          ? null
+          : () {
+              if (isLogout) {
+                _showLogoutConfirmationDialog(); // Show logout confirmation dialog
+              } else if (destination != null) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => destination));
+              }
+            },
+    );
+  }
+
+  void _showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Log Out"),
+          content: Text("Do you want to log out?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Handle the logout logic here
+                _logout();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Log Out"),
+            ),
+          ],
+        );
       },
     );
+  }
+
+  void _logout() {
+    // Perform logout operations, such as clearing user data or navigating to the login screen
+    Navigator.of(context)
+        .pushReplacementNamed('/'); // Navigate to the login screen
   }
 
   Widget _buildProfileInfo() {
@@ -120,31 +502,56 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: const Row(
+        child: Stack(
+          // Use Stack to overlay the date/time
           children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/profile_picture.png'),
-            ),
-            SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
               children: [
-                Text('John Doe',
-                    style: TextStyle(
+                const CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage(
+                      'assets/profile_picture.png'), // Ensure this image exists in your assets
+                ),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'John Doe',
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white)),
-                SizedBox(height: 5),
-                Text('john.doe@example.com',
-                    style: TextStyle(fontSize: 14, color: Colors.grey)),
-                SizedBox(height: 5),
-                Text('Role: Employee',
-                    style: TextStyle(fontSize: 16, color: Colors.white)),
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'john.doe@example.com',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      'Role: Employee',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ],
+                ),
               ],
+            ),
+            Positioned(
+              top: 16, // Adjust this value to position the text
+              right: 16, // Adjust this value to position the text
+              child: Text(
+                'Log In at : '
+                '${DateFormat('MM/dd/yy ').format(DateTime.now())} ${DateFormat('hh:mm a').format(DateTime.now())}', // Format the date and time
+                style: const TextStyle(
+                  color: Color(0xFF70e000), // Set text color to green
+                  fontSize: 14, // Set font size
+                ),
+              ),
             ),
           ],
         ),
@@ -153,40 +560,114 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildKanbanBoard() {
-    List<String> wishlistTasks = ['Task A', 'Task B', 'Task C'];
-    List<String> doingTasks = ['Task D', 'Task E'];
-    List<String> finishedTasks = ['Task F'];
+    // Clear the task lists
+    List<String> tasksProgress = []; // Empty list for Task Progress
+    List<String> quotes = []; // Empty list for Quotes
+    List<String> mood = []; // Empty list for Mood
 
-    void moveTask(String task, List<String> fromList, List<String> toList) {
-      setState(() {
-        fromList.remove(task);
-        toList.add(task);
-      });
+    // Get the count of unfinished and finished tasks for the selected day
+    int unfinishedCount = _tasks[_selectedDay]
+            ?.where((task) => task['completed'] == false)
+            .length ??
+        0;
+    int finishedCount = _finishedTasks[_selectedDay]?.length ?? 0;
+
+    // Sample data for the chart
+    List<ChartData> chartData = [
+      ChartData.withDefaultDate(
+        'Unfinished',
+        unfinishedCount.toDouble(),
+        _selectedDay ??
+            DateTime
+                .now(), // Use the current date as a fallback if _selectedDay is null
+      ),
+      ChartData.withDefaultDate(
+        'Finished',
+        finishedCount.toDouble(),
+        _selectedDay ??
+            DateTime
+                .now(), // Use the current date as a fallback if _selectedDay is null
+      ),
+    ];
+
+    // Populate the tasksProgress list with unfinished tasks
+    tasksProgress =
+        _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ??
+            [];
+
+    // List of quotes
+    List<String> quotesList = [
+      "The only way to do great work is to love what you do. - Steve Jobs",
+      "Success is not the key to happiness. Happiness is the key to success. - Albert Schweitzer",
+      "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+      "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+      "You are never too old to set another goal or to dream a new dream. - C.S. Lewis",
+      "Act as if what you do makes a difference. It does. - William James",
+      "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
+      "Opportunities don't happen. You create them. - Chris Grosser",
+      "I find that the harder I work, the more luck I seem to have. - Thomas Jefferson",
+      "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt",
+      "Believe you can and you're halfway there. - Theodore Roosevelt",
+      "It does not matter how slowly you go as long as you do not stop. - Confucius",
+      "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
+      "Do what you can with all you have, wherever you are. - Theodore Roosevelt",
+      "The best way to predict your future is to create it. - Abraham Lincoln",
+      "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart. - Roy T. Bennett",
+      "Keep your face always toward the sunshine—and shadows will fall behind you. - Walt Whitman",
+      "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
+      "If you want to lift yourself up, lift up someone else. - Booker T. Washington",
+      "The secret of getting ahead is getting started. - Mark Twain",
+      "Dream big and dare to fail. - Norman Vaughan",
+      "You are braver than you believe, stronger than you seem, and smarter than you think. - A.A. Milne",
+      "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty. - Winston Churchill",
+      "You miss 100% of the shots you don’t take. - Wayne Gretzky",
+      "Happiness is not something ready-made. It comes from your own actions. - Dalai Lama",
+      "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+      "Don't let yesterday take up too much of today. - Will Rogers",
+      "Your time is limited, so don’t waste it living someone else’s life. - Steve Jobs",
+      "Do one thing every day that scares you. - Eleanor Roosevelt",
+      "Strive not to be a success, but rather to be of value. - Albert Einstein"
+    ];
+
+    // Get the current date and use it to select a quote
+    int currentDay = DateTime.now().day;
+    String dailyQuote = quotesList[
+        currentDay % quotesList.length]; // Select a quote based on the day
+
+    Widget buildChart() {
+      return SfCartesianChart(
+        title: ChartTitle(
+          text: 'Task Distribution',
+          textStyle:
+              TextStyle(color: Colors.white), // Set title text color to white
+        ),
+        primaryXAxis: CategoryAxis(
+          labelStyle:
+              TextStyle(color: Colors.white), // Set X-axis label color to white
+          title: AxisTitle(
+              text: 'Task Status',
+              textStyle:
+                  TextStyle(color: Colors.white)), // Add label for X-axis
+        ),
+        primaryYAxis: NumericAxis(
+          labelStyle:
+              TextStyle(color: Colors.white), // Set Y-axis label color to white
+        ),
+        series: <CartesianSeries>[
+          ColumnSeries<ChartData, String>(
+            dataSource: chartData,
+            xValueMapper: (ChartData data, _) =>
+                data.task, // Show 'Finished' and 'Unfinished' as categories
+            yValueMapper: (ChartData data, _) => data.value,
+            color: Colors.blue, // Optional: Set the color of the columns
+          )
+        ],
+        backgroundColor: const Color(
+            0xFF2A2A2A), // Optional: Set the background color of the chart
+      );
     }
 
-    void addTask(String task, List<String> targetList) {
-      setState(() {
-        targetList.add(task);
-      });
-    }
-
-    void editTask(String oldTask, String newTask, List<String> taskList) {
-      setState(() {
-        final index = taskList.indexOf(oldTask);
-        if (index != -1) {
-          taskList[index] = newTask;
-        }
-      });
-    }
-
-    void deleteTask(String task, List<String> taskList) {
-      setState(() {
-        taskList.remove(task);
-      });
-    }
-
-    Widget buildKanbanColumn(String title, List<String> tasks,
-        List<String> Function() getTargetList) {
+    Widget buildKanbanColumn(String title, List<String> tasks) {
       return Expanded(
         child: Card(
           elevation: 4,
@@ -195,161 +676,67 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
-              ),
+              color: Color(0xff28658a),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+            child: SingleChildScrollView(
+              // Allow scrolling within each column
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (title ==
+                      'Task Progress') // Insert chart in Task Progress column
+                    Container(
+                      height: 200, // Set a specific height for the chart
+                      child: buildChart(),
+                    ),
+                  if (title ==
+                      'Quotes') // Display the quote in the Quotes column
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        height: 250,
+                        alignment: Alignment.center,
+                        child: Text(
+                          dailyQuote,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
                       ),
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      onPressed: () {
-                        TextEditingController taskController =
-                            TextEditingController();
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Add Task'),
-                            content: TextField(
-                              controller: taskController,
-                              decoration: const InputDecoration(
-                                hintText: 'Task Name',
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  if (taskController.text.isNotEmpty) {
-                                    addTask(
-                                        taskController.text, getTargetList());
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                child: const Text('Add'),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                  if (title == 'Mood') // Add Mood Tracker in Finished column
+                    Container(
+                      height: 300, // Set a specific height for the MoodTracker
+                      child: SingleChildScrollView(
+                        child: MoodTracker(),
+                      ),
                     ),
+                  // Display tasks in the Task Progress column
+                  if (title == 'Task Progress' && tasks.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ...tasks
+                        .map((task) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Text(
+                                task,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ))
+                        .toList(),
                   ],
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: DragTarget<String>(
-                    builder: (context, candidateData, rejectedData) {
-                      return ListView(
-                        children: tasks.map((task) {
-                          return Draggable<String>(
-                            data: task,
-                            feedback: Material(
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                color: const Color(0xFF00E676),
-                                child: Text(
-                                  task,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade800,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  GestureDetector(
-                                    onDoubleTap: () {
-                                      TextEditingController editController =
-                                          TextEditingController(text: task);
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('Edit Task'),
-                                          content: TextField(
-                                            controller: editController,
-                                            decoration: const InputDecoration(
-                                              hintText: 'Task Name',
-                                            ),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                editTask(task,
-                                                    editController.text, tasks);
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Save'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      task,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete,
-                                        color: Colors.red),
-                                    onPressed: () => deleteTask(task, tasks),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                    onWillAcceptWithDetails: (details) {
-                      final data = details.data;
-                      final fromList = [
-                        wishlistTasks,
-                        doingTasks,
-                        finishedTasks
-                      ].firstWhere((list) => list.contains(data));
-                      return fromList != getTargetList();
-                    },
-                    onAcceptWithDetails: (details) {
-                      final data = details.data;
-                      final fromList = [
-                        wishlistTasks,
-                        doingTasks,
-                        finishedTasks
-                      ].firstWhere((list) => list.contains(data));
-                      moveTask(data, fromList, getTargetList());
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -360,126 +747,182 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        height: 300,
         padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: Row(
-          children: [
-            buildKanbanColumn('Wishlist', wishlistTasks, () => wishlistTasks),
-            const SizedBox(width: 8),
-            buildKanbanColumn('Doing', doingTasks, () => doingTasks),
-            const SizedBox(width: 8),
-            buildKanbanColumn('Finished', finishedTasks, () => finishedTasks),
-          ],
+        child: SizedBox(
+          height: 400, // minimum height
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Task Progress', tasksProgress),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Quotes', quotes),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: SizedBox(
+                  width: 350, // maximum width
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minWidth: 300, // minimum width
+                      minHeight: 300, // minimum height
+                      maxWidth: 600, // maximum width
+                      maxHeight: 600, // maximum height
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      child: buildKanbanColumn('Mood', mood),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAttendanceSystem() {
-    List<Map<String, dynamic>> attendanceTasks = [
-      {'task': 'Check in for daily report', 'checked': false, 'time': null},
-      {
-        'task': 'Check in for team meeting at 10 AM',
-        'checked': false,
-        'time': null
-      },
-      {
-        'task': 'Check in for project proposal submission by 3 PM',
-        'checked': false,
-        'time': null
-      },
-    ];
-
-    void toggleCheckIn(int index) {
-      setState(() {
-        if (!attendanceTasks[index]['checked']) {
-          attendanceTasks[index]['checked'] = true;
-          attendanceTasks[index]['time'] = DateTime.now();
-        } else {
-          attendanceTasks[index]['checked'] = false;
-          attendanceTasks[index]['time'] = null;
-        }
-      });
-    }
-
-    return _buildFeatureCard(
-      'Attendance System',
-      [
-        ...attendanceTasks.asMap().entries.map((entry) {
-          int index = entry.key;
-          Map<String, dynamic> task = entry.value;
-
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  task['task'],
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              Checkbox(
-                value: task['checked'],
-                onChanged: (value) => toggleCheckIn(index),
-                checkColor: Colors.white,
-                fillColor: WidgetStateProperty.resolveWith<Color>(
-                  (states) => states.contains(WidgetState.selected)
-                      ? Colors.green
-                      : Colors.grey,
-                ),
-              ),
-              if (task['time'] != null)
-                Text(
-                  'Checked in at: ${task['time'].hour}:${task['time'].minute.toString().padLeft(2, '0')}',
-                  style: const TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-            ],
-          );
-        }),
-      ],
-      height: 300, // Adjust height as needed
-    );
-  }
-
   Widget _buildCalendar() {
-    return _buildFeatureCard(
-      'Calendar/Schedule',
-      [
-        const Text('Upcoming Meeting: 10 AM',
-            style: TextStyle(color: Colors.white)),
-        const Text('Project Deadline: 3 PM',
-            style: TextStyle(color: Colors.white)),
-      ],
-      height: 300, // Set a taller height to match To-Do List
-    );
-  }
-
-  // Updated to accept height for consistent sizes
-  Widget _buildFeatureCard(String title, List<Widget> children,
-      {double height = 250}) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        height: height,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF707070), Color(0xFF4A4A4A)],
+            colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          // Use Row to align calendar and Kanban box side by side
           children: [
-            Text(title,
-                style: const TextStyle(color: Colors.white, fontSize: 18)),
-            const SizedBox(height: 10),
-            ...children,
+            Expanded(
+              child: Container(
+                height:
+                    400, // Adjust height to ensure it fits well with the Kanban box
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 2), // Reduced spacing
+                    Expanded(
+                      child: TableCalendar(
+                        firstDay: DateTime.utc(2020, 1, 1),
+                        lastDay: DateTime.utc(2030, 12, 31),
+                        focusedDay: DateTime.now(),
+                        calendarStyle: CalendarStyle(
+                          todayDecoration: BoxDecoration(
+                              color: Colors.green, shape: BoxShape.circle),
+                          selectedDecoration: BoxDecoration(
+                              color: Colors.blue, shape: BoxShape.circle),
+                          defaultTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13), // Smaller font
+                          weekendTextStyle: const TextStyle(
+                              color: Colors.white, fontSize: 13),
+                          outsideTextStyle:
+                              const TextStyle(color: Colors.grey, fontSize: 11),
+                        ),
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: false,
+                          titleTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15), // Reduced font size
+                          leftChevronIcon: const Icon(Icons.chevron_left,
+                              color: Colors.white, size: 17),
+                          rightChevronIcon: const Icon(Icons.chevron_right,
+                              color: Colors.white, size: 17),
+                        ),
+                        daysOfWeekStyle: const DaysOfWeekStyle(
+                          weekdayStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11), // Smaller font
+                          weekendStyle:
+                              TextStyle(color: Colors.white, fontSize: 11),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 20), // Space between calendar and Kanban box
+            Container(
+              width: 600, // Fixed width for Kanban box
+              height: 400, // Same height as calendar to align properly
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
+                    color: Color(0xff28658a),
+                  ),
+                  child: Column(
+                    children: [
+                      // Insert the image inside the Kanban box with Hero transition
+                      GestureDetector(
+                        onTap: () {
+                          // Navigate to another page when tapped (for hero transition)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ImageDetailPage(),
+                            ),
+                          );
+                        },
+                        child: Hero(
+                          tag: 'kanban_image', // Unique tag for Hero transition
+                          child: Image.asset(
+                            'assets/kanbanpic.jpg',
+                            width: 600, // Adjust the width as necessary
+                            height: 359, // Adjust the height as necessary
+                            fit: BoxFit.cover, // Adjust the fit as necessary
+                          ),
+                        ),
+                      ),
+                      // Add your Kanban board contents here
+                      // For example: Task list, mood tracker, etc.
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
