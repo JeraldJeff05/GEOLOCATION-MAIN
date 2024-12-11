@@ -839,116 +839,158 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return SingleChildScrollView(
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF000814), Color(0xFF001d3d), Color(0xFF003566)],
-            ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: 1200, // Limit the maximum width for the entire layout
           ),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          child: Card(
+            elevation: 4,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF000814),
+                    Color(0xFF001d3d),
+                    Color(0xFF003566)
+                  ],
+                ),
+              ),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Container(
-                      height: screenHeight * 0.5, // Dynamically adjust height
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 2),
-                          Expanded(
-                            child: TableCalendar(
-                              firstDay: DateTime.utc(2020, 1, 1),
-                              lastDay: DateTime.utc(2030, 12, 31),
-                              focusedDay: DateTime.now(),
-                              calendarStyle: CalendarStyle(
-                                todayDecoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle),
-                                selectedDecoration: BoxDecoration(
-                                    color: Colors.blue, shape: BoxShape.circle),
-                                defaultTextStyle: const TextStyle(
-                                    color: Colors.white, fontSize: 13),
-                                weekendTextStyle: const TextStyle(
-                                    color: Colors.white, fontSize: 13),
-                                outsideTextStyle: const TextStyle(
-                                    color: Colors.grey, fontSize: 11),
-                              ),
-                              headerStyle: HeaderStyle(
-                                formatButtonVisible: false,
-                                titleTextStyle: const TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                                leftChevronIcon: const Icon(Icons.chevron_left,
-                                    color: Colors.white, size: 17),
-                                rightChevronIcon: const Icon(
-                                    Icons.chevron_right,
-                                    color: Colors.white,
-                                    size: 17),
-                              ),
-                              daysOfWeekStyle: const DaysOfWeekStyle(
-                                weekdayStyle: TextStyle(
-                                    color: Colors.white, fontSize: 11),
-                                weekendStyle: TextStyle(
-                                    color: Colors.white, fontSize: 11),
-                              ),
-                            ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth:
+                                150, // Set a minimum width for the calendar
+                            maxWidth:
+                                300, // Set a maximum width for the calendar
+                            minHeight:
+                                150, // Set a minimum height for the calendar
+                            maxHeight:
+                                250, // Set a maximum height for the calendar
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Flexible(
-                    child: Container(
-                      width: screenWidth * 0.6, // Dynamically adjust width
-                      height: screenHeight *
-                          0.5, // Match calendar height dynamically
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: const BoxDecoration(
-                            color: Color(0xff28658a),
-                          ),
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ImageDetailPage(),
+                          child: Container(
+                            height:
+                                screenHeight * 0.5, // Dynamically adjust height
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 2),
+                                Expanded(
+                                  child: TableCalendar(
+                                    firstDay: DateTime.utc(2020, 1, 1),
+                                    lastDay: DateTime.utc(2030, 12, 31),
+                                    focusedDay: DateTime.now(),
+                                    calendarStyle: CalendarStyle(
+                                      todayDecoration: BoxDecoration(
+                                          color: Colors.green,
+                                          shape: BoxShape.circle),
+                                      selectedDecoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          shape: BoxShape.circle),
+                                      defaultTextStyle: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                      weekendTextStyle: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                      outsideTextStyle: const TextStyle(
+                                          color: Colors.grey, fontSize: 11),
                                     ),
-                                  );
-                                },
-                                child: Hero(
-                                  tag: 'kanban_image',
-                                  child: Image.asset(
-                                    'assets/kanbanpic.jpg',
-                                    width: screenWidth *
-                                        0.55, // Adjust based on screen width
-                                    height: screenHeight *
-                                        0.45, // Slightly increase height
-                                    fit: BoxFit
-                                        .cover, // Ensure image fits the container
+                                    headerStyle: HeaderStyle(
+                                      formatButtonVisible: false,
+                                      titleTextStyle: const TextStyle(
+                                          color: Colors.white, fontSize: 15),
+                                      leftChevronIcon: const Icon(
+                                          Icons.chevron_left,
+                                          color: Colors.white,
+                                          size: 17),
+                                      rightChevronIcon: const Icon(
+                                          Icons.chevron_right,
+                                          color: Colors.white,
+                                          size: 17),
+                                    ),
+                                    daysOfWeekStyle: const DaysOfWeekStyle(
+                                      weekdayStyle: TextStyle(
+                                          color: Colors.white, fontSize: 11),
+                                      weekendStyle: TextStyle(
+                                          color: Colors.white, fontSize: 11),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 20),
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth:
+                                150, // Set a minimum width for the Kanban box
+                            maxWidth:
+                                300, // Set a maximum width for the Kanban box
+                            minHeight:
+                                150, // Set a minimum height for the Kanban box
+                            maxHeight:
+                                250, // Set a maximum height for the Kanban box
+                          ),
+                          child: Container(
+                            width:
+                                screenWidth * 0.6, // Dynamically adjust width
+                            height: screenHeight *
+                                0.5, // Match calendar height dynamically
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xff28658a),
+                                ),
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ImageDetailPage(),
+                                          ),
+                                        );
+                                      },
+                                      child: Hero(
+                                        tag: 'kanban_image',
+                                        child: Image.asset(
+                                          'assets/kanbanpic.jpg',
+                                          width: screenWidth *
+                                              0.55, // Adjust based on screen width
+                                          height: screenHeight *
+                                              0.45, // Slightly increase height
+                                          fit: BoxFit
+                                              .cover, // Ensure image fits the container
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
