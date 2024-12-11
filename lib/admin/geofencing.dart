@@ -77,140 +77,101 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isSmallScreen =
-            constraints.maxWidth < 300 || constraints.maxHeight < 400;
+        // Determine screen size categories
+        final isWideScreen = constraints.maxWidth > 1200;
+        final isMediumScreen =
+            constraints.maxWidth > 800 && constraints.maxWidth <= 1200;
 
-        if (isSmallScreen) {
+        // Minimum size check
+        if (constraints.maxWidth < 300 || constraints.maxHeight < 400) {
           return Scaffold(
+            backgroundColor: Colors.black,
             body: Center(
               child: Text(
-                "Please increase the screen size",
+                "Please increase screen size",
                 style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            backgroundColor: Colors.black,
           );
         }
 
-        return Scaffold(
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.black54, Colors.black],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      "Geofence Check",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 10.0),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: _buildFirstColumn(),
-                          ),
-                          const SizedBox(width: 16.0),
-                          Expanded(
-                            flex: 2,
-                            child: _buildSecondColumn(),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
+        // Responsive layouts
+        if (isWideScreen || isMediumScreen) {
+          return _buildWideScreenLayout();
+        } else {
+          return _buildNarrowScreenLayout();
+        }
       },
     );
   }
 
-  Widget _buildFirstColumn() {
-    return Flexible(
-      child: Card(
-        elevation: 10.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
+  Widget _buildWideScreenLayout() {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black87, Colors.black],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
-        color: Colors.black,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: _buildControlPanel(),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  flex: 2,
+                  child: _buildMapView(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNarrowScreenLayout() {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.black87, Colors.black],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
+              Padding(
                 padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.white,
-                ),
                 child: Text(
-                  _selectedLocation != null
-                      ? 'Selected Location:\n${_selectedLocation!.latitude}, ${_selectedLocation!.longitude}'
-                      : "Select Location",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
+                  "Geofence Check",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 5.0),
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.0),
-                  color: Colors.white,
-                ),
-                child: Text(
-                  _responseMessage.isEmpty
-                      ? "Waiting for the response..."
-                      : _responseMessage,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+              Expanded(
+                flex: 2,
+                child: _buildMapView(),
               ),
-              const SizedBox(height: 10.0),
-              ElevatedButton(
-                onPressed: _checkGeofence,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16.0,
-                    horizontal: 32.0,
-                  ),
-                  backgroundColor: Colors.grey,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0.0),
-                  ),
-                ),
-                child: const Text(
-                  "Check Geofence",
-                  style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
-                ),
+              Expanded(
+                flex: 1,
+                child: _buildControlPanel(),
               ),
             ],
           ),
@@ -219,37 +180,139 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
     );
   }
 
-  Widget _buildSecondColumn() {
-    return Flexible(
-      flex: 2,
-      child: FlutterMap(
-        options: MapOptions(
-          initialCenter: LatLng(14.067833722868489, 121.3270708600162),
-          initialZoom: 20.0,
-          onTap: (_, latLng) => _onTap(latLng),
+  Widget _buildControlPanel() {
+    return Card(
+      elevation: 10,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: Colors.white10,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Location Display
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Text(
+                _selectedLocation != null
+                    ? 'Location:\n${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
+                    : "Select a Location on Map",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Response Display
+            AnimatedContainer(
+              duration: Duration(milliseconds: 300),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white24),
+              ),
+              child: Text(
+                _responseMessage.isEmpty
+                    ? "Waiting for response..."
+                    : _responseMessage,
+                style: TextStyle(
+                  color: _responseMessage.contains("allowed")
+                      ? Colors.green
+                      : Colors.red,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Check Geofence Button
+            ElevatedButton(
+              onPressed: _checkGeofence,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white24,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                "Check Geofence",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
-        children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerLayer(
-            markers: _selectedLocation != null
-                ? [
-                    Marker(
-                      width: 80.0,
-                      height: 80.0,
-                      point: _selectedLocation!,
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Colors.black,
-                        size: 40,
-                      ),
-                    ),
-                  ]
-                : [],
+      ),
+    );
+  }
+
+  Widget _buildMapView() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10,
+            offset: Offset(0, 5),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: LatLng(14.067833722868489, 121.3270708600162),
+            initialZoom: 18.0,
+            onTap: (_, latLng) => _onTap(latLng),
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+              subdomains: ['a', 'b', 'c'],
+            ),
+            MarkerLayer(
+              markers: _selectedLocation != null
+                  ? [
+                      Marker(
+                        width: 20.0,
+                        height: 20.0,
+                        point: _selectedLocation!,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ]
+                  : [],
+            ),
+          ],
+        ),
       ),
     );
   }
