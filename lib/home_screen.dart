@@ -447,7 +447,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         );
-
       },
     );
   }
@@ -940,57 +939,44 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 20),
                       Flexible(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth:
-                                150, // Set a minimum width for the Kanban box
-                            maxWidth:
-                                300, // Set a maximum width for the Kanban box
-                            minHeight:
-                                150, // Set a minimum height for the Kanban box
-                            maxHeight:
-                                250, // Set a maximum height for the Kanban box
-                          ),
-                          child: Container(
-                            width:
-                                screenWidth * 0.6, // Dynamically adjust width
-                            height: screenHeight *
-                                0.5, // Match calendar height dynamically
-                            child: Card(
-                              elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xff28658a),
-                                ),
-                                child: Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                ImageDetailPage(),
-                                          ),
-                                        );
-                                      },
-                                      child: Hero(
-                                        tag: 'kanban_image',
-                                        child: Image.asset(
-                                          'assets/kanbanpic.jpg',
-                                          width: screenWidth *
-                                              0.55, // Adjust based on screen width
-                                          height: screenHeight *
-                                              0.45, // Slightly increase height
-                                          fit: BoxFit
-                                              .cover, // Ensure image fits the container
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: const BoxDecoration(
+                                color: Color(0xff28658a),
+                              ),
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ImageDetailPage(),
                                         ),
+                                      );
+                                    },
+                                    child: Hero(
+                                      tag: 'kanban_image',
+                                      child: Image.asset(
+                                        'assets/kanbanpic.jpg',
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.55,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.45,
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
