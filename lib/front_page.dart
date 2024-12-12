@@ -13,8 +13,7 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
 
@@ -23,24 +22,39 @@ class _MyHomePageState extends State<MyHomePage>
 
   late AnimationController _animationController;
   late Animation<Offset> _buttonAnimation;
+  late AnimationController _shakeController;
+  late Animation<Offset> _shakeAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animation controller
+    // Initialize animation controller for button
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    // Define animation for button movement
     _buttonAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0.0, -0.10), // Adjust the range of movement
+      end: const Offset(0.0, -0.10),
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
+    ));
+
+    // Initialize shake animation controller
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _shakeAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0.05, 0.0),
+    ).animate(CurvedAnimation(
+      parent: _shakeController,
+      curve: Curves.elasticIn,
     ));
 
     // Delayed animations for login form appearance
@@ -54,18 +68,12 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose(); // Dispose animation controller
-    super.dispose();
-  }
-
   void _login() async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
       setState(() {
-        _isLoading = true; // Show loading indicator
+        _isLoading = true;
       });
 
       // Bypass check for "jeff" as both username and password
@@ -80,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage>
           ),
         );
         setState(() {
-          _isLoading = false; // Hide loading indicator
+          _isLoading = false;
         });
         return;
       }
@@ -93,15 +101,13 @@ class _MyHomePageState extends State<MyHomePage>
       );
 
       if (response == "employee" || response == "admin") {
-        // If credentials are correct, check location
         final locationService = LocationService();
-        await locationService
-            .getCurrentLocation(); // Fetch the current location
+        await locationService.getCurrentLocation();
 
         if (locationService.lat == null || locationService.lng == null) {
           _showDialog('Error', 'Unable to fetch location. Please try again.');
           setState(() {
-            _isLoading = false; // Hide loading indicator
+            _isLoading = false;
           });
           return;
         }
@@ -112,15 +118,12 @@ class _MyHomePageState extends State<MyHomePage>
           locationService.lng!.toString(),
         );
 
-        // Show dialog feedback and navigate after a delay
         if (locationResponse == "Location is allowed") {
           _showDialog(
               'Access Granted', 'Your location is within the allowed area.');
 
-          // Navigate after a delay of 1.5 seconds
           await Future.delayed(const Duration(seconds: 1));
 
-          // Navigate to the appropriate page based on user role
           if (response == "employee") {
             Navigator.pushReplacementNamed(context, '/home');
           } else if (response == "admin") {
@@ -138,13 +141,14 @@ class _MyHomePageState extends State<MyHomePage>
           _showDialog('Sad', locationResponse);
         }
       } else {
-        // Show error if credentials are incorrect
         _showDialog('Error', 'Wrong credentials. Please try again.');
       }
 
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
+    } else {
+      _shakeController.forward(from: 0.0); // Trigger shake animation
     }
   }
 
@@ -166,110 +170,132 @@ class _MyHomePageState extends State<MyHomePage>
     );
   }
 
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/LoginNoLogoBg.png'),
-                fit: BoxFit.cover,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/LoginNoLogoBg.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-          ),
-          Align(
-            alignment:
-                Alignment.centerRight, // Aligns the child to the center-right
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(right: 50.0), // Add padding as needed
-              child: Opacity(
-                opacity: _showLoginForm ? 1.0 : 0.0,
-                child: _buildLoginForm(),
+              Positioned(
+                right: 55,
+                // 5% from the right on narrow screens
+                top: 0,
+                bottom: 20,
+
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Opacity(
+                      opacity: _showLoginForm ? 1.0 : 0.0,
+                      child: _buildLoginForm(constraints),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          if (_isLoading)
-            Center(
-              child: CircularProgressIndicator(),
-            ),
-        ],
+              if (_isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildLoginForm() {
-    final screenWidth = MediaQuery.of(context).size.width;
+  Widget _buildLoginForm(BoxConstraints constraints) {
+    // Calculate responsive width
+    final containerWidth = constraints.maxWidth > 600
+        ? constraints.maxWidth * 0.4 // Wider screens get 40% width
+        : constraints.maxWidth * 0.9; // Narrow screens get 90% width
 
-    // Dynamic width with constraints
-    final containerWidth = screenWidth.clamp(300.0, 500.0);
-
-    return Container(
-      width: containerWidth,
-      padding: const EdgeInsets.only(bottom: 15, right: 50, left: 10),
-      decoration: BoxDecoration(
-        color: Colors.black26.withOpacity(0),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 5),
-            ClipRect(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Image.asset(
-                  'assets/FLlogo.png',
-                  width: 350,
-                  height: 110,
-                  fit: BoxFit.cover,
+    return SlideTransition(
+      position: _shakeAnimation,
+      child: Container(
+        width: containerWidth,
+        constraints: BoxConstraints(
+          maxWidth: 600, // Maximum width to prevent excessive stretching
+          minWidth: 500, // Minimum width to ensure readability
+        ),
+        padding: const EdgeInsets.only(bottom: 80, right: 10, left: 10),
+        decoration: BoxDecoration(
+          color: Colors.black26.withOpacity(0),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 0),
+            ),
+          ],
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 5),
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Image.asset(
+                    'assets/FLlogo.png',
+                    width: 350,
+                    height: 110,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            _buildTextFieldWithValidation(
-              icon: Icons.person,
-              labelText: '',
-              hintText: 'User ID',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your ID number';
-                }
-                return null;
-              },
-              onSaved: (value) => _username = value,
-              width: containerWidth * 0.8, // Adaptive width
-            ),
-            const SizedBox(height: 16),
-            _buildTextFieldWithValidation(
-              icon: Icons.lock,
-              labelText: '',
-              hintText: 'Password',
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
-                }
-                return null;
-              },
-              onSaved: (value) => _password = value,
-              obscureText: true,
-              onSubmit: _login,
-              width: containerWidth * 0.8, // Adaptive width
-            ),
-            const SizedBox(height: 32),
-            _buildGifButton(_login),
-          ],
+              const SizedBox(height: 10),
+              _buildTextFieldWithValidation(
+                icon: Icons.person,
+                labelText: '',
+                hintText: 'User ID',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your ID number';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _username = value,
+                width: containerWidth * 0.8,
+              ),
+              const SizedBox(height: 16),
+              _buildTextFieldWithValidation(
+                icon: Icons.lock,
+                labelText: '',
+                hintText: 'Password',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+                onSaved: (value) => _password = value,
+                obscureText: true,
+                onSubmit: _login,
+                width: containerWidth * 0.8,
+              ),
+              const SizedBox(height: 32),
+              _buildGifButton(_login),
+            ],
+          ),
         ),
       ),
     );
@@ -281,8 +307,8 @@ class _MyHomePageState extends State<MyHomePage>
       child: GestureDetector(
         onTap: onPressed,
         child: Container(
-          height: 30,
-          width: 120,
+          height: 25,
+          width: 100,
           decoration: BoxDecoration(
             color: Color(0xFF726F72).withOpacity(0.8),
             borderRadius: BorderRadius.circular(13),
@@ -295,7 +321,7 @@ class _MyHomePageState extends State<MyHomePage>
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
-                letterSpacing: 10.5, // Adjust letter spacing here
+                letterSpacing: 10.5,
               ),
             ),
           ),
@@ -313,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage>
     required String hintText,
     Color labelColor = Colors.black87,
     VoidCallback? onSubmit,
-    double width = 200, // Default width
+    double width = 200,
     double height = 35,
   }) {
     return SizedBox(

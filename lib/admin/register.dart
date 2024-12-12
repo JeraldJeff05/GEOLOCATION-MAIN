@@ -17,25 +17,25 @@ class _AttendanceWidgetState extends State<AttendanceWidget> {
 
   final List<String> roles = ['Employee', 'Admin', 'Intern'];
 
-  Future<void> sendPostRequest() async {
+  Future<void> sendGetRequest() async {
     final String apiUrl =
-        "https://1lp44l1f-8080.asse.devtunnels.ms/employee/register"; // Replace with your API URL.
+        "https://1lp44l1f-8080.asse.devtunnels.ms/register"; // Replace with your API URL.
 
     // Collect data from fields
-    final data = {
+    final queryParameters = {
       "id": idController.text,
-      "role": selectedRole.toLowerCase(),
+      "first_name": firstNameController.text,
+      "last_name": lastNameController.text,
       "password": passwordController.text,
-      "firstName": firstNameController.text,
-      "lastName": lastNameController.text,
+      "role": selectedRole.toLowerCase(),
     };
 
-    // Send POST request
+    final uri = Uri.parse(apiUrl).replace(queryParameters: queryParameters);
+    print("Sending GET request to: $uri");
+
+    // Send GET request
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        body: data,
-      );
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,21 +177,20 @@ class _AttendanceWidgetState extends State<AttendanceWidget> {
                   ),
                   const SizedBox(height: 24),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: sendPostRequest,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Text(
-                        "Register",
-                        style: TextStyle(fontSize: 16),
+                      child: ElevatedButton(
+                    onPressed: sendGetRequest,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                  ),
+                    child: const Text(
+                      "Register",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )),
                 ],
               ),
             ),

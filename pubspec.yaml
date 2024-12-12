@@ -48,7 +48,9 @@ dependencies:
   flutter_map: ^7.0.2
   fl_chart: ^0.69.2
   one_clock: ^2.0.1
-  
+  lottie: ^2.2.0
+  flutter_animate: ^4.0.0  # Replace with the latest version
+  glassmorphism: ^2.0.0    # Replace with the latest version
   
   
     

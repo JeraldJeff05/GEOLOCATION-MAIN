@@ -281,7 +281,7 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
         child: FlutterMap(
           options: MapOptions(
             initialCenter: LatLng(14.067833722868489, 121.3270708600162),
-            initialZoom: 18.0,
+            initialZoom: 20.0,
             onTap: (_, latLng) => _onTap(latLng),
           ),
           children: [
@@ -293,8 +293,8 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
               markers: _selectedLocation != null
                   ? [
                       Marker(
-                        width: 20.0,
-                        height: 20.0,
+                        width: 25.0,
+                        height: 25.0,
                         point: _selectedLocation!,
                         child: Container(
                           decoration: BoxDecoration(

@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        '/start': (context) => const StartScreen(),
+        //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -49,13 +49,11 @@ class _StartScreenState extends State<StartScreen> {
   final LocationService _locationService = LocationService();
   String _message = "";
   bool _showButton = true;
-  bool _showGif = false;
-  bool _showMessage = false;
+  bool _showLoadingOverlay = false; // New flag for overlay visibility
   late Timer _typingTimer;
   int _messageIndex = 0;
-  bool _greyscaleEffect = false; // New flag to control the greyscale effect
 
-  // Method to start typing animation and loop it
+  // Method to start typing animation
   void _startTypingAnimation(String message, VoidCallback onComplete) {
     _messageIndex = 0;
 
@@ -66,39 +64,28 @@ class _StartScreenState extends State<StartScreen> {
     _typingTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (_messageIndex < message.length) {
         setState(() {
-          _message += message[_messageIndex]; // Append each character
+          _message += message[_messageIndex];
         });
         _messageIndex++;
       } else {
-        // Stop the typing animation and trigger the next step
-        _typingTimer.cancel();
-        onComplete(); // Call the callback when typing is complete
+        timer.cancel();
+        onComplete();
       }
     });
   }
 
   void _fadeOutAndNavigate() async {
     setState(() {
-      _showButton = false; // Hide the button when clicked
-      _opacity = 0.8; // Start darkening animation
-      _showGif = true; // Show the rolling ball GIF
-      _showMessage = true; // Show message in place of the button
-      _greyscaleEffect =
-          true; // Enable greyscale effect when the button is clicked
+      _showButton = false; // Hide button
+      _showLoadingOverlay = true; // Show overlay
     });
 
-    // Wait for 1.5 seconds before showing the GIF
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Start the typing animation for "Getting Current location..."
+    // Start typing animation for "Getting Current location..."
     _startTypingAnimation("Getting Current location...", () async {
-      // Fetch user's location
       await _locationService.getCurrentLocation();
 
-      // Check if the location is available
       if (_locationService.lat != null && _locationService.lng != null) {
         _startTypingAnimation("Location fetched successfully!", () async {
-          // Wait for 2 seconds before navigating to the next page
           await Future.delayed(const Duration(seconds: 1));
           Navigator.pushNamed(context, '/');
         });
@@ -106,18 +93,14 @@ class _StartScreenState extends State<StartScreen> {
         setState(() {
           _message = "Unable to fetch location.";
         });
-
-        // Show a dialog with a warning icon when the location can't be fetched
         _showLocationErrorDialog();
       }
     });
   }
 
   void _showLocationErrorDialog() {
-    // Hide the button and message upon location error
     setState(() {
-      _showButton = false;
-      _showMessage = false;
+      _showLoadingOverlay = false; // Hide overlay
     });
 
     showDialog(
@@ -126,19 +109,12 @@ class _StartScreenState extends State<StartScreen> {
         return AlertDialog(
           title: Row(
             children: const [
-              Icon(
-                Icons.warning,
-                color: Colors.yellow,
-              ),
-              SizedBox(
-                width: 50,
-                height: 200,
-              ),
+              Icon(Icons.warning, color: Colors.yellow),
+              SizedBox(width: 10),
               Text('Location Denied'),
             ],
           ),
-          content:
-              const Text('Please agree towards the user of location services'),
+          content: const Text('Please agree to the use of location services.'),
           actions: [
             TextButton(
               onPressed: () {
@@ -154,7 +130,6 @@ class _StartScreenState extends State<StartScreen> {
 
   @override
   void dispose() {
-    // Dispose the typing timer when the screen is disposed
     _typingTimer.cancel();
     super.dispose();
   }
@@ -163,69 +138,61 @@ class _StartScreenState extends State<StartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        fit: StackFit.expand,
         children: [
-          // Background image with optional greyscale filter
-          ColorFiltered(
-            colorFilter: _greyscaleEffect
-                ? const ColorFilter.mode(
-                    Colors.grey, BlendMode.saturation) // Apply greyscale filter
-                : ColorFilter.mode(
-                    Colors.transparent, BlendMode.saturation), // No filter
-            child: Image.asset(
-              'assets/startpagebg.png',
-              fit: BoxFit.cover,
-            ),
+          // Background image
+          Image.asset(
+            'assets/startpagebg.png',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
           ),
-          // Fade-out overlay
-          AnimatedOpacity(
-            opacity: _opacity,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            child: Container(
-              color: Colors.black.withOpacity(0),
-            ),
-          ),
-          // Centered message showing the API response
-          if (_showMessage)
-            Positioned(
-              top: 425, // Aligns the message where the button was
-              left: 83,
-              child: Text(
-                _message,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+          // Dark overlay
+          if (_showLoadingOverlay)
+            AnimatedOpacity(
+              opacity: 0.8,
+              duration: const Duration(milliseconds: 300),
+              child: Container(
+                color: Colors.black.withOpacity(0.8),
               ),
             ),
-          // Positioned "Get Started" button
+          // Loading GIF and message
+          if (_showLoadingOverlay)
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/rollingball.gif',
+                    width: 300,
+                    height: 200,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    _message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          // Get Started button
           if (_showButton)
-            Align(
-              alignment: const Alignment(-0.6, 0.13),
-              child: GestureDetector(
-                onTap: _fadeOutAndNavigate,
-                child: Image.asset(
-                  'assets/cleansilvbut.png',
-                  width: 170,
-                  height: 130,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          // GIF on the right side of the screen (shows when clicked)
-          if (_showGif)
-            Align(
-              alignment: const Alignment(0.83, -0.3),
-              // Aligns to the right center
-              child: Padding(
-                padding: const EdgeInsets.only(right: 20.0), // Add some padding
-                child: Image.asset(
-                  'assets/rollingball.gif', // Path to your GIF
-                  width: 630, // Adjust the width as needed
-                  height: 650, // Adjust the height as needed
-                  fit: BoxFit.cover,
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 90, left: 250), // Adjust the padding values as needed
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: GestureDetector(
+                  onTap: _fadeOutAndNavigate,
+                  child: Image.asset(
+                    'assets/cleansilvbut.png',
+                    width: 170,
+                    height: 130,
+                  ),
                 ),
               ),
             ),
