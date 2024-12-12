@@ -5,6 +5,7 @@ import 'api/api_login.dart';
 import 'admin_page.dart';
 import 'api/api_service.dart';
 import 'location/location_service.dart'; // Import AdminPage
+import 'home_screen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -125,7 +126,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           await Future.delayed(const Duration(seconds: 1));
 
           if (response == "employee") {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  firstName: apiLogin.firstName,
+                  lastName: apiLogin.lastName,
+                ),
+              ),
+            );
           } else if (response == "admin") {
             Navigator.pushReplacement(
               context,

@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       routes: {
         //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => HomeScreen(),
         '/admin': (context) => const AdminPage(),
       },
     );
