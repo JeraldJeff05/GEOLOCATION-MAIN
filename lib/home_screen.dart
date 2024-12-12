@@ -6,7 +6,7 @@ import 'features/calendar_section.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'features/MoodTracker.dart'; // Adjust the path as necessary
+import 'features/MoodTracker.dart';
 import 'features/kanbanImage.dart';
 import 'features/Quotes.dart';
 
@@ -543,6 +543,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -556,59 +557,76 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SizedBox(
           height: 400, // minimum height
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Flexible(
-                child: SizedBox(
-                  width: 350, // maximum width
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: 300, // minimum width
-                      minHeight: 300, // minimum height
-                      maxWidth: 600, // maximum width
-                      maxHeight: 600, // maximum height
+              Expanded(
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: SizedBox(
+                        width: 350, // maximum width
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: 300, // minimum width
+                            minHeight: 300, // minimum height
+                            maxWidth: 600, // maximum width
+                            maxHeight: 600, // maximum height
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 1, // Set a 1:1 aspect ratio
+                            child: buildKanbanColumn('Task Progress', tasksProgress),
+                          ),
+                        ),
+                      ),
                     ),
-                    child: AspectRatio(
-                      aspectRatio: 1, // Set a 1:1 aspect ratio
-                      child: buildKanbanColumn('Task Progress', tasksProgress),
-                    ),
-                  ),
+                  ],
                 ),
               ),
               const SizedBox(width: 8),
-              Flexible(
-                child: SizedBox(
-                  width: 350, // maximum width
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: 300, // minimum width
-                      minHeight: 300, // minimum height
-                      maxWidth: 600, // maximum width
-                      maxHeight: 600, // maximum height
+              Expanded(
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: SizedBox(
+                        width: 350, // maximum width
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: 300, // minimum width
+                            minHeight: 300, // minimum height
+                            maxWidth: 600, // maximum width
+                            maxHeight: 600, // maximum height
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 1, // Set a 1:1 aspect ratio
+                            child: buildKanbanColumn('Quotes', []), // No tasks needed
+                          ),
+                        ),
+                      ),
                     ),
-                    child: AspectRatio(
-                      aspectRatio: 1, // Set a 1:1 aspect ratio
-                      child: buildKanbanColumn('Quotes', []), // No tasks needed
-                    ),
-                  ),
+                  ],
                 ),
               ),
               const SizedBox(width: 8),
-              Flexible(
-                child: SizedBox(
-                  width: 350, // maximum width
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: 300, // minimum width
-                      minHeight: 300, // minimum height
-                      maxWidth: 600, // maximum width
-                      maxHeight: 600, // maximum height
+              Expanded(
+                child: Column(
+                  children: [
+                    Flexible(
+                      child: SizedBox(
+                        width: 350, // maximum width
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: 300, // minimum width
+                            minHeight: 300, // minimum height
+                            maxWidth: 600, // maximum width
+                            maxHeight: 600, // maximum height
+                          ),
+                          child: AspectRatio(
+                            aspectRatio: 1, // Set a 1:1 aspect ratio
+                            child: buildKanbanColumn('Mood', mood),
+                          ),
+                        ),
+                      ),
                     ),
-                    child: AspectRatio(
-                      aspectRatio: 1, // Set a 1:1 aspect ratio
-                      child: buildKanbanColumn('Mood', mood),
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
