@@ -630,8 +630,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Card(
             elevation: 4,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
@@ -651,18 +650,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       Expanded(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            minWidth:
-                                150, // Set a minimum width for the calendar
-                            maxWidth:
-                                300, // Set a maximum width for the calendar
-                            minHeight:
-                                150, // Set a minimum height for the calendar
-                            maxHeight:
-                                250, // Set a maximum height for the calendar
+                            minWidth: 150, // Set a minimum width for the calendar
+                            maxWidth: 300, // Set a maximum width for the calendar
+                            minHeight: 150, // Set a minimum height for the calendar
+                            maxHeight: 250, // Set a maximum height for the calendar
                           ),
                           child: Container(
-                            height:
-                                screenHeight * 0.5, // Dynamically adjust height
+                            height: screenHeight * 0.5, // Dynamically adjust height
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -692,12 +686,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                           color: Colors.white, fontSize: 15),
                                       leftChevronIcon: const Icon(
                                           Icons.chevron_left,
-                                          color: Colors.white,
-                                          size: 17),
+                                          color: Colors.white, size: 17),
                                       rightChevronIcon: const Icon(
                                           Icons.chevron_right,
-                                          color: Colors.white,
-                                          size: 17),
+                                          color: Colors.white, size: 17),
                                     ),
                                     daysOfWeekStyle: const DaysOfWeekStyle(
                                       weekdayStyle: TextStyle(
@@ -714,48 +706,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 20),
                       Flexible(
-<<<<<<< HEAD
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          height: MediaQuery.of(context).size.height * 0.5,
-                          child: Card(
-                            elevation: 4,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: const BoxDecoration(
-                                color: Color(0xff28658a),
-                              ),
-                              child: Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              ImageDetailPage(),
-=======
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            minWidth:
-                                150, // Set a minimum width for the Kanban box
-                            maxWidth:
-                                300, // Set a maximum width for the Kanban box
-                            minHeight:
-                                150, // Set a minimum height for the Kanban box
-                            maxHeight:
-                                250, // Set a maximum height for the Kanban box
+                            minWidth: 150, // Set a minimum width for the Kanban box
+                            maxWidth: 300, // Set a maximum width for the Kanban box
+                            minHeight: 150, // Set a minimum height for the Kanban box
+                            maxHeight: 250, // Set a maximum height for the Kanban box
                           ),
                           child: Container(
-                            width:
-                                screenWidth * 0.6, // Dynamically adjust width
-                            height: screenHeight *
-                                0.5, // Match calendar height dynamically
+                            width: screenWidth * 0.6, // Dynamically adjust width
+                            height: screenHeight * 0.5, // Match calendar height dynamically
                             child: Card(
                               elevation: 4,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: const BoxDecoration(
@@ -767,8 +730,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       onTap: () {
                                         Navigator.of(context).push(
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                KanbanImageDetailPage(),
+                                            builder: (context) => KanbanImageDetailPage(),
                                           ),
                                         );
                                       },
@@ -776,31 +738,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                         tag: 'kanban_image',
                                         child: Image.asset(
                                           'assets/kanbanpic.jpg',
-                                          width: screenWidth *
-                                              0.55, // Adjust based on screen width
-                                          height: screenHeight *
-                                              0.45, // Slightly increase height
-                                          fit: BoxFit
-                                              .cover, // Ensure image fits the container
->>>>>>> af72954 (separations)
+                                          width: screenWidth * 0.55, // Adjust based on screen width
+                                          height: screenHeight * 0.45, // Slightly increase height
+                                          fit: BoxFit.cover, // Ensure image fits the container
                                         ),
-                                      );
-                                    },
-                                    child: Hero(
-                                      tag: 'kanban_image',
-                                      child: Image.asset(
-                                        'assets/kanbanpic.jpg',
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.55,
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.45,
-                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
