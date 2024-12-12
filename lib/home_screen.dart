@@ -6,10 +6,9 @@ import 'features/calendar_section.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'features/archive_page.dart';
-import 'dart:async';
-import 'package:flutter/material.dart';
+import 'features/MoodTracker.dart'; // Adjust the path as necessary
+import 'features/kanbanImage.dart';
+import 'features/Quotes.dart';
 
 class ChartData {
   final String task;
@@ -23,214 +22,6 @@ class ChartData {
     return ChartData(task, value, date); // Use the provided date
   }
 }
-
-class ImageDetailPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: GestureDetector(
-        onTap: () {
-          // Close the hero transition by popping the current page
-          Navigator.of(context).pop();
-        },
-        child: Center(
-          child: Hero(
-            tag: 'kanban_image', // Same tag as in the first page
-            child: Image.asset(
-              'assets/kanbanpic.jpg', // Make sure this image exists in your assets folder
-              fit: BoxFit.contain, // Adjust the fit for the larger view
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class MoodTracker extends StatefulWidget {
-  @override
-  _MoodTrackerState createState() => _MoodTrackerState();
-}
-
-class _MoodTrackerState extends State<MoodTracker> {
-  final List<String> moods = ["😄", "😐", "😞"]; // Emojis representing moods
-  String? selectedMood;
-  List<String> moodHistory = [];
-  String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-  String interpretationMessage = ""; // Message for mood interpretation
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMoodHistory();
-  }
-
-  // Load mood history from shared preferences
-  Future<void> _loadMoodHistory() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      moodHistory = prefs.getStringList(currentDate) ?? [];
-      _updateInterpretationMessage();
-    });
-  }
-
-  // Save the selected mood to shared preferences
-  Future<void> _saveMood(String mood) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Limit mood history to 5 items for the current day
-    if (moodHistory.length < 5) {
-      setState(() {
-        moodHistory.add(mood); // Add the new mood
-        _updateInterpretationMessage(); // Update the message
-      });
-      await prefs.setStringList(currentDate, moodHistory);
-    }
-  }
-
-  // Update the interpretation message based on mood history
-  void _updateInterpretationMessage() {
-    if (moodHistory.length == 5) {
-      int happyCount = moodHistory.where((mood) => mood == "😄").length;
-      int neutralCount = moodHistory.where((mood) => mood == "😐").length;
-      int sadCount = moodHistory.where((mood) => mood == "😞").length;
-
-      if (happyCount > neutralCount && happyCount > sadCount) {
-        interpretationMessage = "You're having a cheerful day! 🌟";
-      } else if (sadCount > happyCount && sadCount > neutralCount) {
-        interpretationMessage = "It's been a tough day. Take some rest. 🛌";
-      } else if (neutralCount > happyCount && neutralCount > sadCount) {
-        interpretationMessage = "You're feeling neutral today. Keep going! ⚖️";
-      } else if (happyCount == 0 && sadCount == 0) {
-        interpretationMessage =
-            "You're in a calm and balanced state. Well done! ✨";
-      } else if (happyCount == 1 && sadCount == 4) {
-        interpretationMessage =
-            "It seems like you're having a tough time today. Hang in there! 💪";
-      } else if (neutralCount == 2 && happyCount == 2 && sadCount == 1) {
-        interpretationMessage =
-            "Your mood is all over the place today. Take it one step at a time. 🛤️";
-      } else if (happyCount == 5) {
-        interpretationMessage = "You're on cloud nine! What a joyful day! ☁️💖";
-      } else if (sadCount == 5) {
-        interpretationMessage =
-            "Today might feel like a challenge. Reach out if you need support. 🤗";
-      } else if (neutralCount == 5) {
-        interpretationMessage =
-            "A steady day, neither good nor bad. It's okay to feel this way. ⚖️";
-      } else if (happyCount == 4 && sadCount == 1) {
-        interpretationMessage =
-            "You're mostly in a good mood today! Keep that positivity flowing. ✨";
-      } else if (sadCount == 4 && neutralCount == 1) {
-        interpretationMessage =
-            "It seems like you're struggling, but there's a spark of hope today. 🌱";
-      } else if (neutralCount == 3 && happyCount == 2) {
-        interpretationMessage =
-            "You're mostly calm, but you're also feeling a bit positive. Great balance! ⚖️";
-      } else if (happyCount == 3 && sadCount == 2) {
-        interpretationMessage =
-            "A mix of happiness and some difficulties. You're handling it well. 🌟";
-      } else if (sadCount == 3 && neutralCount == 2) {
-        interpretationMessage =
-            "It looks like you're having a rough time, but don't forget to take breaks! 🧘‍♀️";
-      } else if (happyCount == 2 && sadCount == 3) {
-        interpretationMessage =
-            "Not every day is easy, but you're finding moments of joy! 🌻";
-      } else {
-        interpretationMessage =
-            "Your day is a mix of emotions. Balance is key! 💡";
-      }
-    } else {
-      interpretationMessage = "";
-    }
-  }
-
-  // Handle mood selection
-  void _onMoodSelected(String mood) {
-    if (moodHistory.length < 5) {
-      setState(() {
-        selectedMood = mood;
-      });
-      _saveMood(mood);
-    } else {
-      // Show a message if the limit is reached
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("You have reached the limit of 5 moods for today."),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text(
-              "How do you feel today?",
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: moods.map((mood) {
-                return GestureDetector(
-                  onTap: () => _onMoodSelected(mood),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      mood,
-                      style: const TextStyle(fontSize: 48, color: Colors.white),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 10),
-            if (selectedMood != null)
-              Text(
-                "You selected: $selectedMood",
-                style: TextStyle(fontSize: 20, color: Colors.white),
-              ),
-            const SizedBox(height: 10),
-            Text(
-              "Mood History:",
-              style: TextStyle(fontSize: 15, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: moodHistory.map((mood) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Text(
-                    mood,
-                    style: const TextStyle(fontSize: 24, color: Colors.white),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            if (interpretationMessage.isNotEmpty)
-              Text(
-                interpretationMessage,
-                style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontStyle: FontStyle.italic),
-                textAlign: TextAlign.center,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -250,6 +41,12 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showAttendanceDialog();
     });
+  }
+  void main() {
+    int currentDay = DateTime.now().day;
+    Quote dailyQuote = Quotes.quotes[currentDay % Quotes.quotes.length];
+    print(dailyQuote.text);
+    print(dailyQuote.author);
   }
 
   void _showAttendanceDialog() {
@@ -574,13 +371,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildKanbanBoard() {
     // Clear the task lists
     List<String> tasksProgress = []; // Empty list for Task Progress
-    List<String> quotes = []; // Empty list for Quotes
     List<String> mood = []; // Empty list for Mood
 
     // Get the count of unfinished and finished tasks for the selected day
     int unfinishedCount = _tasks[_selectedDay]
-            ?.where((task) => task['completed'] == false)
-            .length ??
+        ?.where((task) => task['completed'] == false)
+        .length ??
         0;
     int finishedCount = _finishedTasks[_selectedDay]?.length ?? 0;
 
@@ -607,69 +403,34 @@ class _HomeScreenState extends State<HomeScreen> {
         _tasks[_selectedDay]?.map((task) => task['text'] as String).toList() ??
             [];
 
-    // List of quotes
-    List<String> quotesList = [
-      "The only way to do great work is to love what you do. - Steve Jobs",
-      "Success is not the key to happiness. Happiness is the key to success. - Albert Schweitzer",
-      "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
-      "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
-      "You are never too old to set another goal or to dream a new dream. - C.S. Lewis",
-      "Act as if what you do makes a difference. It does. - William James",
-      "Success usually comes to those who are too busy to be looking for it. - Henry David Thoreau",
-      "Opportunities don't happen. You create them. - Chris Grosser",
-      "I find that the harder I work, the more luck I seem to have. - Thomas Jefferson",
-      "The only limit to our realization of tomorrow will be our doubts of today. - Franklin D. Roosevelt",
-      "Believe you can and you're halfway there. - Theodore Roosevelt",
-      "It does not matter how slowly you go as long as you do not stop. - Confucius",
-      "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
-      "Do what you can with all you have, wherever you are. - Theodore Roosevelt",
-      "The best way to predict your future is to create it. - Abraham Lincoln",
-      "Don't be pushed around by the fears in your mind. Be led by the dreams in your heart. - Roy T. Bennett",
-      "Keep your face always toward the sunshine—and shadows will fall behind you. - Walt Whitman",
-      "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
-      "If you want to lift yourself up, lift up someone else. - Booker T. Washington",
-      "The secret of getting ahead is getting started. - Mark Twain",
-      "Dream big and dare to fail. - Norman Vaughan",
-      "You are braver than you believe, stronger than you seem, and smarter than you think. - A.A. Milne",
-      "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty. - Winston Churchill",
-      "You miss 100% of the shots you don’t take. - Wayne Gretzky",
-      "Happiness is not something ready-made. It comes from your own actions. - Dalai Lama",
-      "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
-      "Don't let yesterday take up too much of today. - Will Rogers",
-      "Your time is limited, so don’t waste it living someone else’s life. - Steve Jobs",
-      "Do one thing every day that scares you. - Eleanor Roosevelt",
-      "Strive not to be a success, but rather to be of value. - Albert Einstein"
-    ];
-
     // Get the current date and use it to select a quote
     int currentDay = DateTime.now().day;
-    String dailyQuote = quotesList[
-        currentDay % quotesList.length]; // Select a quote based on the day
+    String dailyQuote = Quotes.quotes[currentDay % Quotes.quotes.length].text;
 
     Widget buildChart() {
       return SfCartesianChart(
         title: ChartTitle(
           text: 'Task Distribution',
           textStyle:
-              TextStyle(color: Colors.white), // Set title text color to white
+          TextStyle(color: Colors.white), // Set title text color to white
         ),
         primaryXAxis: CategoryAxis(
           labelStyle:
-              TextStyle(color: Colors.white), // Set X-axis label color to white
+          TextStyle(color: Colors.white), // Set X-axis label color to white
           title: AxisTitle(
               text: 'Task Status',
               textStyle:
-                  TextStyle(color: Colors.white)), // Add label for X-axis
+              TextStyle(color: Colors.white)), // Add label for X-axis
         ),
         primaryYAxis: NumericAxis(
           labelStyle:
-              TextStyle(color: Colors.white), // Set Y-axis label color to white
+          TextStyle(color: Colors.white), // Set Y-axis label color to white
         ),
         series: <CartesianSeries>[
           ColumnSeries<ChartData, String>(
             dataSource: chartData,
             xValueMapper: (ChartData data, _) =>
-                data.task, // Show 'Finished' and 'Unfinished' as categories
+            data.task, // Show 'Finished' and 'Unfinished' as categories
             yValueMapper: (ChartData data, _) => data.value,
             color: Colors.blue, // Optional: Set the color of the columns
           )
@@ -722,17 +483,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             height: screenHeight < 800 ? 200 : 250,
                             alignment: Alignment.center,
-                            child: Text(
-                              dailyQuote,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontStyle: FontStyle.italic,
-                                fontSize: screenWidth < 600 ? 14 : 16,
-                              ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  dailyQuote,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: screenWidth < 600 ? 14 : 16,
+                                  ),
+                                ),
+                                Text(
+                                  '- ${Quotes.quotes[currentDay % Quotes.quotes.length].author}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: screenWidth < 600 ? 12 : 14,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
+
                       if (title ==
                           'Mood') // Add Mood Tracker in Finished column
                         Container(
@@ -746,16 +521,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 10),
                         ...tasks
                             .map((task) => Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
-                                  child: Text(
-                                    task,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: screenWidth < 600 ? 14 : 16,
-                                    ),
-                                  ),
-                                ))
+                          padding:
+                          const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            task,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screenWidth < 600 ? 14 : 16,
+                            ),
+                          ),
+                        ))
                             .toList(),
                       ],
                     ],
@@ -813,7 +588,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: AspectRatio(
                       aspectRatio: 1, // Set a 1:1 aspect ratio
-                      child: buildKanbanColumn('Quotes', quotes),
+                      child: buildKanbanColumn('Quotes', []), // No tasks needed
                     ),
                   ),
                 ),
@@ -939,6 +714,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(width: 20),
                       Flexible(
+<<<<<<< HEAD
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.6,
                           height: MediaQuery.of(context).size.height * 0.5,
@@ -959,6 +735,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               ImageDetailPage(),
+=======
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth:
+                                150, // Set a minimum width for the Kanban box
+                            maxWidth:
+                                300, // Set a maximum width for the Kanban box
+                            minHeight:
+                                150, // Set a minimum height for the Kanban box
+                            maxHeight:
+                                250, // Set a maximum height for the Kanban box
+                          ),
+                          child: Container(
+                            width:
+                                screenWidth * 0.6, // Dynamically adjust width
+                            height: screenHeight *
+                                0.5, // Match calendar height dynamically
+                            child: Card(
+                              elevation: 4,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xff28658a),
+                                ),
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                KanbanImageDetailPage(),
+                                          ),
+                                        );
+                                      },
+                                      child: Hero(
+                                        tag: 'kanban_image',
+                                        child: Image.asset(
+                                          'assets/kanbanpic.jpg',
+                                          width: screenWidth *
+                                              0.55, // Adjust based on screen width
+                                          height: screenHeight *
+                                              0.45, // Slightly increase height
+                                          fit: BoxFit
+                                              .cover, // Ensure image fits the container
+>>>>>>> af72954 (separations)
                                         ),
                                       );
                                     },
