@@ -265,13 +265,13 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: isDisabled
           ? null
           : () {
-              if (isLogout) {
-                _showLogoutConfirmationDialog(); // Show logout confirmation dialog
-              } else if (destination != null) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => destination));
-              }
-            },
+        if (isLogout) {
+          _showLogoutConfirmationDialog(); // Show logout confirmation dialog
+        } else if (destination != null) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => destination));
+        }
+      },
     );
   }
 
@@ -291,8 +291,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () {
-                // Handle the logout logic here
-                _logout();
+                _logout(); // Call the logout method
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text("Log Out"),
@@ -302,11 +301,8 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
   void _logout() {
-    // Perform logout operations, such as clearing user data or navigating to the login screen
-    Navigator.of(context)
-        .pushReplacementNamed('/'); // Navigate to the login screen
+    Navigator.of(context).pushReplacementNamed('/');
   }
 
   Widget _buildProfileInfo() {
@@ -566,16 +562,16 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Flexible(
                 child: SizedBox(
-                  width: 350, // maximum width
+                  width: 350, // Set maximum width
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      minWidth: 300, // minimum width
-                      minHeight: 300, // minimum height
-                      maxWidth: 600, // maximum width
-                      maxHeight: 600, // maximum height
+                      minWidth: 300, // Minimum width
+                      minHeight: 300, // Minimum height
+                      maxWidth: 600, // Maximum width
+                      maxHeight: 600, // Maximum height
                     ),
                     child: AspectRatio(
-                      aspectRatio: 1, // Set a 1:1 aspect ratio
+                      aspectRatio: 1, // Maintain a 1:1 aspect ratio
                       child: buildKanbanColumn('Task Progress', tasksProgress),
                     ),
                   ),
@@ -628,16 +624,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return SingleChildScrollView(
+    return Flexible(
       child: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: 1200, // Limit the maximum width for the entire layout
+            maxWidth: 1300, // Limit the maximum width for the entire layout
           ),
           child: Card(
             elevation: 4,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
@@ -645,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   colors: [
                     Color(0xFF000814),
                     Color(0xFF001d3d),
-                    Color(0xFF003566)
+                    Color(0xFF003566),
                   ],
                 ),
               ),
@@ -654,62 +651,76 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
+                      Flexible(
+                        flex: 1,
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            minWidth:
-                                150, // Set a minimum width for the calendar
-                            maxWidth:
-                                300, // Set a maximum width for the calendar
-                            minHeight:
-                                150, // Set a minimum height for the calendar
-                            maxHeight:
-                                250, // Set a maximum height for the calendar
+                            minWidth: 300,
+                            maxWidth: 700,
+                            minHeight: 300,
+                            maxHeight: 350,
                           ),
-                          child: Container(
-                            height:
-                                screenHeight * 0.5, // Dynamically adjust height
+                          child: SizedBox(
+                            height: screenHeight * 0.5, // Dynamically adjust height
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 2),
                                 Expanded(
-                                  child: TableCalendar(
-                                    firstDay: DateTime.utc(2020, 1, 1),
-                                    lastDay: DateTime.utc(2030, 12, 31),
-                                    focusedDay: DateTime.now(),
-                                    calendarStyle: CalendarStyle(
-                                      todayDecoration: BoxDecoration(
+                                  child: SingleChildScrollView(
+                                    child: TableCalendar(
+                                      firstDay: DateTime.utc(2020, 1, 1),
+                                      lastDay: DateTime.utc(2030, 12, 31),
+                                      focusedDay: DateTime.now(),
+                                      calendarStyle: CalendarStyle(
+                                        todayDecoration: BoxDecoration(
                                           color: Colors.green,
-                                          shape: BoxShape.circle),
-                                      selectedDecoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                        ),
+                                        selectedDecoration: BoxDecoration(
                                           color: Colors.blue,
-                                          shape: BoxShape.circle),
-                                      defaultTextStyle: const TextStyle(
-                                          color: Colors.white, fontSize: 13),
-                                      weekendTextStyle: const TextStyle(
-                                          color: Colors.white, fontSize: 13),
-                                      outsideTextStyle: const TextStyle(
-                                          color: Colors.grey, fontSize: 11),
-                                    ),
-                                    headerStyle: HeaderStyle(
-                                      formatButtonVisible: false,
-                                      titleTextStyle: const TextStyle(
-                                          color: Colors.white, fontSize: 15),
-                                      leftChevronIcon: const Icon(
+                                          shape: BoxShape.circle,
+                                        ),
+                                        defaultTextStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                        ),
+                                        weekendTextStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                        ),
+                                        outsideTextStyle: const TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      headerStyle: HeaderStyle(
+                                        formatButtonVisible: false,
+                                        titleTextStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                        ),
+                                        leftChevronIcon: const Icon(
                                           Icons.chevron_left,
                                           color: Colors.white,
-                                          size: 17),
-                                      rightChevronIcon: const Icon(
+                                          size: 17,
+                                        ),
+                                        rightChevronIcon: const Icon(
                                           Icons.chevron_right,
                                           color: Colors.white,
-                                          size: 17),
-                                    ),
-                                    daysOfWeekStyle: const DaysOfWeekStyle(
-                                      weekdayStyle: TextStyle(
-                                          color: Colors.white, fontSize: 11),
-                                      weekendStyle: TextStyle(
-                                          color: Colors.white, fontSize: 11),
+                                          size: 17,
+                                        ),
+                                      ),
+                                      daysOfWeekStyle: const DaysOfWeekStyle(
+                                        weekdayStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                        weekendStyle: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -718,28 +729,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 40),
                       Flexible(
+                        flex: 1,
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            minWidth:
-                                150, // Set a minimum width for the Kanban box
-                            maxWidth:
-                                300, // Set a maximum width for the Kanban box
-                            minHeight:
-                                150, // Set a minimum height for the Kanban box
-                            maxHeight:
-                                250, // Set a maximum height for the Kanban box
+                            minWidth: 400,
+                            maxWidth: 530,
+                            minHeight: 300,
+                            maxHeight: 350,
                           ),
-                          child: Container(
-                            width:
-                                screenWidth * 0.6, // Dynamically adjust width
-                            height: screenHeight *
-                                0.5, // Match calendar height dynamically
+                          child: SizedBox(
+                            width: screenWidth * 0.6,
+                            height: screenHeight * 0.5,
                             child: Card(
                               elevation: 4,
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: const BoxDecoration(
@@ -760,12 +767,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         tag: 'kanban_image',
                                         child: Image.asset(
                                           'assets/kanbanpic.jpg',
-                                          width: screenWidth *
-                                              0.55, // Adjust based on screen width
-                                          height: screenHeight *
-                                              0.45, // Slightly increase height
-                                          fit: BoxFit
-                                              .cover, // Ensure image fits the container
+                                          width: screenWidth * 0.85,
+                                          height: screenHeight * 0.38,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
                                     ),

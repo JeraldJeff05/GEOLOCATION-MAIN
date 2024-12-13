@@ -100,6 +100,14 @@ flutter:
     - assets/realBACKGROUND.png
     - assets/LoginNoLogoBg.png
     - assets/FLlogo.png
+    - assets/bluebg.jpg
+    - assets/geo1.png
+    - assets/geo2.png
+    - assets/geo3.png
+    - assets/Geofenz.mp4
+    - assets/kanbanpic.jpg
+    - assets/LBSvid.mp4
+    - assets/RTLTvid.mp4
   
   fonts:  
     - family: CustomFont
