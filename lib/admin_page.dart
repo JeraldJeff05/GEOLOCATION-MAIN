@@ -192,9 +192,9 @@ class _AdminPageState extends State<AdminPage>
       body: LayoutBuilder(
         builder: (context, constraints) {
           bool isMobile =
-              constraints.maxWidth < 1100 || constraints.maxHeight < 700;
+              constraints.maxWidth < 1260 || constraints.maxHeight < 700;
           bool isTablet =
-              (constraints.maxWidth >= 1100 && constraints.maxWidth < 1100) ||
+              (constraints.maxWidth >= 1100 && constraints.maxWidth < 1260) ||
                   (constraints.maxHeight >= 700 && constraints.maxHeight < 400);
 
           if (isMobile) {
@@ -218,10 +218,10 @@ class _AdminPageState extends State<AdminPage>
                       effects: [
                         FadeEffect(duration: 500.ms),
                         ScaleEffect(
-                          begin: const Offset(0.7,
-                              0.7), // Use Offset(0.7, 0.7) for the initial scale
-                          end: const Offset(1.0,
-                              1.0), // Use Offset(1.0, 1.0) for the final scale
+                          begin: const Offset(0.7, 0.7),
+                          // Use Offset(0.7, 0.7) for the initial scale
+                          end: const Offset(1.0, 1.0),
+                          // Use Offset(1.0, 1.0) for the final scale
                           duration: 500.ms,
                         ),
                       ],
@@ -296,6 +296,24 @@ class _AdminPageState extends State<AdminPage>
                       Expanded(
                         flex: 3,
                         child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.black87,
+                                Colors.blueGrey.shade900,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.blueAccent.withOpacity(0.3),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
                           margin: const EdgeInsets.only(right: 16),
                           child: _buildAdminFeatures(),
                         ),
@@ -402,11 +420,21 @@ class _AdminPageState extends State<AdminPage>
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
             Colors.black87,
-            Colors.black54,
+            Colors.blueGrey.shade900,
           ],
         ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueAccent.withOpacity(0.3),
+            blurRadius: 15,
+            spreadRadius: 2,
+          ),
+        ],
       ),
       child: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
@@ -501,38 +529,59 @@ class _AdminPageState extends State<AdminPage>
   Widget _buildNavigationDrawer() {
     return Drawer(
       backgroundColor: Colors.black,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            child: Center(
-              child: Text(
-                '${widget.firstName} ${widget.lastName}',
-                style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.black87,
+              Colors.blueGrey.shade900,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueAccent.withOpacity(0.3),
+              blurRadius: 15,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Center(
+                child: Text(
+                  '${widget.firstName} ${widget.lastName}',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+              decoration: const BoxDecoration(
+                color: Colors.black,
+              ),
             ),
-            decoration: BoxDecoration(
-              color: Colors.black,
+            ListTile(
+              leading: const Icon(Icons.info_outline, color: Colors.white),
+              title: const Text('info', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                NamesList();
+              },
             ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.info_outline, color: Colors.white),
-            title: const Text('info', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              NamesList();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.exit_to_app, color: Colors.white),
-            title: const Text('Logout', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-        ],
+            ListTile(
+              leading: const Icon(Icons.exit_to_app, color: Colors.white),
+              title:
+                  const Text('Logout', style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/');
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

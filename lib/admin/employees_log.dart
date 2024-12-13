@@ -2,39 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() => runApp(MyApp());
+void main() => runApp(const EmployeeApp());
 
-class MyApp extends StatelessWidget {
+class EmployeeApp extends StatelessWidget {
+  const EmployeeApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'API Table',
+      title: 'Employee Insights',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.black54,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+        cardTheme: CardTheme(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
-      home: EmployeesLogWidget(),
+      home: const EmployeesLogWidget(),
     );
   }
 }
 
 class EmployeesLogWidget extends StatefulWidget {
+  const EmployeesLogWidget({Key? key}) : super(key: key);
+
   @override
   _EmployeesLogWidgetState createState() => _EmployeesLogWidgetState();
 }
 
 class _EmployeesLogWidgetState extends State<EmployeesLogWidget> {
   List<Map<String, String>> employees = [];
+  bool _isLoading = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    fetchEmployeeData();
+    _fetchEmployeeData();
   }
 
-  // Function to fetch employee data from the API
-  Future fetchEmployeeData() async {
+  Future<void> _fetchEmployeeData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
     final url =
         'https://1lp44l1f-8080.asse.devtunnels.ms/employee/info?keyword=strawberry+shortcake';
 
@@ -64,11 +82,16 @@ class _EmployeesLogWidgetState extends State<EmployeesLogWidget> {
 
         setState(() {
           employees = parsedEmployees;
+          _isLoading = false;
         });
       } else {
         throw Exception('Failed to load data');
       }
     } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load employee data';
+        _isLoading = false;
+      });
       print('Error: $e');
     }
   }
@@ -77,80 +100,94 @@ class _EmployeesLogWidgetState extends State<EmployeesLogWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employee Table'),
+        title: const Text(
+          'Employees Logs',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: fetchEmployeeData,
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchEmployeeData,
             tooltip: 'Refresh Data',
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Container(
-            width: MediaQuery.of(context).size.width *
-                0.9, // 90% of the screen width
-            height: MediaQuery.of(context).size.height *
-                0.5, // 50% of the screen height
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 8.0,
-                  spreadRadius: 1.0,
-                ),
-              ],
-            ),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
                   child: Text(
-                    'Employee Information',
+                    'Database',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                Expanded(
-                  child: employees.isEmpty
-                      ? Center(child: CircularProgressIndicator())
-                      : SingleChildScrollView(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columnSpacing: 12,
-                              columns: [
-                                DataColumn(label: Text('ID                  ')),
-                                DataColumn(
-                                    label: Text(
-                                        'First Name                                    ')),
-                                DataColumn(
-                                    label: Text(
-                                        'Last Name                                    ')),
-                                DataColumn(
-                                    label: Text(
-                                        'Role                                    ')),
-                              ],
-                              rows: employees
-                                  .map((employee) => DataRow(cells: [
-                                        DataCell(Text(employee['ID']!)),
-                                        DataCell(Text(employee['FirstName']!)),
-                                        DataCell(Text(employee['LastName']!)),
-                                        DataCell(Text(employee['Role']!)),
-                                      ]))
-                                  .toList(),
-                            ),
+                if (_isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (_errorMessage.isNotEmpty)
+                  Center(
+                    child: Text(
+                      _errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                          headingRowColor: MaterialStateColor.resolveWith(
+                            (states) => Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.1),
                           ),
+                          columns: const [
+                            DataColumn(
+                                label: Text(
+                                    'ID                                         ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold))),
+                            DataColumn(
+                                label: Text(
+                                    'First Name                                   ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold))),
+                            DataColumn(
+                                label: Text(
+                                    'Last Name                           ',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold))),
+                            DataColumn(
+                                label: Text('Role',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold))),
+                          ],
+                          rows: employees
+                              .map((employee) => DataRow(
+                                    cells: [
+                                      DataCell(Text(employee['ID']!)),
+                                      DataCell(Text(employee['FirstName']!)),
+                                      DataCell(Text(employee['LastName']!)),
+                                      DataCell(Text(employee['Role']!)),
+                                    ],
+                                  ))
+                              .toList(),
                         ),
-                ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

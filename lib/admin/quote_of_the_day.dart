@@ -8,13 +8,12 @@ class QuoteOfTheDay extends StatelessWidget {
   Widget build(BuildContext context) {
     // List of quotes
     final List<String> quotes = [
-      "The best way to get started is to quit talking and begin doing.  ",
-      "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty.",
-      "Don't let yesterday take up too much of today.",
-      "You learn more from failure than from success. Don't let it stop you. Failure builds character.",
-      "It's not whether you get knocked down, it's whether you get up.",
-      "If you are working on something that you really care about, you don't have to be pushed. The vision pulls you.",
-      "Time is Gold, When watching bold",
+      "Accept the things to which fate binds you, and love the people with whom fate brings you together,but do so with all your heart.                                     ",
+      "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty.                                                               ",
+      "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it; and this you have the power to revoke at any moment.",
+      "You learn more from failure than from success. Don't let it stop you. Failure builds character.                                                                      ",
+      "Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth.                                                                     ",
+      "If you are working on something that you really care about, you don't have to be pushed. The vision pulls you.                                                       ",
     ];
 
     // Randomly select a quote
