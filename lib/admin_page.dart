@@ -567,9 +567,12 @@ class _AdminPageState extends State<AdminPage>
             ),
             ListTile(
               leading: const Icon(Icons.info_outline, color: Colors.white),
-              title: const Text('info', style: TextStyle(color: Colors.white)),
+              title: const Text('Info', style: TextStyle(color: Colors.white)),
               onTap: () {
-                NamesList();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NamesList()),
+                );
               },
             ),
             ListTile(

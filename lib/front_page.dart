@@ -258,7 +258,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildLoginForm(BoxConstraints constraints) {
-    final containerWidth = constraints.maxWidth > 600
+    final containerWidth = constraints.maxWidth > 400
         ? constraints.maxWidth * 0.4
         : constraints.maxWidth * 0.9;
 

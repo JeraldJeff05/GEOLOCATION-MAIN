@@ -114,10 +114,9 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         // Determine layout based on screen width
-        bool isWideScreen = constraints.maxWidth > 1200;
+        bool isWideScreen = constraints.maxWidth > 1400;
         bool isMediumScreen =
-            constraints.maxWidth > 800 && constraints.maxWidth <= 1200 ||
-                constraints.maxHeight > 400;
+            constraints.maxWidth > 800 && constraints.maxWidth <= 1500;
 
         return Scaffold(
           appBar: AppBar(
@@ -146,7 +145,7 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
         Container(
           width: 350,
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: Colors.black,
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
@@ -164,7 +163,7 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 20),
@@ -178,8 +177,8 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
                       icon: Icon(Icons.send),
                       label: Text('Submit Data'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black87,
-                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
                         padding: EdgeInsets.symmetric(vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),

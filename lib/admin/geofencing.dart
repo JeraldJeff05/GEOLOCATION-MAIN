@@ -23,9 +23,9 @@ class ApiService {
 
       if (response.statusCode == 200) {
         if (response.body.trim().toLowerCase() == 'true') {
-          return "Location is allowed";
+          return "Location is within the geofence";
         } else if (response.body.trim().toLowerCase() == 'false') {
-          return "Location not allowed";
+          return "Location is outside the geofence";
         } else {
           return "Unexpected response: ${response.body}";
         }
@@ -229,7 +229,7 @@ class _GeofencingWidgetState extends State<GeofencingWidget> {
                     ? "Waiting for response..."
                     : _responseMessage,
                 style: TextStyle(
-                  color: _responseMessage.contains("allowed")
+                  color: _responseMessage.contains("within")
                       ? Colors.green
                       : Colors.red,
                   fontSize: 16,

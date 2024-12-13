@@ -25,9 +25,9 @@ class _ClockWidgetState extends State<ClockWidget>
     super.initState();
     // Initialize animation controller
     _animationController = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 5),
       vsync: this,
-    )..repeat(reverse: true);
+    );
 
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
@@ -52,8 +52,14 @@ class _ClockWidgetState extends State<ClockWidget>
 
   @override
   void dispose() {
+    // Cancel the timer if it's active
     _timer?.cancel();
+
+    // Stop the animation controller
+
+    // Dispose of the animation controller
     _animationController.dispose();
+    _animationController.stop();
 
     super.dispose();
   }
@@ -90,8 +96,8 @@ class _ClockWidgetState extends State<ClockWidget>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Colors.blue.shade700,
-                Colors.blue.shade900,
+                Colors.grey.shade800,
+                Colors.blueAccent,
               ],
             ),
             borderRadius: BorderRadius.circular(12),
