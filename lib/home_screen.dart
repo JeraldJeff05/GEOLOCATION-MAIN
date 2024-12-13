@@ -265,15 +265,16 @@ class _HomeScreenState extends State<HomeScreen> {
       onTap: isDisabled
           ? null
           : () {
-        if (isLogout) {
-          _showLogoutConfirmationDialog(); // Show logout confirmation dialog
-        } else if (destination != null) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => destination));
-        }
-      },
+              if (isLogout) {
+                _showLogoutConfirmationDialog(); // Show logout confirmation dialog
+              } else if (destination != null) {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => destination));
+              }
+            },
     );
   }
+
   void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
@@ -306,7 +307,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
-
 
   Widget _buildProfileInfo() {
     return Card(
@@ -649,22 +649,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: 300,
-                            maxWidth: 700,
-                            minHeight: 300,
-                            maxHeight: 350,
-                          ),
-                          child: SizedBox(
-                            height: screenHeight * 0.5, // Dynamically adjust height
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: 300,
+                              maxWidth: 700,
+                              maxHeight: screenHeight * 0.5,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -731,20 +729,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 40),
-                      Flexible(
-                        flex: 1,
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: 400,
-                            maxWidth: 530,
-                            minHeight: 300,
-                            maxHeight: 350,
-                          ),
-                          child: SizedBox(
-                            width: screenWidth * 0.6,
-                            height: screenHeight * 0.5,
+                        const SizedBox(width: 40),
+                        Flexible(
+                          flex: 1,
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: 400,
+                              maxWidth: 700,
+                              maxHeight: screenHeight * 0.5,
+                            ),
                             child: Card(
                               elevation: 4,
                               shape: RoundedRectangleBorder(
@@ -755,37 +748,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decoration: const BoxDecoration(
                                   color: Color(0xff28658a),
                                 ),
-                                child: Column(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                KanbanImageDetailPage(),
-                                          ),
-                                        );
-                                      },
-                                      child: Hero(
-                                        tag: 'kanban_image',
-                                        child: Image.asset(
-                                          'assets/kanbanpic.jpg',
-                                          width: screenWidth * 0.85,
-                                          height: screenHeight * 0.38,
-                                          fit: BoxFit.cover,
-                                        ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            KanbanImageDetailPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: 'kanban_image',
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(16),
+                                      child: Image.asset(
+                                        'assets/kanbanpic.jpg',
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        fit: BoxFit.cover,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
