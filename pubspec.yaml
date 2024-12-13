@@ -53,6 +53,7 @@ dependencies:
   glassmorphism: ^2.0.0    # Replace with the latest version
   syncfusion_flutter_charts: ^27.2.3
   animations: ^2.0.7
+  animate_do: ^3.3.4
   
     
 

@@ -5,6 +5,7 @@ import 'dart:async';
 import 'front_page.dart';
 import 'home_screen.dart';
 import 'admin_page.dart';
+import 'package:animate_do/animate_do.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        //'/start': (context) => const StartScreen(),
+        '/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -44,16 +45,59 @@ class StartScreen extends StatefulWidget {
   _StartScreenState createState() => _StartScreenState();
 }
 
-class _StartScreenState extends State<StartScreen> {
+class _StartScreenState extends State<StartScreen>
+    with SingleTickerProviderStateMixin {
   double _opacity = 0.0;
   final LocationService _locationService = LocationService();
   String _message = "";
   bool _showButton = true;
-  bool _showLoadingOverlay = false; // New flag for overlay visibility
+  bool _showLoadingOverlay = false;
   late Timer _typingTimer;
   int _messageIndex = 0;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<Offset> _slideAnimation;
 
-  // Method to start typing animation
+  @override
+  void initState() {
+    super.initState();
+
+    // Setup animation controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    // Create scale animation
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    // Create slide animation
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(1, 0),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutQuart,
+      ),
+    );
+
+    // Start the initial animation
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _typingTimer.cancel();
+    _animationController.dispose();
+    super.dispose();
+  }
+
   void _startTypingAnimation(String message, VoidCallback onComplete) {
     _messageIndex = 0;
 
@@ -128,25 +172,39 @@ class _StartScreenState extends State<StartScreen> {
     );
   }
 
-  @override
-  void dispose() {
-    _typingTimer.cancel();
-    super.dispose();
-  }
+  // ... [previous method implementations remain unchanged]
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
-          Image.asset(
-            'assets/startpagebg.png',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
+          // Animated background with gradient effect
+          TweenAnimationBuilder<double>(
+            duration: const Duration(seconds: 2),
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.blue.withOpacity(0.9 * value),
+                      Colors.black.withOpacity(0.9 * value),
+                    ],
+                  ),
+                  image: DecorationImage(
+                    image: AssetImage('assets/startpagebg.png'),
+                    fit: BoxFit.cover,
+                    opacity: 0.5 * value,
+                  ),
+                ),
+              );
+            },
           ),
-          // Dark overlay
+
+          // Loading overlay - remains the same as in original code
           if (_showLoadingOverlay)
             AnimatedOpacity(
               opacity: 0.8,
@@ -155,43 +213,68 @@ class _StartScreenState extends State<StartScreen> {
                 color: Colors.black.withOpacity(0.8),
               ),
             ),
-          // Loading GIF and message
+
+          // Animated loading content
           if (_showLoadingOverlay)
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Image.asset(
-                    'assets/rollingball.gif',
-                    width: 300,
-                    height: 200,
+                  // Pulsating loading GIF
+                  Pulse(
+                    child: Image.asset(
+                      'assets/rollingball.gif',
+                      width: 300,
+                      height: 200,
+                    ),
                   ),
                   const SizedBox(height: 5),
-                  Text(
-                    _message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  // Typing text animation
+                  FadeIn(
+                    child: Text(
+                      _message,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 10.0,
+                            color: Colors.blue,
+                            offset: Offset(0, 0),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          // Get Started button
+
+          // Animated Get Started button
           if (_showButton)
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 90, left: 250), // Adjust the padding values as needed
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: GestureDetector(
-                  onTap: _fadeOutAndNavigate,
-                  child: Image.asset(
-                    'assets/cleansilvbut.png',
-                    width: 170,
-                    height: 130,
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 90, left: 250),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: ElasticIn(
+                      child: GestureDetector(
+                        onTap: _fadeOutAndNavigate,
+                        child: Container(
+                          decoration: BoxDecoration(),
+                          child: Image.asset(
+                            'assets/cleansilvbut.png',
+                            width: 170,
+                            height: 130,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
