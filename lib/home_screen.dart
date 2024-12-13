@@ -274,36 +274,39 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
   void _showLogoutConfirmationDialog() {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Log Out"),
-          content: Text("Do you want to log out?"),
-          actions: [
+          title: const Text("Confirm Logout"),
+          content: const Text("Are you sure you want to log out?"),
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                _logout(); // Call the logout method
-                Navigator.of(context).pop(); // Close the dialog
+                _logout(); // Call the logout function
               },
-              child: Text("Log Out"),
+              child: const Text("Logout"),
             ),
           ],
         );
       },
     );
   }
+
   void _logout() {
-    Navigator.of(context).pushReplacementNamed('/');
+    // Perform any logout logic here (e.g., clear user data, session, etc.)
+    // Then navigate to the homepage (root screen)
+
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
   }
+
 
   Widget _buildProfileInfo() {
     return Card(
