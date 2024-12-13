@@ -116,7 +116,8 @@ class _InputPointsScreenState extends State<InputPointsScreen> {
         // Determine layout based on screen width
         bool isWideScreen = constraints.maxWidth > 1200;
         bool isMediumScreen =
-            constraints.maxWidth > 800 && constraints.maxWidth <= 1200;
+            constraints.maxWidth > 800 && constraints.maxWidth <= 1200 ||
+                constraints.maxHeight > 400;
 
         return Scaffold(
           appBar: AppBar(

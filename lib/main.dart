@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        '/start': (context) => const StartScreen(),
+        //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -187,17 +187,16 @@ class _StartScreenState extends State<StartScreen>
               return Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    begin: Alignment.bottomRight,
                     colors: [
-                      Colors.blue.withOpacity(0.9 * value),
-                      Colors.black.withOpacity(0.9 * value),
+                      Colors.grey.withOpacity(0.9 * value),
+                      Colors.black.withOpacity(0.8 * value),
                     ],
                   ),
                   image: DecorationImage(
                     image: AssetImage('assets/startpagebg.png'),
                     fit: BoxFit.cover,
-                    opacity: 0.5 * value,
+                    opacity: 0.8 * value,
                   ),
                 ),
               );
@@ -262,15 +261,64 @@ class _StartScreenState extends State<StartScreen>
                   padding: EdgeInsets.only(top: 90, left: 250),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: ElasticIn(
-                      child: GestureDetector(
-                        onTap: _fadeOutAndNavigate,
-                        child: Container(
-                          decoration: BoxDecoration(),
-                          child: Image.asset(
-                            'assets/cleansilvbut.png',
-                            width: 170,
-                            height: 130,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withOpacity(0.7),
+                            Colors.grey.withOpacity(0.8),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.5),
+                            spreadRadius: 1,
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(15),
+                          splashColor: Colors.white.withOpacity(0.3),
+                          highlightColor: Colors.white.withOpacity(0.2),
+                          onTap: _fadeOutAndNavigate,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 5),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  '    Get Started',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 5.0,
+                                        color: Colors.black.withOpacity(0.3),
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white.withOpacity(0.8),
+                                  size: 25,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

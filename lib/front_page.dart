@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:animate_do/animate_do.dart';
 import 'api/api_login.dart';
 import 'admin_page.dart';
 import 'api/api_service.dart';
-import 'location/location_service.dart'; // Import AdminPage
+import 'location/location_service.dart';
 import 'home_screen.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -15,11 +16,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  // Existing state variables remain the same
   final _formKey = GlobalKey<FormState>();
   String? _username, _password;
-
   bool _showLoginForm = false;
-  bool _isLoading = false; // Loading indicator state
+  bool _isLoading = false;
 
   late AnimationController _animationController;
   late Animation<Offset> _buttonAnimation;
@@ -30,7 +31,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // Initialize animation controller for button
+    // Existing animation controllers remain the same
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -44,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       curve: Curves.easeInOut,
     ));
 
-    // Initialize shake animation controller
     _shakeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -58,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       curve: Curves.elasticIn,
     ));
 
-    // Delayed animations for login form appearance
+    // Enhanced initial animation sequence
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {});
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -68,6 +68,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       });
     });
   }
+
+  // All existing methods (_login, _showDialog, etc.) remain unchanged
 
   void _login() async {
     if (_formKey.currentState?.validate() ?? false) {
@@ -180,45 +182,73 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   @override
-  void dispose() {
-    _animationController.dispose();
-    _shakeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Stack(
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/LoginNoLogoBg.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              // Animated background with parallax effect
+              TweenAnimationBuilder<double>(
+                duration: const Duration(seconds: 3),
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/LoginNoLogoBg.png'),
+                        fit: BoxFit.cover,
+                        colorFilter: ColorFilter.mode(
+                          Colors.black.withOpacity(0.5 * (1 - value)),
+                          BlendMode.darken,
+                        ),
+                        alignment: Alignment(
+                          0.5 * (1 - value), // Slight parallax movement
+                          0.0,
+                        ),
+                      ),
+                    ),
+                    // Animated blur effect
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 5 * (1 - value),
+                        sigmaY: 5 * (1 - value),
+                      ),
+                      child: Container(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                  );
+                },
               ),
+
+              // Positioned login form with enhanced animations
               Positioned(
                 right: 55,
-                // 5% from the right on narrow screens
                 top: 0,
                 bottom: 20,
-
                 child: Center(
                   child: SingleChildScrollView(
-                    child: Opacity(
-                      opacity: _showLoginForm ? 1.0 : 0.0,
-                      child: _buildLoginForm(constraints),
+                    child: ZoomIn(
+                      duration: const Duration(milliseconds: 800),
+                      child: Opacity(
+                        opacity: _showLoginForm ? 1.0 : 0.0,
+                        child: _buildLoginForm(constraints),
+                      ),
                     ),
                   ),
                 ),
               ),
+
+              // Loading indicator with pulsing effect
               if (_isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
+                Center(
+                  child: Pulse(
+                    child: const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      strokeWidth: 6,
+                    ),
+                  ),
                 ),
             ],
           );
@@ -228,18 +258,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildLoginForm(BoxConstraints constraints) {
-    // Calculate responsive width
     final containerWidth = constraints.maxWidth > 600
-        ? constraints.maxWidth * 0.4 // Wider screens get 40% width
-        : constraints.maxWidth * 0.9; // Narrow screens get 90% width
+        ? constraints.maxWidth * 0.4
+        : constraints.maxWidth * 0.9;
 
     return SlideTransition(
       position: _shakeAnimation,
       child: Container(
         width: containerWidth,
         constraints: BoxConstraints(
-          maxWidth: 600, // Maximum width to prevent excessive stretching
-          minWidth: 500, // Minimum width to ensure readability
+          maxWidth: 600,
+          minWidth: 500,
         ),
         padding: const EdgeInsets.only(bottom: 80, right: 10, left: 10),
         decoration: BoxDecoration(
@@ -247,10 +276,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 0),
+              color: Colors.black.withOpacity(0),
+              spreadRadius: 5,
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
           ],
         ),
@@ -260,49 +289,63 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 5),
-              ClipRect(
-                child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Image.asset(
-                    'assets/FLlogo.png',
-                    width: 350,
-                    height: 110,
-                    fit: BoxFit.cover,
+              // Bouncing logo animation
+              BounceInDown(
+                child: ClipRect(
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Image.asset(
+                      'assets/FLlogo.png',
+                      width: 350,
+                      height: 110,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
-              _buildTextFieldWithValidation(
-                icon: Icons.person,
-                labelText: '',
-                hintText: 'User ID',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your ID number';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _username = value,
-                width: containerWidth * 0.8,
+              // Animated text fields with staggered entry
+              FadeInLeft(
+                delay: const Duration(milliseconds: 800),
+                child: _buildTextFieldWithValidation(
+                  icon: Icons.person,
+                  labelText: '',
+                  hintText: 'User ID',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your ID number';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _username = value,
+                  width: containerWidth * 0.8,
+                ),
               ),
               const SizedBox(height: 16),
-              _buildTextFieldWithValidation(
-                icon: Icons.lock,
-                labelText: '',
-                hintText: 'Password',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-                onSaved: (value) => _password = value,
-                obscureText: true,
-                onSubmit: _login,
-                width: containerWidth * 0.8,
+              FadeInRight(
+                delay: const Duration(milliseconds: 800),
+                child: _buildTextFieldWithValidation(
+                  icon: Icons.lock,
+                  labelText: '',
+                  hintText: 'Password',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _password = value,
+                  obscureText: true,
+                  onSubmit: _login,
+                  width: containerWidth * 0.8,
+                ),
               ),
               const SizedBox(height: 32),
-              _buildGifButton(_login),
+              // Animated login button
+              FadeInUp(
+                delay: const Duration(milliseconds: 600),
+                child: _buildGifButton(_login),
+              ),
             ],
           ),
         ),
@@ -375,3 +418,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 }
+
+// Existing _buildGifButton and _buildTextFieldWithValidation methods remain unchanged
+// ... [rest of the code remains the same]
