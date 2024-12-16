@@ -1,4 +1,3 @@
-// quotes.dart
 
 class Quote {
   final String text;
