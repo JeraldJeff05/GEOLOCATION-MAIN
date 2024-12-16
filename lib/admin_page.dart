@@ -571,7 +571,7 @@ class _AdminPageState extends State<AdminPage>
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NamesList()),
+                  MaterialPageRoute(builder: (context) => AboutUsPage()),
                 );
               },
             ),

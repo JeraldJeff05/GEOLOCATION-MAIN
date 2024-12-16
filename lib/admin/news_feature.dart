@@ -29,7 +29,7 @@ class NewsFeature extends StatelessWidget {
           const SizedBox(height: 50),
           TextButton(
             onPressed: () {},
-            child: const Text('News Feature 1',
+            child: const Text('Not Yet Available :(',
                 style: TextStyle(color: Colors.white)),
           ),
         ],

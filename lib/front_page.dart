@@ -418,6 +418,3 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 }
-
-// Existing _buildGifButton and _buildTextFieldWithValidation methods remain unchanged
-// ... [rest of the code remains the same]

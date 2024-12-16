@@ -86,7 +86,7 @@ class _ClockWidgetState extends State<ClockWidget>
         DateFormat('MMM dd, yyyy').format(_currentTime);
 
     // Check screen size for responsive design
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 1425;
+    final bool isSmallScreen = MediaQuery.of(context).size.width < 1440;
 
     return LayoutBuilder(
       builder: (context, constraints) {
