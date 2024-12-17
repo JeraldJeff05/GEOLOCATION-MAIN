@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/start',
       routes: {
-        '/start': (context) => const StartScreen(),
+        //'/start': (context) => const StartScreen(),
         '/': (context) => const MyHomePage(),
         '/home': (context) => HomeScreen(),
         '/admin': (context) => const AdminPage(),
@@ -47,7 +47,6 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen>
     with SingleTickerProviderStateMixin {
-  double _opacity = 0.0;
   final LocationService _locationService = LocationService();
   String _message = "";
   bool _showButton = true;

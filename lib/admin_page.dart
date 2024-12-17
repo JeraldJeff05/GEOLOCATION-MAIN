@@ -11,6 +11,7 @@ import 'admin/quote_of_the_day.dart';
 import 'admin/news_feature.dart';
 import 'package:intl/intl.dart';
 import 'admin/info_devs.dart';
+import 'package:geolocator/geolocator.dart';
 
 class AdminPage extends StatefulWidget {
   final String? firstName;
@@ -31,7 +32,7 @@ class _AdminPageState extends State<AdminPage>
   final List<String> _pageTitles = [
     'Employees Log',
     'Geofencing',
-    'Clock',
+    'Dashboard',
     'Change Geofence',
     'Register',
   ];
@@ -76,7 +77,7 @@ class _AdminPageState extends State<AdminPage>
         return EmployeesLogWidget();
       case 'Geofencing':
         return const GeofencingWidget();
-      case 'Clock':
+      case 'Dashboard':
         return const ClockWidget();
       case 'Change Geofence':
         return InputPointsScreen();
@@ -553,12 +554,48 @@ class _AdminPageState extends State<AdminPage>
           children: [
             DrawerHeader(
               child: Center(
-                child: Text(
-                  '${widget.firstName} ${widget.lastName}',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${widget.firstName} ${widget.lastName}',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    FutureBuilder<Map<String, double>>(
+                      future: _getCurrentLocation(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Text(
+                            'Fetching location...',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          );
+                        } else if (snapshot.hasError) {
+                          return const Text(
+                            'Error fetching location',
+                            style: TextStyle(color: Colors.red, fontSize: 16),
+                          );
+                        } else if (snapshot.hasData) {
+                          final data = snapshot.data!;
+                          return Text(
+                            'Lat: ${data['latitude']}, Long: ${data['longitude']}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 16),
+                            textAlign: TextAlign.center,
+                          );
+                        } else {
+                          return const Text(
+                            'Location unavailable',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
               decoration: const BoxDecoration(
@@ -587,5 +624,34 @@ class _AdminPageState extends State<AdminPage>
         ),
       ),
     );
+  }
+
+  Future<Map<String, double>> _getCurrentLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return Future.error('Location services are disabled.');
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        return Future.error('Location permissions are permanently denied.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+      return {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+      };
+    } catch (e) {
+      throw 'Error: $e';
+    }
   }
 }

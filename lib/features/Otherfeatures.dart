@@ -57,96 +57,95 @@ class _OtherFeaturesState extends State<OtherFeatures> {
               ],
             ),
           ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: 600, // Minimum width
-              maxWidth: 1300, // Maximum width
-              minHeight: 700, // Minimum height
-              maxHeight: 800, // Maximum height
-            ),
-            child: FittedBox(
-              child: Align(
-                alignment: Alignment.center, // Center both horizontally and vertically
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildFeatureContainer(
-                      image: 'geo1.png',
-                      title: 'Real-Time Location Tracking',
-                      isHovering: isHoveringFirst,
-                      onHover: (hovering) {
-                        setState(() {
-                          isHoveringFirst = hovering;
-                        });
-                      },
-                      isHoveringLearnMore: isHoveringLearnMoreFirst,
-                      onHoverLearnMore: (hovering) {
-                        setState(() {
-                          isHoveringLearnMoreFirst = hovering;
-                        });
-                      },
-                      onLearnMoreTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RealTimeLocationInfoScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 50),
-                    _buildFeatureContainer(
-                      image: 'geo2.png',
-                      title: 'Geofencing',
-                      isHovering: isHoveringSecond,
-                      onHover: (hovering) {
-                        setState(() {
-                          isHoveringSecond = hovering;
-                        });
-                      },
-                      isHoveringLearnMore: isHoveringLearnMoreSecond,
-                      onHoverLearnMore: (hovering) {
-                        setState(() {
-                          isHoveringLearnMoreSecond = hovering;
-                        });
-                      },
-                      onLearnMoreTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => GeofencingScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(width: 50),
-                    _buildFeatureContainer(
-                      image: 'geo3.png',
-                      title: 'Location-Based Service',
-                      isHovering: isHoveringThird,
-                      onHover: (hovering) {
-                        setState(() {
-                          isHoveringThird = hovering;
-                        });
-                      },
-                      isHoveringLearnMore: isHoveringLearnMoreThird,
-                      onHoverLearnMore: (hovering) {
-                        setState(() {
-                          isHoveringLearnMoreThird = hovering;
-                        });
-                      },
-                      onLearnMoreTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LocationBasedServicesScreen(),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                bool isSmallScreen = constraints.maxWidth < 800;
+                return SingleChildScrollView(
+                  child: Wrap(
+                    direction: isSmallScreen ? Axis.vertical : Axis.horizontal,
+                    alignment: WrapAlignment.center,
+                    spacing: isSmallScreen ? 0 : 50,
+                    runSpacing: isSmallScreen ? 20 : 0,
+                    children: [
+                      _buildFeatureContainer(
+                        image: 'geo1.png',
+                        title: 'Real-Time Location Tracking',
+                        isHovering: isHoveringFirst,
+                        onHover: (hovering) {
+                          setState(() {
+                            isHoveringFirst = hovering;
+                          });
+                        },
+                        isHoveringLearnMore: isHoveringLearnMoreFirst,
+                        onHoverLearnMore: (hovering) {
+                          setState(() {
+                            isHoveringLearnMoreFirst = hovering;
+                          });
+                        },
+                        onLearnMoreTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  RealTimeLocationInfoScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildFeatureContainer(
+                        image: 'geo2.png',
+                        title: 'Geofencing',
+                        isHovering: isHoveringSecond,
+                        onHover: (hovering) {
+                          setState(() {
+                            isHoveringSecond = hovering;
+                          });
+                        },
+                        isHoveringLearnMore: isHoveringLearnMoreSecond,
+                        onHoverLearnMore: (hovering) {
+                          setState(() {
+                            isHoveringLearnMoreSecond = hovering;
+                          });
+                        },
+                        onLearnMoreTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GeofencingScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      _buildFeatureContainer(
+                        image: 'geo3.png',
+                        title: 'Location-Based Service',
+                        isHovering: isHoveringThird,
+                        onHover: (hovering) {
+                          setState(() {
+                            isHoveringThird = hovering;
+                          });
+                        },
+                        isHoveringLearnMore: isHoveringLearnMoreThird,
+                        onHoverLearnMore: (hovering) {
+                          setState(() {
+                            isHoveringLearnMoreThird = hovering;
+                          });
+                        },
+                        onLearnMoreTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  LocationBasedServicesScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           )
         ],
@@ -163,99 +162,102 @@ class _OtherFeaturesState extends State<OtherFeatures> {
     required void Function(bool) onHoverLearnMore,
     required VoidCallback onLearnMoreTap,
   }) {
-    return MouseRegion(
-      onEnter: (_) => onHover(true),
-      onExit: (_) => onHover(false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeInOut,
-        width: isHovering ? 400 : 380,
-        height: isHovering ? 670 : 650,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(5),
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: isHovering
-                ? [Colors.lightBlueAccent, Color(0xFF90e0ef)]
-                : [Color(0xFF90e0ef), Colors.lightBlue],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10), // Add vertical spacing
+      child: MouseRegion(
+        onEnter: (_) => onHover(true),
+        onExit: (_) => onHover(false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+          width: isHovering ? 400 : 380,
+          height: isHovering ? 670 : 650,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(5),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isHovering
+                  ? [Colors.lightBlueAccent, Color(0xFF90e0ef)]
+                  : [Color(0xFF90e0ef), Colors.lightBlue],
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Image.asset(
-              image,
-              width: 220,
-              height: 220,
-            ),
-            const SizedBox(height: 20),
-            Column(
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset(
+                image,
+                width: 220,
+                height: 220,
+              ),
+              const SizedBox(height: 20),
+              Column(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _getDescription(title),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 19,
+                  const SizedBox(height: 8),
+                  Text(
+                    _getDescription(title),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 19,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            MouseRegion(
-              onEnter: (_) => onHoverLearnMore(true),
-              onExit: (_) => onHoverLearnMore(false),
-              child: GestureDetector(
-                onTap: onLearnMoreTap,
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 100),
-                  curve: Curves.easeInOut,
-                  width: 320,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    gradient: isHoveringLearnMore
-                        ? LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.blue.shade500,
-                              Colors.blue.shade500,
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Color(0xFF023e8a),
-                              Color(0xFF023e8a),
-                            ],
-                          ),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'Learn more',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
+                ],
+              ),
+              const SizedBox(height: 20),
+              MouseRegion(
+                onEnter: (_) => onHoverLearnMore(true),
+                onExit: (_) => onHoverLearnMore(false),
+                child: GestureDetector(
+                  onTap: onLearnMoreTap,
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 100),
+                    curve: Curves.easeInOut,
+                    width: 320,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      gradient: isHoveringLearnMore
+                          ? LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Colors.blue.shade500,
+                                Colors.blue.shade500,
+                              ],
+                            )
+                          : LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color(0xFF023e8a),
+                                Color(0xFF023e8a),
+                              ],
+                            ),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Learn more',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

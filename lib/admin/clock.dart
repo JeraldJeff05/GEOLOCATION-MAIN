@@ -41,7 +41,7 @@ class _ClockWidgetState extends State<ClockWidget>
     _performanceData = _generateRandomData();
 
     // Update every second
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
         _currentTime = DateTime.now();
         // Randomly update performance data
@@ -55,11 +55,11 @@ class _ClockWidgetState extends State<ClockWidget>
     // Cancel the timer if it's active
     _timer?.cancel();
 
-    // Stop the animation controller
+    // Stop the animation controller before disposing
+    _animationController.stop();
 
     // Dispose of the animation controller
     _animationController.dispose();
-    _animationController.stop();
 
     super.dispose();
   }
@@ -85,12 +85,24 @@ class _ClockWidgetState extends State<ClockWidget>
     final String formattedDate =
         DateFormat('MMM dd, yyyy').format(_currentTime);
 
-    // Check screen size for responsive design
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 1440;
+    // Get screen width and height
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    // Determine responsive sizing
+    bool isVerySmallScreen = screenWidth < 600;
+    bool isNarrowScreen = screenWidth >= 600 && screenWidth < 1000;
+    bool isWideScreen = screenWidth >= 1000;
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return Container(
+          constraints: BoxConstraints(
+            maxWidth: screenWidth > 1430 ? 1430 : double.infinity,
+            maxHeight:
+                screenHeight * 0.9, // Limit height to 90% of screen height
+          ),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
@@ -111,145 +123,167 @@ class _ClockWidgetState extends State<ClockWidget>
             ],
           ),
           padding: EdgeInsets.symmetric(
-            horizontal: isSmallScreen ? 12 : 20,
-            vertical: isSmallScreen ? 10 : 15,
+            horizontal: isVerySmallScreen ? 8 : (isNarrowScreen ? 12 : 20),
+            vertical: isVerySmallScreen ? 8 : (isNarrowScreen ? 10 : 15),
           ),
           margin: const EdgeInsets.all(8),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Top Row with Time and Location (Same as before)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Time Column
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+              // Top Row with Time and Location
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Time Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.access_time,
-                            color: Colors.white,
-                            size: isSmallScreen ? 20 : 25,
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  color: Colors.white,
+                                  size: isVerySmallScreen ? 16 : 25,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  formattedTime,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: isVerySmallScreen ? 16 : 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            formattedTime,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: isSmallScreen ? 20 : 25,
-                              fontWeight: FontWeight.bold,
+                          const SizedBox(height: 4),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '$formattedDay, $formattedDate',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: isVerySmallScreen ? 10 : 14,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$formattedDay, $formattedDate',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: isSmallScreen ? 12 : 14,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
 
-                  // Location Column
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Row(
+                    // Location Column
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.location_on,
-                            color: Colors.white70,
-                            size: isSmallScreen ? 16 : 20,
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_on,
+                                  color: Colors.white70,
+                                  size: isVerySmallScreen ? 14 : 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'San Pablo City, Philippines HQ',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: isVerySmallScreen ? 10 : 14,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'San Pablo City, Philippines HQ',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: isSmallScreen ? 12 : 14,
+                          const SizedBox(height: 4),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              'Corporate Dashboard',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: isVerySmallScreen ? 8 : 12,
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Corporate Dashboard',
-                        style: TextStyle(
-                          color: Colors.white54,
-                          fontSize: isSmallScreen ? 10 : 12,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
 
               // Animated Performance Graph
               const SizedBox(height: 10),
-              AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return Container(
-                    height: isSmallScreen ? 245 : 330,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SfCartesianChart(
-                        primaryXAxis: DateTimeAxis(
-                          intervalType: DateTimeIntervalType.minutes,
-                          labelStyle: const TextStyle(color: Colors.white54),
-                          axisLine: const AxisLine(color: Colors.white24),
-                        ),
-                        primaryYAxis: NumericAxis(
-                          title: AxisTitle(
-                            text: 'Performance',
-                            textStyle: const TextStyle(color: Colors.white70),
+              Expanded(
+                flex: 3,
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white10,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SfCartesianChart(
+                          primaryXAxis: DateTimeAxis(
+                            intervalType: DateTimeIntervalType.minutes,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            axisLine: const AxisLine(color: Colors.white24),
                           ),
-                          labelStyle: const TextStyle(color: Colors.white54),
-                          axisLine: const AxisLine(color: Colors.white24),
-                        ),
-                        series: <CartesianSeries<PerformanceData, DateTime>>[
-                          SplineAreaSeries<PerformanceData, DateTime>(
-                            dataSource: _performanceData,
-                            xValueMapper: (PerformanceData data, _) =>
-                                data.time,
-                            yValueMapper: (PerformanceData data, _) =>
-                                data.value,
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white
-                                    .withOpacity(0.7 * _animation.value),
-                                Colors.white
-                                    .withOpacity(0.2 * _animation.value),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
+                          primaryYAxis: NumericAxis(
+                            title: AxisTitle(
+                              text: 'Performance',
+                              textStyle: const TextStyle(color: Colors.white70),
                             ),
-                            borderColor: Colors.white,
-                            borderWidth: 2,
+                            labelStyle: const TextStyle(color: Colors.white54),
+                            axisLine: const AxisLine(color: Colors.white24),
                           ),
-                        ],
-                        tooltipBehavior: TooltipBehavior(
-                          enable: true,
-                          header: 'Performance',
-                          canShowMarker: true,
-                          format: 'point.x : point.y',
-                          textStyle: const TextStyle(color: Colors.black),
+                          series: <CartesianSeries<PerformanceData, DateTime>>[
+                            SplineAreaSeries<PerformanceData, DateTime>(
+                              dataSource: _performanceData,
+                              xValueMapper: (PerformanceData data, _) =>
+                                  data.time,
+                              yValueMapper: (PerformanceData data, _) =>
+                                  data.value,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white
+                                      .withOpacity(0.7 * _animation.value),
+                                  Colors.white
+                                      .withOpacity(0.2 * _animation.value),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                              borderColor: Colors.white,
+                              borderWidth: 2,
+                            ),
+                          ],
+                          tooltipBehavior: TooltipBehavior(
+                            enable: true,
+                            header: 'Performance',
+                            canShowMarker: true,
+                            format: 'point.x : point.y',
+                            textStyle: const TextStyle(color: Colors.black),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ],
           ),

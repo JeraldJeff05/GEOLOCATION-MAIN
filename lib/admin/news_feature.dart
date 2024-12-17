@@ -19,6 +19,15 @@ class NewsFeature extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
+            'WE LISTEN WE ANTICIPATE WE DELIVER',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
             'News Features',
             style: TextStyle(
               fontSize: 18,
@@ -26,7 +35,7 @@ class NewsFeature extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
           TextButton(
             onPressed: () {},
             child: const Text('Not Yet Available :(',

@@ -111,6 +111,10 @@ flutter:
     - assets/kanbanpic.jpg
     - assets/LBSvid.mp4
     - assets/RTLTvid.mp4
+    - assets/team/vincent.jpeg
+    - assets/team/kyle.webp
+    - assets/team/jeff.webp
+    - assets/team/ady.jpeg
   
   fonts:  
     - family: CustomFont

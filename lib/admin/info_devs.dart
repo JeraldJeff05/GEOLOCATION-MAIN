@@ -8,7 +8,7 @@ class AboutUsPage extends StatelessWidget {
       role: 'Team Leader,Frontend Developer,UI/UX Designer',
       bio:
           'Leads with a holistic approach, managing both development and design',
-      imagePath: 'assets/images/john_doe.jpg',
+      imagePath: 'assets/team/jeff.webp',
       skills: [
         'Flutter',
         'Frontend Architecture',
@@ -23,7 +23,7 @@ class AboutUsPage extends StatelessWidget {
       role: 'Frontend Developer, UI/UX Designer',
       bio:
           'Focuses on front-end refinement and employee dashboard functionalities.',
-      imagePath: 'assets/images/emily_chen.jpg',
+      imagePath: 'assets/team/kyle.webp',
       skills: ['Flutter', 'User Research'],
       socialLinks: {'Dribbble': '', 'Behance': ''},
     ),
@@ -32,7 +32,7 @@ class AboutUsPage extends StatelessWidget {
       role: 'Backend Developer, Database Manager',
       bio:
           'Architecting robust and scalable backend systems that power our applications.',
-      imagePath: 'assets/images/michael_rodriguez.jpg',
+      imagePath: 'assets/team/ady.jpeg',
       skills: [
         'Go language',
         'Database Optimization',
@@ -45,7 +45,7 @@ class AboutUsPage extends StatelessWidget {
       name: 'Vincent Canilao',
       role: 'Quality Assurance, Support Role',
       bio: 'Supports and verifies the functionality, playing a QA role.',
-      imagePath: 'assets/images/sophia_kim.jpg',
+      imagePath: 'assets/team/vincent.jpeg',
       skills: ['System Testing', 'Website polishing'],
       socialLinks: {'LinkedIn': '', 'Twitter': ''},
     ),
@@ -148,8 +148,9 @@ class _TeamMemberCardState extends State<TeamMemberCard> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                Theme.of(context).colorScheme.secondary.withOpacity(0.7),
+                Color(0xFF333A3A)
+                    .withOpacity(0.7), // Replace with your desired color
+                Color(0xFF333A3A).withOpacity(0.7),
               ],
             ),
           ),

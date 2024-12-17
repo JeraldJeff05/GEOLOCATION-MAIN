@@ -13,7 +13,7 @@ class QuoteOfTheDay extends StatelessWidget {
       "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it; and this you have the power to revoke at any moment.",
       "You learn more from failure than from success. Don't let it stop you. Failure builds character.                                                                      ",
       "Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth.                                                                     ",
-      "If you are working on something that you really care about, you don't have to be pushed. The vision pulls you.                                                       ",
+      "If you are working on something that you really care about, you don't have to be pushed. The vision pulls you.                                                        ",
     ];
 
     // Randomly select a quote
@@ -35,6 +35,15 @@ class QuoteOfTheDay extends StatelessWidget {
             MainAxisSize.min, // Ensures the container fits its content
         children: [
           const Text(
+            'WE LISTEN WE ANTICIPATE WE DELIVER',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
             'Quote of the Day',
             style: TextStyle(
               fontSize: 18,
@@ -42,7 +51,7 @@ class QuoteOfTheDay extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             randomQuote,
             style: const TextStyle(
